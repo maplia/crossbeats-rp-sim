@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, user-scalable=noinitial-scale=1, maximum-scale=1"/>
+		<meta name="generator" content="<!--PRESET_ENGINE_NAME-->"/>
+		<meta name="robots" content="noindex, nofollow"/>
+		<link rel="stylesheet" type="text/css" href="<!--PRESET_SITE_STYLE-->"/>
+		<title>ユーザー登録 - <!--PRESET_SITE_NAME--></title>
+    <script type="text/javascript" src="http://maplia.jp/script/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript" src="http://maplia.jp/script/jquery.disableOnSubmit.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        $("form").disableOnSubmit();
+      });
+    </script>
+    <%= make_tracker %>
+	</head>
+
+	<body>
+		<p class="top_navi"><a href="<%= SITE_TOP_URI %>">トップ</a> &gt; ユーザー登録</p>
+		<h1>ユーザー登録</h1>
+
+		<form method="post" action="<%= USER_ADD_URI %>">
+			<p><em>*印</em>がついている項目は入力必須項目です</p>
+
+			<%= user.to_html_edit %>
+
+			<p>
+				<input type="submit" value="次へ進む"/>
+				<input type="reset" value="入力リセット"/>
+			</p>
+		</form>
+
+		<!--PRESET_FOOTER-->
+	</body>
+</html>

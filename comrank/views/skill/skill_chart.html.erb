@@ -1,0 +1,70 @@
+<p class="top_navi"><a href="<%= SITE_TOP_URI %>"><%= $mobile ? '' : $config.name %> トップ</a> &gt; クリア状況表</p>
+<h1>クリア状況表</small></h1>
+
+<% if last_modified %>
+  <p class="last_modified">最終更新時刻: <%= last_modified.strftime('%Y-%m-%d %H:%M:%S') %></p>
+<% end %>
+
+<%= user.to_html(false) %>
+
+<div class="unit">
+  <h2>クリア状況</h2>
+  <div class="subunit">
+    <table>
+      <tbody>
+        <tr>
+          <th>クリア譜面数</th>
+          <td class="mark" style="width: 7.0em"><%= cleared_stage_count %>譜面</td>
+          <% if $config.rev_mode? %>
+            <th>MASTER以上クリア譜面数</th>
+          <% else %>
+            <th>MASTERクリア譜面数</th>
+          <% end %>
+          <td class="mark" style="width: 7.0em"><%= cleared_master_count %>曲</td>
+        </tr>
+        <tr>
+          <th>Sランク以上クリア譜面数</th>
+          <td class="mark"><%= srank_stage_count %>譜面</td>
+          <th>最高クリアレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, cleared_max_level) %></td>
+        </tr>
+        <tr>
+          <th>フルコンボ譜面数</th>
+          <td class="mark"><%= fullcombo_stage_count %>譜面</td>
+          <th>最高フルコンボレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, fullcombo_max_level) %></td>
+        </tr>
+        <tr>
+          <th>ULTIMATEクリア譜面数</th>
+          <td class="mark" style="width: 7.0em"><%= ultimate_stage_count %>譜面</td>
+          <th>最高ULTIMATEクリアレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, ultimate_max_level) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="unit">
+  <h2>曲リスト</h2>
+	<div class="subunit">
+		<table class="chart">
+			<thead>
+				<tr>
+					<% if $config.cxb_mode? %>
+					  <th>#</th>
+					<% end %>
+   				<th class="title">タイトル</th>
+		    	<% $config.music_diffs.keys.sort.each do |diff| %>
+				    <th colspan="2" class="<%= $config.music_diffs[diff].downcase %>"><%= $config.music_diffs[diff] %></th>
+			    <% end %>
+		    </tr>
+    	</thead>
+	    <tbody>
+      <% skills.each do |skill| %>
+        <%= skill.to_html_chart %>
+      <% end %>
+      </tbody>
+	  </table>
+	</div>
+</div>

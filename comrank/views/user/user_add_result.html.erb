@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta http-equiv="Content-Style-Type" content="text/css"/>
+		<meta http-equiv="Content-Script-Type" content="text/javascript"/>
+		<meta name="generator" content="<!--PRESET_ENGINE_NAME-->"/>
+		<meta name="robots" content="noindex, nofollow"/>
+		<link rel="stylesheet" type="text/css" href="<!--PRESET_SITE_STYLE-->"/>
+		<title>ユーザー登録完了 - <!--PRESET_SITE_NAME--></title>
+    <%= make_tracker %>
+	</head>
+
+	<body>
+		<p class="top_navi"><a href="<%= SITE_TOP_URI %>"><!--PRESET_SITE_NAME--></a> &gt; ユーザー登録</p>
+		<h1>ユーザー登録完了</h1>
+
+		<p>ユーザーID「<strong><%= user.user_id %></strong>」で登録されました。</p>
+		<p>今後ログインする際にはこのユーザーIDが必要になります。忘れないようにしてください。</p>
+		<p><a href="<%= SKILL_LIST_EDIT_URI %>">ユーザーメニューへ進む</a></p>
+
+		<!--PRESET_FOOTER-->
+	</body>
+</html>

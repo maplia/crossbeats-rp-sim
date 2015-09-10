@@ -1,0 +1,82 @@
+<% if $config.music_diffs.size == 5 %>
+  <% music_diffs_blocks = [$config.music_diffs.keys.sort[0..1], $config.music_diffs.keys.sort[2..3], $config.music_diffs.keys.sort[4].to_a] %>
+<% else %>
+  <% music_diffs_blocks = [$config.music_diffs.keys.sort[0..1], $config.music_diffs.keys.sort[2].to_a] %>
+<% end %>
+
+<tr>
+	<td colspan="4" class="title text">
+		<%= music.title %>
+		<% if music.subtitle %>
+      <small><%= music.subtitle %></small>
+    <% end %>
+	</td>
+</tr>
+<% music_diffs_blocks.each do |block| %>
+  <tr>
+    <% block.each do |diff| %>
+  		<td rowspan="2" class="rank 
+  			<% if fullcombo?(diff) %>
+  				fullcombo
+  			<% elsif failed?(diff) %>
+  				failed
+  			<% end %>
+  		">
+  			<% if cleared?(diff) %>
+  				<%= SP_RANK_STATUSES[rank(diff)] %>
+  			<% elsif failed?(diff) %>
+  				F
+  			<% else %>
+  				&nbsp;
+  			<% end %>
+  		</td>
+  		<td class="<%= $config.music_diffs[diff].downcase %> mark"
+  			<% if best_diff == diff and rp_target? %>
+  				style="color: white; background-color: red"
+  			<% end %>
+  		>
+        <% if best_diff == diff and rp_target? %>
+					<em style="color: inherit"><%= point_to_s(diff) %></em>
+				<% else %>
+					<%= point_to_s(diff) %>
+  			<% end %>
+  		</td>
+    <% end %>
+    <% if block.size == 1 %>
+      <td rowspan="3" colspan="2">&nbsp;</td>
+    <% end %>
+  </tr>
+  <tr>
+    <% block.each do |diff| %>
+  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
+				<%= rate_to_s(diff) %>
+  		</td>
+    <% end %>
+  </tr>
+  <tr>
+    <% block.each do |diff| %>
+  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
+        <% if music.exist?(diff) %>
+    			<% if locked?(diff) %>
+    				<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
+    			<% end %>
+    			<% if survival?(diff) %>
+    				[S]
+          <% end %>
+          <% if ultimate?(diff) %>
+            [U]
+    			<% end %>
+        <% else %>
+          -
+        <% end %>
+  		</td>
+  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
+  			<% if fullcombo?(diff) %>
+  				<%= SP_COMBO_STATUSES[combo(diff)] %>
+  			<% else %>
+  				&nbsp;
+  			<% end %>
+  		</td>
+  	<% end %>
+  </tr>
+<% end %>

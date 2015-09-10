@@ -1,0 +1,81 @@
+<p class="top_navi"><a href="<%= SITE_TOP_URI %>"><%= $mobile ? '' : $config.name %> トップ</a> &gt; ユーザー一覧</p>
+<h1><%= $mobile ? '' : $config.name %> ユーザー一覧</h1>
+
+<div class="unit">
+  <h2>ユーザー一覧</h2>
+  <div class="subunit">
+    <table class="list">
+      <% unless $mobile %>
+        <thead>
+          <tr>
+            <th>ユーザーID</th>
+            <th>ユーザー名</th>
+            <% if $config.cxb_mode? %>
+              <th>CxB ID</th>
+            <% else %>
+              <th>REV. ID</th>
+            <% end %>
+            <th>RP</th>
+            <th>コメント</th>
+            <th>最終更新時刻</th>
+          </tr>
+        </thead>
+      <% end %>
+      <tbody>
+        <% users.each do |user| %>
+          <% if $mobile %>
+            <tr>
+              <td class="text">
+                <a href="<%= user.skill_view_uri %>">
+                  <%= h user.name.split(//u)[0, 8].join('') %>
+                  <%= '...' if user.name.split(//u).size > 8 %>
+                </a>
+              </td>
+              <% if user.game_id_display == 1 %>
+                <td class="number"><%= (user.game_id.to_i == 0 ? '' : user.game_id) %></td>
+              <% else %>
+                <td class="number"></td>
+              <% end %>
+              <td class="number"><%= sprintf("%.2f", user.point) %></td>
+            </tr>
+            <tr>
+              <td colspan="3" class="text">
+                <% if user.comment.size == 0 %>
+                  &nbsp;
+                <% else %>
+                  <%= h user.comment.split(//u)[0, 30].join('') %>
+                  <%= '...' if user.comment.split(//u).size > 30 %>
+                <% end %>
+              </td>
+            </tr>
+          <% else %>
+            <tr>
+              <th><%= user.user_id %></th>
+              <td class="text">
+                <a href="<%= user.skill_view_uri %>">
+                  <%= h user.name.split(//u)[0, 15].join('') %>
+                  <%= '...' if user.name.split(//u).size > 15 %>
+                </a>
+              </td>
+              <% if user.game_id_display == 1 %>
+                <td class="number"><%= (user.game_id.to_i == 0 ? '' : user.game_id) %></td>
+              <% else %>
+                <td class="number"></td>
+              <% end %>
+              <td class="number">
+                <% if user.point %>
+                  <%= sprintf("%.2f", user.point) %>
+                <% end %>
+              </td>
+              <td class="text" style="width: 17em">
+                <%= h user.comment.split(//u)[0, 100].join('') %>
+                <%= '...' if user.comment.split(//u).size > 100 %>
+              </td>
+              <td><%= (user.point_updated_at ? user.point_updated_at.strftime("%Y-%m-%d %T") : '') %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

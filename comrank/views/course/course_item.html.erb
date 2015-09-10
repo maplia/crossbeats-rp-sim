@@ -1,0 +1,27 @@
+<% unless $mobile %>
+  <tr>
+    <td rowspan="4" class="text"><%= name %></td>
+    <td rowspan="4" class="level"><%= level_to_s %></td>
+    <td rowspan="4" class="notes"><%= notes_to_s %></td>
+    <%= course_musics.sort[0].to_html %>
+  </tr>
+  <% course_musics.sort[1..-1].each do |course_music| %>
+    <tr>
+      <%= course_music.to_html %>
+    </tr>
+  <% end %>
+<% else %>
+  <tr>
+    <td class="text" colspan="2">
+      <%= name %>
+    </td>
+  </tr>
+  <tr>
+    <td class="level">
+      <%= level_to_s %>
+    </td>
+    <td class="notes">
+      <%= notes_to_s %>
+    </td>
+  </tr>
+<% end %>

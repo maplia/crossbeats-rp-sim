@@ -1,0 +1,51 @@
+<dl>
+  <% if id %>
+    <dt>ユーザーID</dt>
+    <dd><p><%= user_id %></p></dd>
+  <% end %>
+  <dt>ユーザー名 <em>*</em>（文字種の制限はありません。全角文字OKです）</dt>
+  <dd>
+    <input type="text" name="name" size="30" maxlength="30" value="<%= h name %>" />
+  </dd>
+  <% if id %>
+    <dt>パスワード（変更しない場合は空欄にしてください）</dt>
+    <dd>
+      <input type="password" name="password" size="20" maxlength="50" value="<%= h password_changed? ? password : '' %>" />
+    </dd>
+    <dt>確認用パスワード（変更しない場合は空欄にしてください）</dt>
+    <dd>
+      <input type="password" name="password_confirmation" size="20" maxlength="50" value="<%= h password_confirmation %>" />
+    </dd>
+  <% else %>
+    <dt>パスワード <em>*</em></dt>
+    <dd>
+      <input type="password" name="password" size="20" maxlength="50" value="<%= h password %>" />
+    </dd>
+    <dt>確認用パスワード <em>*</em></dt>
+    <dd>
+      <input type="password" name="password_confirmation" size="20" maxlength="50" value="<%= h password_confirmation %>" />
+    </dd>
+  <% end %>
+  <% if $config.cxb_mode? %>
+    <dt>CROSS&times;BEAT ID</dt>
+    <dd>
+      <input type="text" name="game_id" size="8" maxlength="8" value="<%= game_id %>" />
+    </dd>
+  <% else %>
+    <dt>REV.ユーザーID（MY DATAからのデータインポートに使用します）</dt>
+    <dd>
+      <input type="text" name="game_id" size="8" maxlength="8" value="<%= game_id %>" />
+      <label>
+        <input type="checkbox" name="game_id_display" value="1" <%= game_id_display == 1 ? 'checked="checked"' : '' %> /> REV.ユーザーIDを公開する
+      </label>
+    </dd>
+  <% end %>
+  <dt>ユーザーコメント（HTMLタグによる文字装飾はできません。URLには自動的にリンクが設定されます）</dt>
+  <dd>
+    <% if $mobile %>
+      <textarea name="comment" rows="6" style="width: 100%;"><%= h comment %></textarea>
+    <% else %>
+      <textarea name="comment" rows="6" cols="70"><%= h comment %></textarea>
+    <% end %>
+  </dd>
+</dl>

@@ -1,0 +1,87 @@
+<p class="top_navi"><%= $mobile ? '' : $config.name %> トップ</p>
+<h1><%= $config.name %></h1>
+<div class="sidebar">
+  <div class="unit">
+    <h2>ログイン</h2>
+    <div class="subunit">
+      <dl>
+        <dt>■ユーザー登録済の方</dt>
+        <dd>
+          <form method="post" action="<%= USER_LOGIN_URI %>">
+            <p>ユーザーID: <input type="text" name="user_id" size="<%= USER_ID_FIGURE %>" maxlength="<%= USER_ID_FIGURE %>" /></p>
+            <p>パスワード: <input type="password" name="password" size="12" maxlength="80" /></p>
+            <p><input type="submit" value="ログインする" /></p>
+          </form>
+        </dd>
+        <dt>■ユーザー未登録の方</dt>
+        <dd>
+          <p><a href="<%= USER_ADD_URI %>">新規ユーザー登録</a></p>
+        </dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="unit">
+    <h2>登録ユーザーリスト</h2>
+    <div class="subunit">
+      <p><a href="<%= USER_LIST_URI %>">登録ユーザーリスト</a></p>
+    </div>
+  </div>
+
+  <div class="unit">
+    <h2>登録曲リスト</h2>
+    <div class="subunit">
+      <p><a href="<%= MUSIC_LIST_VIEW_URI %>">登録曲リスト</a></p>
+    </div>
+  </div>
+
+  <div class="unit">
+    <h2>その他ツール</h2>
+    <div class="subunit">
+      <p><del>ランク別許容ミス数計算機</del></p>
+      <p><del>得点率計算ツール</del></p>
+    </div>
+  </div>
+
+  <div class="unit">
+    <h2>Link</h2>
+    <div class="subunit">
+      <dl>
+        <dt>■公式サイト</dt>
+        <dd>
+          <ul>
+            <li><a href="http://www.capcom.co.jp/arcade/rev/">公式サイト</a></li>
+          </ul>
+        </dd>
+        <dt>■Wiki/個人サイト</dt>
+        <dd>
+          <ul>
+            <li><a href="http://wiki.maplia.jp/?crossbeats%20REV.">MapWiki - crossbeats REV.</a></li>
+          </ul>
+        </dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="unit">
+    <h2>このサイトについて</h2>
+    <div class="subunit">
+      <dl>
+        <dt>これは何ですか?</dt>
+        <dd>
+          <p><a href="http://www.capcom.co.jp/">カプコン</a>のアーケードゲーム「<a href="http://www.capcom.co.jp/arcade/rev/">crossbeats REV.（クロスビーツ レヴ）</a>」のランクポイント管理Webアプリケーションです。</p>
+          <p>登録はご自由にどうぞ。</p>
+        </dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="unit">
+    <h2>最新の運営情報</h2>
+    <div class="subunit">
+      <%= File.open('views/index_news.html.erb').read %>
+    </div>
+  </div>
+</div>

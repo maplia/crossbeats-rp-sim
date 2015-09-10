@@ -1,0 +1,53 @@
+<% unless $mobile %>
+  <tr>
+    <% if $config.cxb_mode? %>
+      <th class="number"><%= number %></td>
+    <% end %>
+    <td class="text">
+      <% if subtitle %>
+        <%= title %> <small><%= subtitle %></small>
+      <% else %>
+        <%= title %>
+      <% end %>
+    </td>
+    <% $config.music_diffs.keys.sort.each do |diff| %>
+      <td class="<%= $config.music_diffs[diff].downcase %> level">
+        <%= level_to_s(diff) %>
+      </td>
+      <td class="<%= $config.music_diffs[diff].downcase %> notes">
+        <%= notes_to_s(diff) %>
+      </td>
+    <% end %>
+  </tr>
+<% else %>
+  <% if $config.music_diffs.size == 3 %>
+    <% music_diffs_blocks = [$config.music_diffs.keys.sort[0..2]] %>
+  <% else %>
+    <% music_diffs_blocks = [$config.music_diffs.keys.sort[0..2], $config.music_diffs.keys.sort[3..4]] %>
+  <% end %>
+  
+  <tr>
+    <td class="text" colspan="6">
+      <% if subtitle %>
+        <%= title %> <small><%= subtitle %></small>
+      <% else %>
+        <%= title %>
+      <% end %>
+    </td>
+  </tr>
+  <% music_diffs_blocks.each do |block| %>
+    <tr>
+      <% block.each do |diff| %>
+        <td class="<%= $config.music_diffs[diff].downcase %> level">
+          <%= level_to_s(diff) %>
+        </td>
+        <td class="<%= $config.music_diffs[diff].downcase %> notes">
+          <%= notes_to_s(diff) %>
+        </td>
+      <% end %>
+      <% if block.size < 3 %>
+        <td colspan="<%= (3 - block.size) * 2 %>" class="etc"></td>
+      <% end %>
+    </tr>
+  <% end %>
+<% end %>

@@ -1,0 +1,40 @@
+<table class="conf">
+  <% unless $mobile %>
+    <thead>
+      <tr><th>レベル</th>
+      <th class="point">RP</th>
+      <% if before %>
+        <th class="diff">差異</th>
+      <% end %>
+      <th>RATE</th><th>コンボ</th>
+      </tr>
+    </thead>
+  <% end %>
+  <tbody>
+    <tr class="etc">
+      <% unless $mobile %>
+        <td><%= course.level_to_s %></td>
+      <% end %>
+      <td class="point"><%= point_to_s %></td>
+      <% if before %>
+        <% difference = (point || 0.0) - (before.point || 0.0) %>
+        <% if difference == 0.0 %>
+          <td class="rate">&ndash;</td>
+        <% else %>
+          <% diff_class = (difference > 0.0 ? 'inc' : 'dec') %>
+          <td class="rate <%= diff_class %>"><%= sprintf('%+.2f', difference) %></td>
+        <% end %>
+      <% end %>
+      <% unless cleared? %>
+        <td colspan="2" class="none"><%= SP_STATUSES[stat] %></td>
+      <% else %>
+        <td class="rate"><%= rate_to_s %></td>
+        <td class="mark"><%= SP_COMBO_STATUSES[combo] %></td>
+      <% end %>
+    </tr>
+  </tbody>
+</table>
+
+<% if (comment || '').size > 0 %>
+  <p>コメント: <%= comment %></p>
+<% end %>
