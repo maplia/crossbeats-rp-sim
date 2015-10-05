@@ -4,48 +4,48 @@
 @import url("common_rev.css");
 
 /*------------------------------------------------------------------
-    表示幅
+		表示幅
  ------------------------------------------------------------------*/
 table.music_list th.number {
-  width: 2.5em;
+	width: 2.5em;
 }
 table.music_list th.title {
-  width: 23em;
+	width: 23em;
 }
 table.music_list td.level {
-  width: 2.5em;
+	width: 2.5em;
 }
 table.music_list td.notes {
-  width: 2.5em;
+	width: 2.5em;
 }
 
 table.list th.number {
-  width: 2.5em;
+	width: 2.5em;
 }
 table.list th.point {
-  width: 4.0em;
+	width: 4.0em;
 }
 table.list th.rate {
-  width: 3.5em;
+	width: 3.5em;
 }
 table.list th.mark {
-  width: 3.5em;
+	width: 3.5em;
 }
 table.conf th.mark {
-  width: 1.5em;
+	width: 1.5em;
 }
 table.conf th.point {
-  width: 4.0em;
+	width: 4.0em;
 }
 table.conf th.diff {
-  width: 4.5em;
+	width: 4.5em;
 }
 table.conf th.rate {
-  width: 3.5em;
+	width: 3.5em;
 }
 input.point {
-  width: 4.0em;
+	width: 4.0em;
 }
 input.rate {
-  width: 2.5em;
+	width: 2.5em;
 }

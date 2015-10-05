@@ -191,7 +191,7 @@ module CxbRank
 				return nlv
 			else
 				if $config.rev_mode?
-				  mark = (survival?(diff) ? 'S' : (ultimate?(diff) ? 'U' : ''))
+					mark = (survival?(diff) ? 'S' : (ultimate?(diff) ? 'U' : ''))
 				else
 					mark = ''
 				end

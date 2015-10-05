@@ -1,65 +1,65 @@
 <% if $mobile %>
-  <% if edit %>
-    <p><a href="<%= USER_EDIT_URI %>">ユーザー情報編集</a></p>
-  <% end %>
+	<% if edit %>
+		<p><a href="<%= USER_EDIT_URI %>">ユーザー情報編集</a></p>
+	<% end %>
 <% else %>
-  <div class="unit">
-    <div class="subunit">
-      <table>
-        <tbody>
-          <tr>
-            <th>ユーザー名</th>
-            <td class="text"><%= h name %></td>
-          </tr>
-          <% if edit %>
-            <tr>
-              <th>RP表公開URL</th>
-              <td class="text">
-                <a href="<%= skill_view_uri %>"><%= "http://#{ENV['HTTP_HOST']}#{skill_view_uri}" %></a>
-                <br/>
-                <a href="<%= skill_ignore_uri %>"><%= "http://#{ENV['HTTP_HOST']}#{skill_ignore_uri}" %></a>（未取得/ロックフラグ無視版）
-              </td>
-            </tr>
-            <tr>
-              <th>クリア表公開URL</th>
-              <td class="text">
-                <a href="<%= skill_chart_uri %>"><%= "http://#{ENV['HTTP_HOST']}#{skill_chart_uri}" %></a>
-              </td>
-            </tr>
-          <% end %>
-          <% if !(game_id || '').empty? and game_id_display == 1 %>
-            <tr>
-              <% if $config.cxb_mode? %>
-                <th>C&times;B ID</th>
-              <% else %>
-                <th>REV.ユーザーID</th>
-              <% end %>
-              <td class="text"><%= game_id %></td>
-            </tr>
-          <% end %>
-          <% unless (comment || '').empty? %>
-            <tr>
-              <th>コメント</th>
-              <td class="text"><%= textarea_data_to_html(h(comment), true) %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-      <% if edit %>
-        <a href="<%= USER_EDIT_URI %>">ユーザー情報編集</a>
-      <% else %>
-        <% if ENV['PATH_INFO'] =~ Regexp.new(SKILL_LIST_VIEW_URI) %>
-          通常RP表
-        <% else %>
-          <a href="<%= skill_view_uri %>">通常RP表</a>
-        <% end %>
-        /
-        <% if ENV['PATH_INFO'] =~ Regexp.new(SKILL_LIST_VIEW_IGLOCK_URI) %>
-          ロック状態無視RP表
-        <% else %>
-          <a href="<%= skill_ignore_uri %>">ロック状態無視RP表</a>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
+	<div class="unit">
+		<div class="subunit">
+			<table>
+				<tbody>
+					<tr>
+						<th>ユーザー名</th>
+						<td class="text"><%= h name %></td>
+					</tr>
+					<% if edit %>
+						<tr>
+							<th>RP表公開URL</th>
+							<td class="text">
+								<a href="<%= skill_view_uri %>"><%= "http://#{ENV['HTTP_HOST']}#{skill_view_uri}" %></a>
+								<br/>
+								<a href="<%= skill_ignore_uri %>"><%= "http://#{ENV['HTTP_HOST']}#{skill_ignore_uri}" %></a>（未取得/ロックフラグ無視版）
+							</td>
+						</tr>
+						<tr>
+							<th>クリア表公開URL</th>
+							<td class="text">
+								<a href="<%= skill_chart_uri %>"><%= "http://#{ENV['HTTP_HOST']}#{skill_chart_uri}" %></a>
+							</td>
+						</tr>
+					<% end %>
+					<% if !(game_id || '').empty? and game_id_display == 1 %>
+						<tr>
+							<% if $config.cxb_mode? %>
+								<th>C&times;B ID</th>
+							<% else %>
+								<th>REV.ユーザーID</th>
+							<% end %>
+							<td class="text"><%= game_id %></td>
+						</tr>
+					<% end %>
+					<% unless (comment || '').empty? %>
+						<tr>
+							<th>コメント</th>
+							<td class="text"><%= textarea_data_to_html(h(comment), true) %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			</table>
+			<% if edit %>
+				<a href="<%= USER_EDIT_URI %>">ユーザー情報編集</a>
+			<% else %>
+				<% if ENV['PATH_INFO'] =~ Regexp.new(SKILL_LIST_VIEW_URI) %>
+					通常RP表
+				<% else %>
+					<a href="<%= skill_view_uri %>">通常RP表</a>
+				<% end %>
+				/
+				<% if ENV['PATH_INFO'] =~ Regexp.new(SKILL_LIST_VIEW_IGLOCK_URI) %>
+					ロック状態無視RP表
+				<% else %>
+					<a href="<%= skill_ignore_uri %>">ロック状態無視RP表</a>
+				<% end %>
+			<% end %>
+		</div>
+	</div>
 <% end %>

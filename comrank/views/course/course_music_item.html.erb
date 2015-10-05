@@ -1,16 +1,16 @@
 <th class="number"><%= seq %></th>
 <td class="text title">
-  <%= music.title %>
-  <% if music.subtitle %>
-    <small><%= music.subtitle %></small>
-  <% end %>
+	<%= music.title %>
+	<% if music.subtitle %>
+		<small><%= music.subtitle %></small>
+	<% end %>
 </td>
 <td class="<%= $config.music_diffs[diff].downcase %> level">
-  <%= $config.music_diffs[diff] %>
+	<%= $config.music_diffs[diff] %>
 </td>
 <td class="<%= $config.music_diffs[diff].downcase %> level">
-  <%= music.level_to_s(diff) %>
+	<%= music.level_to_s(diff) %>
 </td>
 <td class="notes <%= $config.music_diffs[diff].downcase %>">
-  <%= music.notes_to_s(diff) %>
+	<%= music.notes_to_s(diff) %>
 </td>

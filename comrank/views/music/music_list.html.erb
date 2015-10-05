@@ -4,70 +4,70 @@
 <p>間違いがあれば、ご指摘ください。確認の上、修正を行います。</p>
 
 <% $config.music_types.keys.sort.each do |type| %>
-  <% if type == MUSIC_TYPE_REV_COURSE %>
-    <% next if music_hash[type].empty? %>
-    <div class="unit">
-      <h2><%= $config.music_types[type] %></h2>
-      <div class="subunit">
-        <table class="music_list">
-          <% unless $mobile %>
-            <thead>
-              <tr>
-                <th rowspan="2" class="title">コース名</th>
-                <th rowspan="2" class="level">Lv</th>
-                <th rowspan="2" class="notes">Notes</th>
-                <th colspan="5" class="title">コース曲構成</th>
-              </tr>
-              <tr>
-                <th class="number">#</th>
-                <th class="title">タイトル</th>
-                <th colspan="2" class="level">Lv</th>
-                <th class="notes">Notes</th>
-              </tr>
-            </thead>
-          <% end %>
-          <tbody>
-            <% music_hash[type].each do |course| %>
-              <%= course.to_html %>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  <% else %>
-    <% next if music_hash[type].empty? %>
-    <div class="unit">
-      <h2><%= $config.music_types[type] %></h2>
-      <div class="subunit">
-        <table class="music_list">
-          <% unless $mobile %>
-            <thead>
-              <tr>
-                <% if $config.cxb_mode? %>
-                  <th rowspan="2" class="number">#</th>
-                <% end %>
-                <th rowspan="2" class="title">タイトル</th>
-                <% $config.music_diffs.keys.sort.each do |diff| %>
-                  <th colspan="2" class="<%= $config.music_diffs[diff].downcase %>">
-                    <%= $config.music_diffs[diff] %>
-                  </th>
-                <% end %>
-              </tr>
-              <tr>
-                <% $config.music_diffs.keys.sort.each do |diff| %>
-                  <th class="<%= $config.music_diffs[diff].downcase %>">Lv</th>
-                  <th class="<%= $config.music_diffs[diff].downcase %>">Notes</th>
-                <% end %>
-              </tr>
-            </thead>
-          <% end %>
-          <tbody>
-            <% music_hash[type].each do |music| %>
-              <%= music.to_html %>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  <% end %>
+	<% if type == MUSIC_TYPE_REV_COURSE %>
+		<% next if music_hash[type].empty? %>
+		<div class="unit">
+			<h2><%= $config.music_types[type] %></h2>
+			<div class="subunit">
+				<table class="music_list">
+					<% unless $mobile %>
+						<thead>
+							<tr>
+								<th rowspan="2" class="title">コース名</th>
+								<th rowspan="2" class="level">Lv</th>
+								<th rowspan="2" class="notes">Notes</th>
+								<th colspan="5" class="title">コース曲構成</th>
+							</tr>
+							<tr>
+								<th class="number">#</th>
+								<th class="title">タイトル</th>
+								<th colspan="2" class="level">Lv</th>
+								<th class="notes">Notes</th>
+							</tr>
+						</thead>
+					<% end %>
+					<tbody>
+						<% music_hash[type].each do |course| %>
+							<%= course.to_html %>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	<% else %>
+		<% next if music_hash[type].empty? %>
+		<div class="unit">
+			<h2><%= $config.music_types[type] %></h2>
+			<div class="subunit">
+				<table class="music_list">
+					<% unless $mobile %>
+						<thead>
+							<tr>
+								<% if $config.cxb_mode? %>
+									<th rowspan="2" class="number">#</th>
+								<% end %>
+								<th rowspan="2" class="title">タイトル</th>
+								<% $config.music_diffs.keys.sort.each do |diff| %>
+									<th colspan="2" class="<%= $config.music_diffs[diff].downcase %>">
+										<%= $config.music_diffs[diff] %>
+									</th>
+								<% end %>
+							</tr>
+							<tr>
+								<% $config.music_diffs.keys.sort.each do |diff| %>
+									<th class="<%= $config.music_diffs[diff].downcase %>">Lv</th>
+									<th class="<%= $config.music_diffs[diff].downcase %>">Notes</th>
+								<% end %>
+							</tr>
+						</thead>
+					<% end %>
+					<tbody>
+						<% music_hash[type].each do |music| %>
+							<%= music.to_html %>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	<% end %>
 <% end %>

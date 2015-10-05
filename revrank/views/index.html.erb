@@ -1,87 +1,103 @@
 <p class="top_navi"><%= $mobile ? '' : $config.name %> トップ</p>
 <h1><%= $config.name %></h1>
 <div class="sidebar">
-  <div class="unit">
-    <h2>ログイン</h2>
-    <div class="subunit">
-      <dl>
-        <dt>■ユーザー登録済の方</dt>
-        <dd>
-          <form method="post" action="<%= USER_LOGIN_URI %>">
-            <p>ユーザーID: <input type="text" name="user_id" size="<%= USER_ID_FIGURE %>" maxlength="<%= USER_ID_FIGURE %>" /></p>
-            <p>パスワード: <input type="password" name="password" size="12" maxlength="80" /></p>
-            <p><input type="submit" value="ログインする" /></p>
-          </form>
-        </dd>
-        <dt>■ユーザー未登録の方</dt>
-        <dd>
-          <p><a href="<%= USER_ADD_URI %>">新規ユーザー登録</a></p>
-        </dd>
-      </dl>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>ログイン</h2>
+		<div class="subunit">
+			<dl>
+				<dt>■ユーザー登録済の方</dt>
+				<dd>
+					<form method="post" action="<%= USER_LOGIN_URI %>">
+						<p>ユーザーID: <input type="text" name="user_id" size="<%= USER_ID_FIGURE %>" maxlength="<%= USER_ID_FIGURE %>" /></p>
+						<p>パスワード: <input type="password" name="password" size="12" maxlength="80" /></p>
+						<p><input type="submit" value="ログインする" /></p>
+					</form>
+				</dd>
+				<dt>■ユーザー未登録の方</dt>
+				<dd>
+					<p><a href="<%= USER_ADD_URI %>">新規ユーザー登録</a></p>
+				</dd>
+			</dl>
+		</div>
+	</div>
 
-  <div class="unit">
-    <h2>登録ユーザーリスト</h2>
-    <div class="subunit">
-      <p><a href="<%= USER_LIST_URI %>">登録ユーザーリスト</a></p>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>登録ユーザーリスト</h2>
+		<div class="subunit">
+			<p><a href="<%= USER_LIST_URI %>">登録ユーザーリスト</a></p>
+		</div>
+	</div>
 
-  <div class="unit">
-    <h2>登録曲リスト</h2>
-    <div class="subunit">
-      <p><a href="<%= MUSIC_LIST_VIEW_URI %>">登録曲リスト</a></p>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>登録曲リスト</h2>
+		<div class="subunit">
+			<p><a href="<%= MUSIC_LIST_VIEW_URI %>">登録曲リスト</a></p>
+		</div>
+	</div>
 
-  <div class="unit">
-    <h2>その他ツール</h2>
-    <div class="subunit">
-      <p><del>ランク別許容ミス数計算機</del></p>
-      <p><del>得点率計算ツール</del></p>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>その他ツール</h2>
+		<div class="subunit">
+			<p><del>ランク別許容ミス数計算機</del></p>
+			<p><del>得点率計算ツール</del></p>
+		</div>
+	</div>
 
-  <div class="unit">
-    <h2>Link</h2>
-    <div class="subunit">
-      <dl>
-        <dt>■公式サイト</dt>
-        <dd>
-          <ul>
-            <li><a href="http://www.capcom.co.jp/arcade/rev/">公式サイト</a></li>
-          </ul>
-        </dd>
-        <dt>■Wiki/個人サイト</dt>
-        <dd>
-          <ul>
-            <li><a href="http://wiki.maplia.jp/?crossbeats%20REV.">MapWiki - crossbeats REV.</a></li>
-          </ul>
-        </dd>
-      </dl>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>Link</h2>
+		<div class="subunit">
+			<dl>
+				<dt>■公式サイト</dt>
+				<dd>
+					<ul>
+						<li><a href="http://www.capcom.co.jp/arcade/rev/">公式サイト</a></li>
+					</ul>
+				</dd>
+				<dt>■Wiki/個人サイト</dt>
+				<dd>
+					<ul>
+						<li><a href="http://wiki.maplia.jp/?crossbeats%20REV.">MapWiki - crossbeats REV.</a></li>
+					</ul>
+				</dd>
+			</dl>
+		</div>
+	</div>
 </div>
 
 <div class="main">
-  <div class="unit">
-    <h2>このサイトについて</h2>
-    <div class="subunit">
-      <dl>
-        <dt>これは何ですか?</dt>
-        <dd>
-          <p><a href="http://www.capcom.co.jp/">カプコン</a>のアーケードゲーム「<a href="http://www.capcom.co.jp/arcade/rev/">crossbeats REV.（クロスビーツ レヴ）</a>」のランクポイント管理Webアプリケーションです。</p>
-          <p>登録はご自由にどうぞ。</p>
-        </dd>
-      </dl>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>このサイトについて</h2>
+		<div class="subunit">
+			<dl>
+				<dt>これは何ですか?</dt>
+				<dd>
+					<p><a href="http://www.capcom.co.jp/">カプコン</a>のアーケードゲーム「<a href="http://www.capcom.co.jp/arcade/rev/">crossbeats REV.（クロスビーツ レヴ）</a>」のランクポイント管理Webアプリケーションです。</p>
+					<p>登録はご自由にどうぞ。</p>
+				</dd>
+				<dt>ブックマークレット</dt>
+				<dd>
+					<p>「REV.」では<a href="https://rev-www.ac.capcom.jp/weblogin">Web上のMY DATAページ</a>でプレイデータの閲覧を行うことができるため、このデータを取り込むことができるようにするためにブックマークレットによる更新方法を用意しています。</p>
+					<p>使用するには以下のURLをブックマークに登録し、<a href="https://rev-www.ac.capcom.jp/profile">MY DATAにログインした直後に表示されるページ</a>にいる状態で先ほど登録したブックマークを開きます。</p>
+					<pre>javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://secure508.sakura.ne.jp/revtest.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()</pre>
+					<dl>
+						<dt>ブックマーク登録 (PC)</dt>
+						<dd>
+							<p>PCの場合は<a href="javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://secure508.sakura.ne.jp/revtest.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()">このリンク</a>をブックマークとして登録します。</p>
+						</dd>
+						<dt>ブックマーク登録 (スマートフォン)</dt>
+						<dd>
+							<p>スマートフォンの場合は<a href="./#javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://secure508.sakura.ne.jp/revtest.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()">このリンク</a>をブックマークとして登録した後、ブックマークの編集で「javascript:」よりも前の部分を削除してください。</p>
+						</dd>
+					</dl>
+				</dd>
+			</dl>
+		</div>
+	</div>
 
-  <div class="unit">
-    <h2>最新の運営情報</h2>
-    <div class="subunit">
-      <%= File.open('views/index_news.html.erb').read %>
-    </div>
-  </div>
+	<div class="unit">
+		<h2>最新の運営情報</h2>
+		<div class="subunit">
+			<%= File.open('views/index_news.html.erb').read %>
+		</div>
+	</div>
 </div>

@@ -8,8 +8,8 @@ module CxbRank
 	class SkillListMaker < PageMaker
 		private
 		def page_title
-		  user = (@session ? @session[:user] : User.find(@params[:user_id].to_i))
-		  return "#{user.name}さんのランクポイント表"
+			user = (@session ? @session[:user] : User.find(@params[:user_id].to_i))
+			return "#{user.name}さんのランクポイント表"
 		end
 		
 		def last_data_modified

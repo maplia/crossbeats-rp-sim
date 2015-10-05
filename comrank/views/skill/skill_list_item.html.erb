@@ -1,96 +1,96 @@
 <% css_class = (display_diff and (ignore_locked or display_diff == best_diff)) ? $config.music_diffs[display_diff].downcase : 'etc' %>
 
 <% unless $mobile %>
-  <tr class="<%= css_class %>">
-  	<th class="number <%= rp_target? ? 'st' : 'sn' %>"><%= row.to_s %></th>
-  	<td class="title text">
-  		<% if edit %>
-  		  <% if music.subtitle %>
-  			  <a href="<%= edit_uri %>"><%= music.title %> <small><%= music.subtitle %></small></a>
-        <% else %>
-          <a href="<%= edit_uri %>"><%= music.title %></a>
-        <% end %>
-      <% else %>
-        <% if music.subtitle %>
-          <%= music.title %> <small><%= music.subtitle %></small>
-        <% else %>
-          <%= music.title %>
-        <% end %>
-  		<% end %>
-  		<% if display_diff and locked?(display_diff) %>
-  			<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
-  		<% end %>
-  		<% if display_diff %>
-  		  <% if $config.cxb_mode? and ultimate?(display_diff) %>
-    			<img src="/images/ult.png" alt="[U]" height="12"/>
-    		<% elsif $config.rev_mode? and survival?(display_diff) %>
-    		  [SURV]
-    		<% elsif $config.rev_mode? and ultimate?(display_diff) %>
-    		  [ULT]
-    		<% end %>
-  		<% end %>
-  	</td>
-  	<% if !display_diff or !cleared?(display_diff) %>
-  		<td colspan="6" class="none">記録なし</td>
-  	<% else %>
-  		<td class="level">
-  			[<%= $config.music_diffs[display_diff]%>] <%= music.level_to_s(display_diff) %>
-  		</td>
-  		<td class="number"><%= point_to_s(display_diff) %></td>
-  		<td class="number"><%= rate_to_s(display_diff) %></td>
-  		<td class="number"><%= u_rate_to_s(display_diff) %></td>
-  		<td class="mark"><%= SP_RANK_STATUSES[rank(display_diff)] %></td>
-  		<td class="mark"><%= SP_COMBO_STATUSES[combo(display_diff)] %></td>
-  	<% end %>
-  	<td class="text"><%= Rinku.auto_link(h(comment)) %></td>
-  </tr>
+	<tr class="<%= css_class %>">
+		<th class="number <%= rp_target? ? 'st' : 'sn' %>"><%= row.to_s %></th>
+		<td class="title text">
+			<% if edit %>
+				<% if music.subtitle %>
+					<a href="<%= edit_uri %>"><%= music.title %> <small><%= music.subtitle %></small></a>
+				<% else %>
+					<a href="<%= edit_uri %>"><%= music.title %></a>
+				<% end %>
+			<% else %>
+				<% if music.subtitle %>
+					<%= music.title %> <small><%= music.subtitle %></small>
+				<% else %>
+					<%= music.title %>
+				<% end %>
+			<% end %>
+			<% if display_diff and locked?(display_diff) %>
+				<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
+			<% end %>
+			<% if display_diff %>
+				<% if $config.cxb_mode? and ultimate?(display_diff) %>
+					<img src="/images/ult.png" alt="[U]" height="12"/>
+				<% elsif $config.rev_mode? and survival?(display_diff) %>
+					[SURV]
+				<% elsif $config.rev_mode? and ultimate?(display_diff) %>
+					[ULT]
+				<% end %>
+			<% end %>
+		</td>
+		<% if !display_diff or !cleared?(display_diff) %>
+			<td colspan="6" class="none">記録なし</td>
+		<% else %>
+			<td class="level">
+				[<%= $config.music_diffs[display_diff]%>] <%= music.level_to_s(display_diff) %>
+			</td>
+			<td class="number"><%= point_to_s(display_diff) %></td>
+			<td class="number"><%= rate_to_s(display_diff) %></td>
+			<td class="number"><%= u_rate_to_s(display_diff) %></td>
+			<td class="mark"><%= SP_RANK_STATUSES[rank(display_diff)] %></td>
+			<td class="mark"><%= SP_COMBO_STATUSES[combo(display_diff)] %></td>
+		<% end %>
+		<td class="text"><%= Rinku.auto_link(h(comment)) %></td>
+	</tr>
 <% else %>
-  <% row_count = ((comment || '').size.nonzero? ? 3 : 2) %>
+	<% row_count = ((comment || '').size.nonzero? ? 3 : 2) %>
 
-  <tr class="<%= css_class %>">
-    <th rowspan="<%= row_count %>" class="number <%= rp_target? ? 'st' : 'sn' %>"><%= row.to_s %></th>
-    <td colspan="5" class="title text">
-      <% if edit %>
-        <% if music.subtitle %>
-          <a href="<%= edit_uri %>"><%= music.title %> <small><%= music.subtitle %></small></a>
-        <% else %>
-          <a href="<%= edit_uri %>"><%= music.title %></a>
-        <% end %>
-      <% else %>
-        <% if music.subtitle %>
-          <%= music.title %> <small><%= music.subtitle %></small>
-        <% else %>
-          <%= music.title %>
-        <% end %>
-      <% end %>
-      <% if display_diff and locked?(display_diff) %>
-        <img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
-      <% end %>
-      <% if display_diff %>
-        <% if $config.cxb_mode? and ultimate?(display_diff) %>
-          <img src="/images/ult.png" alt="[U]" height="12"/>
-        <% elsif $config.rev_mode? and survival?(display_diff) %>
-          [S]
-        <% elsif $config.rev_mode? and ultimate?(display_diff) %>
-          [U]
-        <% end %>
-      <% end %>
-    </td>
-  </tr>
-  <tr class="<%= css_class %>">
-    <% if !display_diff or !cleared?(display_diff) %>
-      <td colspan="5" class="none">記録なし</td>
-    <% else %>
-      <td class="diff"><%= $config.music_diffs[display_diff] %></td>
-      <td class="point"><%= point_to_s(display_diff) %></td>
-      <td class="rate"><%= rate_to_s(display_diff) %></td>
-      <td class="mark"><%= SP_RANK_STATUSES[rank(display_diff)] %></td>
-      <td class="mark"><%= SP_COMBO_STATUSES[combo(display_diff)] %></td>
-    <% end %>
-  </tr>
-  <% if (comment || '').size.nonzero? %>
-    <tr class="<%= css_class %>">
-      <td class="text" colspan="5"><%= Rinku.auto_link(h(comment)) %></td>
-    </tr>
-  <% end %>
+	<tr class="<%= css_class %>">
+		<th rowspan="<%= row_count %>" class="number <%= rp_target? ? 'st' : 'sn' %>"><%= row.to_s %></th>
+		<td colspan="5" class="title text">
+			<% if edit %>
+				<% if music.subtitle %>
+					<a href="<%= edit_uri %>"><%= music.title %> <small><%= music.subtitle %></small></a>
+				<% else %>
+					<a href="<%= edit_uri %>"><%= music.title %></a>
+				<% end %>
+			<% else %>
+				<% if music.subtitle %>
+					<%= music.title %> <small><%= music.subtitle %></small>
+				<% else %>
+					<%= music.title %>
+				<% end %>
+			<% end %>
+			<% if display_diff and locked?(display_diff) %>
+				<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
+			<% end %>
+			<% if display_diff %>
+				<% if $config.cxb_mode? and ultimate?(display_diff) %>
+					<img src="/images/ult.png" alt="[U]" height="12"/>
+				<% elsif $config.rev_mode? and survival?(display_diff) %>
+					[S]
+				<% elsif $config.rev_mode? and ultimate?(display_diff) %>
+					[U]
+				<% end %>
+			<% end %>
+		</td>
+	</tr>
+	<tr class="<%= css_class %>">
+		<% if !display_diff or !cleared?(display_diff) %>
+			<td colspan="5" class="none">記録なし</td>
+		<% else %>
+			<td class="diff"><%= $config.music_diffs[display_diff] %></td>
+			<td class="point"><%= point_to_s(display_diff) %></td>
+			<td class="rate"><%= rate_to_s(display_diff) %></td>
+			<td class="mark"><%= SP_RANK_STATUSES[rank(display_diff)] %></td>
+			<td class="mark"><%= SP_COMBO_STATUSES[combo(display_diff)] %></td>
+		<% end %>
+	</tr>
+	<% if (comment || '').size.nonzero? %>
+		<tr class="<%= css_class %>">
+			<td class="text" colspan="5"><%= Rinku.auto_link(h(comment)) %></td>
+		</tr>
+	<% end %>
 <% end %>

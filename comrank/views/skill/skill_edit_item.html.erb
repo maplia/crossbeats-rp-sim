@@ -1,94 +1,94 @@
 <table class="edit">
-  <tbody>
-    <% $config.music_diffs.keys.sort.each do |diff| %>
-      <% next unless music.exist?(diff) %>
+	<tbody>
+		<% $config.music_diffs.keys.sort.each do |diff| %>
+			<% next unless music.exist?(diff) %>
 
-      <% name_init = $config.music_diffs[diff].downcase %>
-      <tr class="<%= $config.music_diffs[diff].downcase %>">
-        <th rowspan="2"><%= $config.music_diffs[diff] %></th>
-        <td>
-          <label>
-            <input type="radio" name="<%= name_init %>_stat" value="<%= SP_STATUS_CLEAR %>"
-              <% if stat(diff) == SP_STATUS_CLEAR %>
-                checked="checked"
-              <% end %>
-            /><%= SP_STATUSES[SP_STATUS_CLEAR] %>
-          </label>:
-          <label>
-            RP:
-            <input type="text" name="<%= name_init %>_point" class="point"
-              maxlength="<%= POINT_FIGURE %>" size="<%= POINT_FIGURE %>"
-              value="<%= point(diff) ? point_to_s(diff) : '' %>"
-            />
-          </label>
-          <label>
-            CLEAR RATE:
-            <input type="text" name="<%= name_init %>_rate" class="rate"
-              maxlength="<%= RATE_FIGURE %>" size="<%= RATE_FIGURE %>"
-              value="<%= rate(diff) ? rate_to_s(diff).gsub(/%/, '') : '' %>"
-            />%
-          </label>
-          <label>
-            ランク:
-            <select name="<%= name_init %>_rank">
-              <%= hash_to_option_html(SP_RANK_STATUSES, rank(diff)) %>
-            </select>
-          </label>
-          <label>
-            フルコンボ:
-            <select name="<%= name_init %>_combo">
-              <%= hash_to_option_html(SP_COMBO_STATUSES, combo(diff)) %>
-            </select>
-          </label>
-          <% if $config.cxb_mode? %>
-            <label>
-              <input type="checkbox" name="<%= name_init %>_gauge"
-                value="1"
-                <% if ultimate?(diff) %>
-                  checked="checked"
-                <% end %>
-              />ULTIMATE
-            </label>
-          <% else %>
-            <label>
-              ゲージ:
-              <select name="<%= name_init %>_gauge">
-                <%= hash_to_option_html(SP_GAUGES[$config.mode], gauge(diff)) %>
-              </select>
-            </label>
-          <% end %>
-        </td>
-      </tr>
-      <tr class="<%= $config.music_diffs[diff].downcase %>">
-        <td>
-          <label>
-            <input type="radio" name="<%= name_init %>_stat" value="<%= SP_STATUS_FAILED %>"
-              <% if stat(diff) == SP_STATUS_FAILED %>
-                checked="checked"
-              <% end %>
-            /><%= SP_STATUSES[SP_STATUS_FAILED] %>
-          </label> /
-          <label>
-            <input type="radio" name="<%= name_init %>_stat" value="<%= SP_STATUS_NO_PLAY %>"
-              <% if stat(diff) == SP_STATUS_NO_PLAY %>
-                checked="checked"
-              <% end %>
-            /><%= SP_STATUSES[SP_STATUS_NO_PLAY] %>
-          </label>
-          <label>
-            <input type="checkbox" name="<%= name_init %>_locked"
-              value="1"
-              <% if locked?(diff) %>
-                checked="checked"
-              <% end %>
-            />未取得/ロック譜面
-          </label>
-        </td>
-      </tr>
-    <% end %>
-    <tr>
-      <th>コメント</th>
-      <td><input type="text" name="comment" style="width: 100%;" value="<%= h comment %>" /></td>
-    </tr>
-  </tbody>
+			<% name_init = $config.music_diffs[diff].downcase %>
+			<tr class="<%= $config.music_diffs[diff].downcase %>">
+				<th rowspan="2"><%= $config.music_diffs[diff] %></th>
+				<td>
+					<label>
+						<input type="radio" name="<%= name_init %>_stat" value="<%= SP_STATUS_CLEAR %>"
+							<% if stat(diff) == SP_STATUS_CLEAR %>
+								checked="checked"
+							<% end %>
+						/><%= SP_STATUSES[SP_STATUS_CLEAR] %>
+					</label>:
+					<label>
+						RP:
+						<input type="text" name="<%= name_init %>_point" class="point"
+							maxlength="<%= POINT_FIGURE %>" size="<%= POINT_FIGURE %>"
+							value="<%= point(diff) ? point_to_s(diff) : '' %>"
+						/>
+					</label>
+					<label>
+						CLEAR RATE:
+						<input type="text" name="<%= name_init %>_rate" class="rate"
+							maxlength="<%= RATE_FIGURE %>" size="<%= RATE_FIGURE %>"
+							value="<%= rate(diff) ? rate_to_s(diff).gsub(/%/, '') : '' %>"
+						/>%
+					</label>
+					<label>
+						ランク:
+						<select name="<%= name_init %>_rank">
+							<%= hash_to_option_html(SP_RANK_STATUSES, rank(diff)) %>
+						</select>
+					</label>
+					<label>
+						フルコンボ:
+						<select name="<%= name_init %>_combo">
+							<%= hash_to_option_html(SP_COMBO_STATUSES, combo(diff)) %>
+						</select>
+					</label>
+					<% if $config.cxb_mode? %>
+						<label>
+							<input type="checkbox" name="<%= name_init %>_gauge"
+								value="1"
+								<% if ultimate?(diff) %>
+									checked="checked"
+								<% end %>
+							/>ULTIMATE
+						</label>
+					<% else %>
+						<label>
+							ゲージ:
+							<select name="<%= name_init %>_gauge">
+								<%= hash_to_option_html(SP_GAUGES[$config.mode], gauge(diff)) %>
+							</select>
+						</label>
+					<% end %>
+				</td>
+			</tr>
+			<tr class="<%= $config.music_diffs[diff].downcase %>">
+				<td>
+					<label>
+						<input type="radio" name="<%= name_init %>_stat" value="<%= SP_STATUS_FAILED %>"
+							<% if stat(diff) == SP_STATUS_FAILED %>
+								checked="checked"
+							<% end %>
+						/><%= SP_STATUSES[SP_STATUS_FAILED] %>
+					</label> /
+					<label>
+						<input type="radio" name="<%= name_init %>_stat" value="<%= SP_STATUS_NO_PLAY %>"
+							<% if stat(diff) == SP_STATUS_NO_PLAY %>
+								checked="checked"
+							<% end %>
+						/><%= SP_STATUSES[SP_STATUS_NO_PLAY] %>
+					</label>
+					<label>
+						<input type="checkbox" name="<%= name_init %>_locked"
+							value="1"
+							<% if locked?(diff) %>
+								checked="checked"
+							<% end %>
+						/>未取得/ロック譜面
+					</label>
+				</td>
+			</tr>
+		<% end %>
+		<tr>
+			<th>コメント</th>
+			<td><input type="text" name="comment" style="width: 100%;" value="<%= h comment %>" /></td>
+		</tr>
+	</tbody>
 </table>

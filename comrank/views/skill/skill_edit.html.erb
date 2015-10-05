@@ -2,31 +2,31 @@
 <h1>ランクポイント編集 <small>[<%= music.full_title %>]</small></h1>
 
 <% if @session[:before_skill] %>
-  <p class="last_modified">最終更新時刻: <%= @session[:before_skill].updated_at.strftime('%Y-%m-%d %H:%M:%S') %></p>
+	<p class="last_modified">最終更新時刻: <%= @session[:before_skill].updated_at.strftime('%Y-%m-%d %H:%M:%S') %></p>
 <% end %>
 
 <div class="unit">
-  <h2>現在の登録情報</h2>
-  <div class="subunit">
-    <% unless @session[:before_skill] %>
-      <p>この曲のプレイ情報は登録されていません。</p>
-    <% else %>
-      <%= @session[:before_skill].to_html_exist %>
-    <% end %>
-  </div>
+	<h2>現在の登録情報</h2>
+	<div class="subunit">
+		<% unless @session[:before_skill] %>
+			<p>この曲のプレイ情報は登録されていません。</p>
+		<% else %>
+			<%= @session[:before_skill].to_html_exist %>
+		<% end %>
+	</div>
 </div>
 
 <div class="unit">
-  <h2>編集フォーム</h2>
-  <div class="subunit">
-    <p><em>「未取得/ロック譜面」をチェックすると計算対象外になります</em></p>
-    <form method="post" action="<%= SKILL_ITEM_EDIT_URI %>">
-      <%= skill.to_html_edit %>
-      <p>
-        <input type="submit" name="update" value="登録" />
-        <input type="submit" name="delete" value="削除" <%= @session[:before_skill] ? '' : 'disabled="disabled"' %> />
-        <input type="reset" value="入力リセット" />
-      </p>
-    </form>
-  </div>
+	<h2>編集フォーム</h2>
+	<div class="subunit">
+		<p><em>「未取得/ロック譜面」をチェックすると計算対象外になります</em></p>
+		<form method="post" action="<%= SKILL_ITEM_EDIT_URI %>">
+			<%= skill.to_html_edit %>
+			<p>
+				<input type="submit" name="update" value="登録" />
+				<input type="submit" name="delete" value="削除" <%= @session[:before_skill] ? '' : 'disabled="disabled"' %> />
+				<input type="reset" value="入力リセット" />
+			</p>
+		</form>
+	</div>
 </div>

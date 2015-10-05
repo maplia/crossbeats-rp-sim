@@ -1,13 +1,13 @@
 <% if defined? error_no %>
-  <p><%= ERRORS[error_no] %></p>
+	<p><%= ERRORS[error_no] %></p>
 <% else %>
-  <p>入力内容にエラーがあります。</p>
-  <ul>
-    <% errors.each do |error| %>
-      <li><%= error %></li>
-    <% end %>
-  </ul>
+	<p>入力内容にエラーがあります。</p>
+	<ul>
+		<% errors.each do |error| %>
+			<li><%= error %></li>
+		<% end %>
+	</ul>
 <% end %>
 <% if back_uri %>
-  <p><a href="<%= back_uri %>">戻る</a></p>
+	<p><a href="<%= back_uri %>">戻る</a></p>
 <% end %>

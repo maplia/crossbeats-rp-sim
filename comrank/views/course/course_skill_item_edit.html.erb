@@ -1,60 +1,60 @@
 <table class="edit">
-  <tbody>
-    <tr>
-      <th rowspan="2">
-        -
-      </th>
-      <td>
-        <label>
-          <input type="radio" name="stat" value="<%= SP_STATUS_CLEAR %>"
-            <% if stat == SP_STATUS_CLEAR %>
-              checked="checked"
-            <% end %>
-          /><%= SP_STATUSES[SP_STATUS_CLEAR] %>
-        </label>:
-        <label>
-          RP:
-          <input type="text" name="point" class="point"
-            maxlength="<%= POINT_FIGURE %>" size="<%= POINT_FIGURE %>"
-            value="<%= point ? point_to_s('') : '' %>"
-          />
-        </label>
-        <label>
-          CLEAR RATE:
-          <input type="text" name="rate" class="rate"
-            maxlength="<%= COURSE_RATE_FIGURE %>" size="<%= COURSE_RATE_FIGURE %>"
-            value="<%= rate ? rate_to_s.gsub(/%/, '') : '' %>"
-          />%
-        </label>
-        <label>
-          フルコンボ:
-          <select name="combo">
-            <%= hash_to_option_html(SP_COMBO_STATUSES) %>
-          </select>
-        </label>
-      </td>
-    </tr>
-    <tr class="etc">
-      <td>
-        <label>
-          <input type="radio" name="stat" value="<%= SP_STATUS_FAILED %>"
-            <% if stat == SP_STATUS_FAILED %>
-              checked="checked"
-            <% end %>
-          /><%= SP_STATUSES[SP_STATUS_FAILED] %>
-        </label> /
-        <label>
-          <input type="radio" name="stat" value="<%= SP_STATUS_NO_PLAY %>"
-            <% if stat == SP_STATUS_NO_PLAY %>
-              checked="checked"
-            <% end %>
-          /><%= SP_STATUSES[SP_STATUS_NO_PLAY] %>
-        </label>
-      </td>
-    </tr>
-    <tr>
-      <th>コメント</th>
-      <td><input type="text" name="comment" style="width: 100%;" value="<%= h comment %>" /></td>
-    </tr>
-  </tbody>
+	<tbody>
+		<tr>
+			<th rowspan="2">
+				-
+			</th>
+			<td>
+				<label>
+					<input type="radio" name="stat" value="<%= SP_STATUS_CLEAR %>"
+						<% if stat == SP_STATUS_CLEAR %>
+							checked="checked"
+						<% end %>
+					/><%= SP_STATUSES[SP_STATUS_CLEAR] %>
+				</label>:
+				<label>
+					RP:
+					<input type="text" name="point" class="point"
+						maxlength="<%= POINT_FIGURE %>" size="<%= POINT_FIGURE %>"
+						value="<%= point ? point_to_s('') : '' %>"
+					/>
+				</label>
+				<label>
+					CLEAR RATE:
+					<input type="text" name="rate" class="rate"
+						maxlength="<%= COURSE_RATE_FIGURE %>" size="<%= COURSE_RATE_FIGURE %>"
+						value="<%= rate ? rate_to_s.gsub(/%/, '') : '' %>"
+					/>%
+				</label>
+				<label>
+					フルコンボ:
+					<select name="combo">
+						<%= hash_to_option_html(SP_COMBO_STATUSES) %>
+					</select>
+				</label>
+			</td>
+		</tr>
+		<tr class="etc">
+			<td>
+				<label>
+					<input type="radio" name="stat" value="<%= SP_STATUS_FAILED %>"
+						<% if stat == SP_STATUS_FAILED %>
+							checked="checked"
+						<% end %>
+					/><%= SP_STATUSES[SP_STATUS_FAILED] %>
+				</label> /
+				<label>
+					<input type="radio" name="stat" value="<%= SP_STATUS_NO_PLAY %>"
+						<% if stat == SP_STATUS_NO_PLAY %>
+							checked="checked"
+						<% end %>
+					/><%= SP_STATUSES[SP_STATUS_NO_PLAY] %>
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<th>コメント</th>
+			<td><input type="text" name="comment" style="width: 100%;" value="<%= h comment %>" /></td>
+		</tr>
+	</tbody>
 </table>

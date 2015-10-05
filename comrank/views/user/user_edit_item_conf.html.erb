@@ -1,60 +1,60 @@
 <table class="info">
-  <% if id %>
-    <tr>
-      <th>ユーザーID</th>
-      <td><%= user_id %></td>
-    </tr>
-  <% end %>
-  <tr>
-    <th>ユーザー名</th>
-    <td><%= h name %></td>
-  </tr>
-  <tr>
-    <th>パスワード</th>
-    <% if password_changed? %>
-      <td><%= '*' * password.size %></td>
-    <% else %>
-      <td>（変更なし）</td>
-    <% end %>
-  </tr>
-  <% if $config.cxb_mode? %>
-    <tr>
-      <th>CROSS&times;BEATS ID</th>
-      <% if game_id.empty? %>
-        <td>入力なし</td>
-      <% else %>
-        <td><%= game_id %></td>
-      <% end %>
-    </tr>
-  <% else %>
-    <tr>
-      <% if $mobile %>
-        <th>REV.ID</th>
-      <% else %>
-        <th>REV.ユーザーID</th>
-      <% end %>
-      <% if game_id.empty? %>
-        <td>入力なし</td>
-      <% else %>
-        <td>
-          <%= game_id %>
-          <% if game_id_display == 0 %>
-            （ユーザーID非公開）
-          <% end %>
-        </td>
-      <% end %>
-    </tr>
-  <% end %>
-  <tr>
-    <% if $mobile %>
-      <th>ユーザー</th>
-    <% else %>
-      <th>ユーザーコメント</th>
-    <% end %>
-    <% if comment.empty? %>
-      <td>入力なし</td>
-    <% else %>
-      <td><%= textarea_data_to_html(h (comment)) %></td>
-    <% end %>
-  </tr>
+	<% if id %>
+		<tr>
+			<th>ユーザーID</th>
+			<td><%= user_id %></td>
+		</tr>
+	<% end %>
+	<tr>
+		<th>ユーザー名</th>
+		<td><%= h name %></td>
+	</tr>
+	<tr>
+		<th>パスワード</th>
+		<% if password_changed? %>
+			<td><%= '*' * password.size %></td>
+		<% else %>
+			<td>（変更なし）</td>
+		<% end %>
+	</tr>
+	<% if $config.cxb_mode? %>
+		<tr>
+			<th>CROSS&times;BEATS ID</th>
+			<% if game_id.empty? %>
+				<td>入力なし</td>
+			<% else %>
+				<td><%= game_id %></td>
+			<% end %>
+		</tr>
+	<% else %>
+		<tr>
+			<% if $mobile %>
+				<th>REV.ID</th>
+			<% else %>
+				<th>REV.ユーザーID</th>
+			<% end %>
+			<% if game_id.empty? %>
+				<td>入力なし</td>
+			<% else %>
+				<td>
+					<%= game_id %>
+					<% if game_id_display == 0 %>
+						（ユーザーID非公開）
+					<% end %>
+				</td>
+			<% end %>
+		</tr>
+	<% end %>
+	<tr>
+		<% if $mobile %>
+			<th>ユーザー</th>
+		<% else %>
+			<th>ユーザーコメント</th>
+		<% end %>
+		<% if comment.empty? %>
+			<td>入力なし</td>
+		<% else %>
+			<td><%= textarea_data_to_html(h (comment)) %></td>
+		<% end %>
+	</tr>
 </table>

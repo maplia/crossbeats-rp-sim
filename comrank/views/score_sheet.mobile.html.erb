@@ -1,66 +1,66 @@
 <!DOCTYPE HTML>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=noinitial-scale=1, maximum-scale=1.5" />
-    <title>CROSS&times;BEATS イベントスコアシート（<%= event.title %>）</title>
-    <script type="text/javascript">
-      var eid = '<%= text_id %>';
-      var requires = [
-        <% data = [] %>
-        <% musics.each_with_index do |music, i| %>
-          <% data << "{mid: '#{music.text_id}', title: '#{music.title}', notes: #{music.notes(MUSIC_DIFF_MAS)}}" %>
-        <% end %>
-        <%= data.join(",") %>
-      ];
-      var span = {start: Date.parse('<%= event.start_date.strftime("%Y/%m/%d") %>'), end: Date.parse('<%= event.end_date.strftime("%Y/%m/%d") %>')};
-    </script>
-    <script type="text/javascript" src="http://maplia.jp/script/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="http://maplia.jp/script/jquery.cookie.js"></script>
-    <script type="text/javascript" src="http://maplia.jp/script/jquery.json2table.js"></script>
-    <script type="text/javascript" src="http://maplia.jp/script/strftime-min.js"></script>
-    <script type="text/javascript" src="/script/cxb_event.js"></script>
-    <%= make_tracker %>
-    </script>
-    <link rel="stylesheet" type="text/css" href="/style/skill_pc.css" />
-    <style type="text/css">
-      * {font-family: sans-serif;}
-      th {text-align: left; padding: 0 0.5em;}
-      td {text-align: right; padding: 0 0.5em;}
-      tfoot td {font-weight: bold; background-color: #ccffcc;}
-    </style>
-  </head>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=noinitial-scale=1, maximum-scale=1.5" />
+		<title>CROSS&times;BEATS イベントスコアシート（<%= event.title %>）</title>
+		<script type="text/javascript">
+			var eid = '<%= text_id %>';
+			var requires = [
+				<% data = [] %>
+				<% musics.each_with_index do |music, i| %>
+					<% data << "{mid: '#{music.text_id}', title: '#{music.title}', notes: #{music.notes(MUSIC_DIFF_MAS)}}" %>
+				<% end %>
+				<%= data.join(",") %>
+			];
+			var span = {start: Date.parse('<%= event.start_date.strftime("%Y/%m/%d") %>'), end: Date.parse('<%= event.end_date.strftime("%Y/%m/%d") %>')};
+		</script>
+		<script type="text/javascript" src="http://maplia.jp/script/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="http://maplia.jp/script/jquery.cookie.js"></script>
+		<script type="text/javascript" src="http://maplia.jp/script/jquery.json2table.js"></script>
+		<script type="text/javascript" src="http://maplia.jp/script/strftime-min.js"></script>
+		<script type="text/javascript" src="/script/cxb_event.js"></script>
+		<%= make_tracker %>
+		</script>
+		<link rel="stylesheet" type="text/css" href="/style/skill_pc.css" />
+		<style type="text/css">
+			* {font-family: sans-serif;}
+			th {text-align: left; padding: 0 0.5em;}
+			td {text-align: right; padding: 0 0.5em;}
+			tfoot td {font-weight: bold; background-color: #ccffcc;}
+		</style>
+	</head>
 
-  <body onLoad="initialize(eid, requires, span);">
-    <p><a href="/">CxB RankPoint Simulator</a> / <a href="http://wiki.maplia.jp/?CROSS%C3%97BEATS">MapWiki - CROSS×BEATS</a></p>
-    <h1>CROSS&times;BEATS イベントスコアシート<br/><small>（<%= event.title %>）</small></h1>
-    <p>※入力データはサーバに保存していないため、他のブラウザには引き継がれません</p>
+	<body onLoad="initialize(eid, requires, span);">
+		<p><a href="/">CxB RankPoint Simulator</a> / <a href="http://wiki.maplia.jp/?CROSS%C3%97BEATS">MapWiki - CROSS×BEATS</a></p>
+		<h1>CROSS&times;BEATS イベントスコアシート<br/><small>（<%= event.title %>）</small></h1>
+		<p>※入力データはサーバに保存していないため、他のブラウザには引き継がれません</p>
 
-    <form>
-      <table id="table_input"></table>
-      <p>
-        <input type="button" value="計算" onClick="submitScores(eid, requires, span);" />
-        <label>
-          <input type="checkbox" id="show_history" /> 日別履歴を非表示にする
-        </label>
-        <script type="text/javascript">
-          $('#show_history').change(function () {
-            if (this.checked) {
-              $('#p_history').hide();
-              $('#table_history').hide();
-            } else {
-              $('#p_history').show();
-              $('#table_history').show();
-            }
-          });
-        </script>
-      </p>
-    </form>
+		<form>
+			<table id="table_input"></table>
+			<p>
+				<input type="button" value="計算" onClick="submitScores(eid, requires, span);" />
+				<label>
+					<input type="checkbox" id="show_history" /> 日別履歴を非表示にする
+				</label>
+				<script type="text/javascript">
+					$('#show_history').change(function () {
+						if (this.checked) {
+							$('#p_history').hide();
+							$('#table_history').hide();
+						} else {
+							$('#p_history').show();
+							$('#table_history').show();
+						}
+					});
+				</script>
+			</p>
+		</form>
 
-    <p id="p_mtime"></p>
-    <table id="table_chart"></table>
+		<p id="p_mtime"></p>
+		<table id="table_chart"></table>
 
-    <p id="p_history">日別履歴</p>
-    <table id="table_history"></table>
-  </body>
+		<p id="p_history">日別履歴</p>
+		<table id="table_history"></table>
+	</body>
 </html>
