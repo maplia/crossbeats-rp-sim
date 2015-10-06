@@ -49,7 +49,7 @@ module CxbRank
 			@template_html = 'score_sheet.html.erb'
 		end
 
-		def get_last_modified
+		def last_modified
 			return Music.maximum('updated_at')
 		end
 

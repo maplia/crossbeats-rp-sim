@@ -1,5 +1,5 @@
 create table if not exists `_musics` (
-		`id` int(4) not null auto_increment
+	  `id` int(4) not null auto_increment
 	, `text_id` varchar(64) not null
 	, `number` int(4) not null
 	, `lookup_key` varchar(128)
@@ -27,18 +27,19 @@ create table if not exists `_musics` (
 ) default charset=utf8;
 
 create table if not exists `rptargets` (
-	   `id` int(4) not null auto_increment
-	 , `music_id` int(4) not null
-	 , `span_s` datetime not null
-	 , `span_e` datetime not null
-	 , `created_at` datetime default null
-	 , `updated_at` datetime default null
-	 , primary key (`id`)
-	 , unique key `music` (`music_id`, `span_s`)
+	  `id` int(4) not null auto_increment
+	, `music_id` int(4) not null
+	, `span_s` datetime not null
+	, `span_e` datetime not null
+	, `created_at` datetime default null
+	, `updated_at` datetime default null
+	, primary key (`id`)
+	, unique key `music` (`music_id`, `span_s`)
 ) default charset=utf8;
 
 create or replace view `musics` as
-select `_musics`.`id` as `id`
+select
+	  `_musics`.`id` as `id`
 	, `_musics`.`text_id` as `text_id`
 	, `_musics`.`number` as `number`
 	, `_musics`.`lookup_key` as `lookup_key`
@@ -194,4 +195,14 @@ create table if not exists `event_musics` (
 	, `updated_at` datetime default null
 	, primary key (`id`)
 	, unique key `music` (`event_id`, `seq`, `music_id`)
+) default charset=utf8;
+
+create table if not exists `bookmarklet_sessions` (
+	  `id` int(4) not null auto_increment
+	, `user_id` int(4) not null
+	, `key` varchar(64) not null
+	, `created_at` datetime default null
+	, `updated_at` datetime default null
+	, primary key (`id`)
+	, unique key `key` (`key`)
 ) default charset=utf8;

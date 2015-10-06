@@ -16,12 +16,8 @@ module CxbRank
 		end
 
 		def last_modified
-			music_skills = Skill.find(:all, :conditions => {:user_id => @params[:user_id]})
-			if music_skills.empty?
-				return nil
-			else
-				return music_skills.max.updated_at
-			end
+			music_skill = Skill.find(:first, :conditions => {:user_id => @params[:user_id].to_i}, :order => 'updated_at desc')
+			return music_skill ? music_skill.updated_at : nil
 		end
 
 		def to_html
@@ -51,6 +47,10 @@ module CxbRank
 			fullcombo_max_level = 0
 			ultimate_max_level = 0
 			sprank_max_level = 0
+			rate_max_count = 0
+			rate_max_level = 0
+			ultimate_master_count = 0
+			ultimate_master_max_level = 0
 
 			skills.each do |skill|
 				$config.music_diffs.keys.each do |diff|
@@ -72,12 +72,24 @@ module CxbRank
 							ultimate_stage_count += 1
 							# ULTIMATEクリア最高レベル
 							ultimate_max_level = stage_level if stage_level > ultimate_max_level
+							# MASTER以上ULTIMATEクリア曲数
+							if diff == MUSIC_DIFF_MAS or diff == MUSIC_DIFF_UNL
+								ultimate_master_count += 1
+								# ULTIMATEクリア最高レベル
+								ultimate_master_max_level = stage_level if stage_level > ultimate_master_max_level
+							end
 						end
 						# フルコンボ譜面数
 						if skill.fullcombo?(diff)
 							fullcombo_stage_count += 1
 							# フルコンボ最高レベル
 							fullcombo_max_level = stage_level if stage_level > fullcombo_max_level
+						end
+						# 100%クリア譜面数
+						if skill.rate(diff) == 100
+							rate_max_count += 1
+							# フルコンボ最高レベル
+							rate_max_level = stage_level if stage_level > rate_max_level
 						end
 						# Sランク取得譜面数
 						if [SP_RANK_STATUS_SPP, SP_RANK_STATUS_SP, SP_RANK_STATUS_S].include?(skill.rank(diff))

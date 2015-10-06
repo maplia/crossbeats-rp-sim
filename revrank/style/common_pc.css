@@ -1,72 +1,72 @@
 @charset 'UTF-8';
 
 /*******************************************************************
-	共通スタイル指定
+    共通スタイル指定
  *******************************************************************/
 
 /*------------------------------------------------------------------
-	基本要素表示指定
+    基本要素表示指定
  ------------------------------------------------------------------*/
 body {
-	font-family: sans-serif;
-	padding: 4px;
+  font-family: sans-serif;
+  padding: 4px;
 }
 
 h1 {
-	margin: 0px;
-	padding: 0px 5px;
-	text-align: center;
+  margin: 0px;
+  padding: 0px 5px;
+  text-align: center;
 }
 
 h2 {
-	font-size: 1.25em;
-	margin: 0px;
-	padding: 0px;
+  font-size: 1.25em;
+  margin: 0px;
+  padding: 0px;
 }
 
 p, ul, ol, table {
-	margin: 2px 0px;
+    margin: 2px 0px;
 }
 
 ul, ol {
-	padding: 0 0 0 1.5em;
+    padding: 0 0 0 1.5em;
 }
 
 ul.setting {
-	padding: 0;
+    padding: 0;
 }
 
 ul.setting li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 dl {
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 dt {
-	font-weight: bold;
-	padding: 0;
-	margin: 0;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
 }
 
 dd {
-	padding: 0;
-	margin: 0 0 0 1.5em;
+    padding: 0;
+    margin: 0 0 0 1.5em;
 }
 
 form {
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 div.unit {
-	margin: 5px 0;
+    margin: 5px 0;
 }
 
 div.subunit {
-	margin: 0px 0px 0px 1.5em;
+    margin: 0px 0px 0px 1.5em;
 }
 
 div.comment {
@@ -89,99 +89,99 @@ acronym {
 }
 
 /*------------------------------------------------------------------
-	表示幅
+    表示幅
  ------------------------------------------------------------------*/
 table.music_list th.number {
-	width: 2.5em;
+  width: 2.5em;
 }
 table.music_list th.title {
-	width: 23em;
+  width: 23em;
 }
 table.music_list td.level {
-	width: 2.5em;
+  width: 2.5em;
 }
 table.music_list td.notes {
-	width: 2.5em;
+  width: 2.5em;
 }
 
 table.list th.number {
-	width: 2.5em;
+  width: 2.5em;
 }
 table.list th.point {
-	width: 4.0em;
+  width: 4.0em;
 }
 table.list th.rate {
-	width: 3.5em;
+  width: 3.5em;
 }
 table.list th.mark {
-	width: 3.5em;
+  width: 3.5em;
 }
 table.conf th.mark {
-	width: 1.5em;
+  width: 1.5em;
 }
 table.conf th.point {
-	width: 4.0em;
+  width: 4.0em;
 }
 table.conf th.diff {
-	width: 4.5em;
+  width: 4.5em;
 }
 table.conf th.rate {
-	width: 3.5em;
+  width: 3.5em;
 }
 input.point {
-	width: 4.0em;
+  width: 4.0em;
 }
 input.rate {
-	width: 2.5em;
+  width: 2.5em;
 }
 
 /*------------------------------------------------------------------
-	テーブル表示指定
+    テーブル表示指定
  ------------------------------------------------------------------*/
 table {
-	border-collapse: collapse;
-	border-style: solid;
-	border-width: 1px 2px 2px 1px;
+    border-collapse: collapse;
+    border-style: solid;
+    border-width: 1px 2px 2px 1px;
 }
 
 th, td {
-	padding: 1px 3px;
-	border-style: solid;
-	border-width: 1px;
+    padding: 1px 3px;
+    border-style: solid;
+    border-width: 1px;
 }
 
-td {							/* データセルは原則右寄せにする */
-	text-align: right;			/* それ以外の場合はその都度指定する */
+td {                            /* データセルは原則右寄せにする */
+    text-align: right;          /* それ以外の場合はその都度指定する */
 }
 
-td dl dt {						/* table内では、dtの強調を打ち消す */
-	font-weight: normal;
+td dl dt {                      /* table内では、dtの強調を打ち消す */
+    font-weight: normal;
 }
 
-table.edit td,					/* 編集用テーブルのデータセルは原則左寄せに変更 */
-table.info td {			/* ユーザ情報表示用も同じく原則左寄せに */
-	text-align: left;
+table.edit td,                  /* 編集用テーブルのデータセルは原則左寄せに変更 */
+table.info td {					/* ユーザ情報表示用も同じく原則左寄せに */
+    text-align: left;
 }
 
-th.title {						/* 曲タイトルのヘッダセル */
-	width: 25.0em;
+th.title {                      /* 曲タイトルのヘッダセル */
+    width: 25.0em;
 }
 
-th.title_skill {				/* スキル表用の曲タイトルのヘッダセル */
-	width: 28.0em;				/* 一部パート表示が発生するので少し幅を広げる */
+th.title_skill {                /* スキル表用の曲タイトルのヘッダセル */
+    width: 28.0em;              /* 一部パート表示が発生するので少し幅を広げる */
 }
 
-td.text {						/* タイトル以外のテキストデータセル */
-	text-align: left;
+td.text {                       /* タイトル以外のテキストデータセル */
+    text-align: left;
 }
-td.mark {						/* プレイクラスなどのマーク表示データセル */
-	text-align: center;
+td.mark {                       /* プレイクラスなどのマーク表示データセル */
+    text-align: center;
 }
-td.level {			/* レベル表示のデータセル */
-	text-align: center;
+td.level {						/* レベル表示のデータセル */
+    text-align: center;
 }
-td.none {						/* 登録データなしなどのデータセル */
-	text-align: center;
+td.none {                       /* 登録データなしなどのデータセル */
+    text-align: center;
 }
 
 table.chart td.rank {
@@ -199,130 +199,130 @@ table.list td.level {
 
 table.summary th.sum,
 table.summary th.part {
-	width: 9.0em;
+    width: 9.0em;
 }
 table.summary td {
-	font-weight: bold;
-	text-align: center;
+    font-weight: bold;
+    text-align: center;
 }
 
 /*------------------------------------------------------------------
-	スキル表の行番号表示
+    スキル表の行番号表示
  ------------------------------------------------------------------*/
-th.st {							/* SP計算対象曲 */
-	color: red !important;
-	background-color: #FCC !important;
+th.st {                         /* SP計算対象曲 */
+    color: red !important;
+    background-color: #FCC !important;
 }
-th.sn {							/* SP非対象曲 */
-	color: #050 !important;
-	background-color: #CFC !important;
+th.sn {                         /* SP非対象曲 */
+    color: #050 !important;
+    background-color: #CFC !important;
 }
 
 th.st, th.sn {
-	width: 2.0em;
+    width: 2.0em;
 }
 
 /*------------------------------------------------------------------
-	運営情報など
+    運営情報など
  ------------------------------------------------------------------*/
 address {
-	font-style: normal;
-	text-align: right;
+    font-style: normal;
+    text-align: right;
 }
 
 div.footer {
-	text-align: right;
+    text-align: right;
 }
 
 /*------------------------------------------------------------------
-	パンくずリストとユーザ情報表示
+    パンくずリストとユーザ情報表示
  ------------------------------------------------------------------*/
 .top_navi {
-	margin: 0px 0px 2px 0px;
-	padding: 0px;
-	text-align: left;
+    margin: 0px 0px 2px 0px;
+    padding: 0px;
+    text-align: left;
 }
 
 .user_info {
-	float: right;
-	text-align: right;
+    float: right;
+    text-align: right;
 }
 
 /*------------------------------------------------------------------
-	各種強調表示
+    各種強調表示
  ------------------------------------------------------------------*/
 em {
-	font-style: normal;
-	font-weight: bold;
-	color: red;
+    font-style: normal;
+    font-weight: bold;
+    color: red;
 }
 strong {
-	font-size: larger;
-	font-style: normal;
-	font-weight: bold;
-	color: red;
+    font-size: larger;
+    font-style: normal;
+    font-weight: bold;
+    color: red;
 }
-td.max {						/* 達成率表示セルの、100%の場合の強調表示 */
-	text-align: center;
-	font-weight: bold;
+td.max {                        /* 達成率表示セルの、100%の場合の強調表示 */
+    text-align: center;
+    font-weight: bold;
 }
-.overwrote {					/* ランクを上書き更新した場合の表示 */
-	font-weight: bold;
-	color: gray;
+.overwrote {                    /* ランクを上書き更新した場合の表示 */
+    font-weight: bold;
+    color: gray;
 }
 
 /*------------------------------------------------------------------
-	修正箇所の表示指定
+    修正箇所の表示指定
  ------------------------------------------------------------------*/
 del, del * {
-	text-decoration: line-through;
-	color: gray;
+    text-decoration: line-through;
+    color: gray;
 }
 ins, ins * {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 /*------------------------------------------------------------------
-	トップページ、ヘルプページのサイドバーにまつわる表示指定
-	参考サイト: http://www.geocities.jp/multi_column/
+    トップページ、ヘルプページのサイドバーにまつわる表示指定
+    参考サイト: http://www.geocities.jp/multi_column/
  ------------------------------------------------------------------*/
 div.sidebar {
-	color: inherit;
-	background-color: #fff;
-	margin: 2px 5px 0px 0px;
-	padding: 2px;
-	float: left;
-	width: 19.0em;
-	border-width: 0px 1px 1px 0px;
-	border-style: solid;
+    color: inherit;
+    background-color: #fff;
+    margin: 2px 5px 0px 0px;
+    padding: 2px;
+    float: left;
+    width: 19.0em;
+    border-width: 0px 1px 1px 0px;
+    border-style: solid;
 }
 
-div.sidebar h2 {			/* サイドバー内の見出し項目 */
-	font-size: 1.0em;
-	margin: 0px;
-	padding: 0px;
-	border-style: solid;
-	border-width: 0px 0px 1px 0px;
+div.sidebar h2 {            /* サイドバー内の見出し項目 */
+    font-size: 1.0em;
+    margin: 0px;
+    padding: 0px;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
 }
 
 div.main {
-	margin-left: 19.5em;
+    margin-left: 19.5em;
 }
 
-div.main dl dt {				/*	*/
+div.main dl dt {                /*  */
 	margin: 3px 0;
-	padding: 1px 3px;
+    padding: 1px 3px;
 }
 
 address {
-	clear: both;
+    clear: both;
 }
 
 a img {
-	border: none;
+    border: none;
 }
 
 p.last_modified {
-	float: right;
-	text-align: right;
+  float: right;
+  text-align: right;
 }

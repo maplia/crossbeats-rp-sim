@@ -21,12 +21,10 @@
 				<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
 			<% end %>
 			<% if display_diff %>
-				<% if $config.cxb_mode? and ultimate?(display_diff) %>
-					<img src="/images/ult.png" alt="[U]" height="12"/>
-				<% elsif $config.rev_mode? and survival?(display_diff) %>
-					[SURV]
-				<% elsif $config.rev_mode? and ultimate?(display_diff) %>
-					[ULT]
+				<% if survival?(display_diff) %>
+					<img src="/images/survival.png" alt="[S]" height="12"/>
+				<% elsif ultimate?(display_diff) %>
+					<img src="/images/ultimate.png" alt="[U]" height="12"/>
 				<% end %>
 			<% end %>
 		</td>
@@ -67,12 +65,10 @@
 				<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
 			<% end %>
 			<% if display_diff %>
-				<% if $config.cxb_mode? and ultimate?(display_diff) %>
-					<img src="/images/ult.png" alt="[U]" height="12"/>
-				<% elsif $config.rev_mode? and survival?(display_diff) %>
-					[S]
-				<% elsif $config.rev_mode? and ultimate?(display_diff) %>
-					[U]
+				<% if survival?(display_diff) %>
+					<img src="/images/survival.png" alt="[S]" height="12"/>
+				<% elsif ultimate?(display_diff) %>
+					<img src="/images/ultimate.png" alt="[U]" height="12"/>
 				<% end %>
 			<% end %>
 		</td>

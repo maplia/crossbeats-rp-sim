@@ -1,4 +1,4 @@
-$LOAD_PATH << '../combeta/lib'
+$LOAD_PATH << '../comtest/lib'
 ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 
 require 'rubygems'
@@ -20,6 +20,7 @@ require 'cxbrank/skill_chart'
 require 'cxbrank/user_view'
 require 'cxbrank/user_form'
 require 'cxbrank/user'
+require 'cxbrank/bookmarklet'
 
 def to_json(data, callback=nil)
 	cross_origin
@@ -224,8 +225,24 @@ get '/api/musics' do
 	to_json(hashes, params[:callback])
 end
 
-post '/edit_direct' do
+post '/bml_login' do
+	executor = CxbRank::BookmarkletAuthenticator.new(params)
+	to_json(executor.execute)
+end
+
+post '/bml_update_master' do
+	data = JSON.parse(request.body.read, {:symbolize_names => true})
+	executor = CxbRank::BookmarkletMasterUpdater.new(data)
+	to_json(executor.execute)
+end
+
+post '/bml_edit' do
 	body = JSON.parse(request.body.read, {:symbolize_names => true})
-	executor = CxbRank::SkillEditorDirect.new(body)
+	executor = CxbRank::BookmarkletSkillEditor.new(body)
+	to_json(executor.execute)
+end
+
+get '/bml_logout' do
+	executor = CxbRank::BookmarkletSessionTerminator.new(params)
 	to_json(executor.execute)
 end

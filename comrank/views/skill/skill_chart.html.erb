@@ -8,41 +8,53 @@
 <%= user.to_html(false) %>
 
 <div class="unit">
-	<h2>クリア状況</h2>
-	<div class="subunit">
-		<table>
-			<tbody>
-				<tr>
-					<th>クリア譜面数</th>
-					<td class="mark" style="width: 7.0em"><%= cleared_stage_count %>譜面</td>
-					<% if $config.rev_mode? %>
-						<th>MASTER以上クリア譜面数</th>
-					<% else %>
-						<th>MASTERクリア譜面数</th>
-					<% end %>
-					<td class="mark" style="width: 7.0em"><%= cleared_master_count %>曲</td>
-				</tr>
-				<tr>
-					<th>Sランク以上クリア譜面数</th>
-					<td class="mark"><%= srank_stage_count %>譜面</td>
-					<th>最高クリアレベル</th>
-					<td class="mark">Lv.<%= sprintf($config.level_format, cleared_max_level) %></td>
-				</tr>
-				<tr>
-					<th>フルコンボ譜面数</th>
-					<td class="mark"><%= fullcombo_stage_count %>譜面</td>
-					<th>最高フルコンボレベル</th>
-					<td class="mark">Lv.<%= sprintf($config.level_format, fullcombo_max_level) %></td>
-				</tr>
-				<tr>
-					<th>ULTIMATEクリア譜面数</th>
-					<td class="mark" style="width: 7.0em"><%= ultimate_stage_count %>譜面</td>
-					<th>最高ULTIMATEクリアレベル</th>
-					<td class="mark">Lv.<%= sprintf($config.level_format, ultimate_max_level) %></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+  <h2>クリア状況</h2>
+  <div class="subunit">
+    <table>
+      <tbody>
+        <tr>
+          <th>クリア譜面数</th>
+          <td class="mark" style="width: 7.0em"><%= cleared_stage_count %>譜面</td>
+          <% if $config.rev_mode? %>
+            <th>MASTER以上クリア譜面数</th>
+          <% else %>
+            <th>MASTERクリア譜面数</th>
+          <% end %>
+          <td class="mark" style="width: 7.0em"><%= cleared_master_count %>曲</td>
+        </tr>
+        <tr>
+          <th>Sランク以上クリア譜面数</th>
+          <td class="mark"><%= srank_stage_count %>譜面</td>
+          <th>最高クリアレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, cleared_max_level) %></td>
+        </tr>
+        <tr>
+          <th>フルコンボ譜面数</th>
+          <td class="mark"><%= fullcombo_stage_count %>譜面</td>
+          <th>最高フルコンボレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, fullcombo_max_level) %></td>
+        </tr>
+        <tr>
+          <th>100%クリア譜面数</th>
+          <td class="mark"><%= rate_max_count %>譜面</td>
+          <th>最高100%クリアレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, rate_max_level) %></td>
+        </tr>
+        <tr>
+          <th>ULTIMATEクリア譜面数</th>
+          <td class="mark" style="width: 7.0em"><%= ultimate_stage_count %>譜面</td>
+          <th>最高ULTIMATEクリアレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, ultimate_max_level) %></td>
+        </tr>
+        <tr>
+          <th>MASTER以上Uクリア譜面数</th>
+          <td class="mark" style="width: 7.0em"><%= ultimate_master_count %>譜面</td>
+          <th>MASTER以上最高Uクリアレベル</th>
+          <td class="mark">Lv.<%= sprintf($config.level_format, ultimate_master_max_level) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <div class="unit">

@@ -1,6 +1,10 @@
 <p class="top_navi"><a href="<%= SITE_TOP_URI %>"><%= $mobile ? '' : $config.name %> トップ</a> &gt; 登録曲リスト</p>
 <h1>登録曲リスト</h1>
 
+<% if last_modified %>
+	<p class="last_modified">最終更新時刻: <%= last_modified.strftime('%Y-%m-%d %H:%M:%S') %></p>
+<% end %>
+
 <p>間違いがあれば、ご指摘ください。確認の上、修正を行います。</p>
 
 <% $config.music_types.keys.sort.each do |type| %>

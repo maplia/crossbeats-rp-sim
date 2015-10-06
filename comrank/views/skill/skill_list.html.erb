@@ -1,8 +1,8 @@
 <p class="top_navi"><a href="<%= SITE_TOP_URI %>"><%= $mobile ? '' : $config.name %> トップ</a> &gt; ランクポイント表</p>
 <h1>ランクポイント表</small></h1>
 
-<% if last_data_modified %>
-	<p class="last_modified">最終更新時刻: <%= last_data_modified.strftime('%Y-%m-%d %H:%M:%S') %></p>
+<% if last_modified %>
+	<p class="last_modified">最終更新時刻: <%= last_modified.strftime('%Y-%m-%d %H:%M:%S') %></p>
 <% end %>
 
 <%= user.to_html(@edit) %>

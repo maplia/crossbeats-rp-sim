@@ -1,87 +1,87 @@
 @charset 'utf-8';
 
 /****
-	table-cell color
+  table-cell color
  ****/
 table {
-	border-collapse: collapse;
-	border-style: solid;
-	border-color: inherit;
-	border-width: 1px 2px 2px 1px;
+  border-collapse: collapse;
+  border-style: solid;
+  border-color: inherit;
+  border-width: 1px 2px 2px 1px;
 }
 th, td {
-	padding: 1px 3px;
-	border-style: solid;
-	border-color: inherit;
-	border-width: 1px;
+  padding: 1px 3px;
+  border-style: solid;
+  border-color: inherit;
+  border-width: 1px;
 }
 
 th.esy, tr.esy th {
-	color: #000066;
-	background-color: #bbeeee;
+  color: #000066;
+  background-color: #bbeeee;
 }
 td.esy, tr.esy td {
-	color: #000066;
-	background-color: #cceeff;
+  color: #000066;
+  background-color: #cceeff;
 }
 th.std, tr.std th {
-	color: #006600;
-	background-color: #ccffcc;
+  color: #006600;
+  background-color: #ccffcc;
 }
 td.std, tr.std td {
-	color: #006600;
-	background-color: #ddffdd;
+  color: #006600;
+  background-color: #ddffdd;
 }
 th.hrd, tr.hrd th {
-	color: #444400;
-	background-color: #ffffcc;
+  color: #444400;
+  background-color: #ffffcc;
 }
 td.hrd, tr.hrd td {
-	color: #444400;
-	background-color: #ffffdd;
+  color: #444400;
+  background-color: #ffffdd;
 }
 th.mas, tr.mas th {
-	color: #660000;
-	background-color: #ffcccc;
+  color: #660000;
+  background-color: #ffcccc;
 }
 td.mas, tr.mas td {
-	color: #660000;
-	background-color: #ffdddd;
+  color: #660000;
+  background-color: #ffdddd;
 }
 th.unl, tr.unl th {
-	color: #440066;
-	background-color: #ccbbee;
+  color: #440066;
+  background-color: #ccbbee;
 }
 td.unl, tr.unl td {
-	color: #440066;
-	background-color: #ddccff;
+  color: #440066;
+  background-color: #ddccff;
 }
 td.played, tr.played td {
-	color: #000066;
-	background-color: #dfeeee;
+  color: #000066;
+  background-color: #dfeeee;
 }
 th.etc, td.etc, tr.etc th, tr.etc td {
-	color: inherit;
-	background-color: white;
+  color: inherit;
+  background-color: white;
 }
 
 table.summary td {
-	color: white;
-	background-color: black;
-	font-weight: bold;
-	text-align: center;
-	border-color: inherit;
+  color: white;
+  background-color: black;
+  font-weight: bold;
+  text-align: center;
+  border-color: inherit;
 }
 
 td.inc {
-	font-weight: bold;
-	color: red !important;
-	background-color: inherit;
+  font-weight: bold;
+  color: red !important;
+  background-color: inherit;
 }
 td.dec {
-	font-weight: bold;
-	color: blue !important;
-	background-color: inherit;
+  font-weight: bold;
+  color: blue !important;
+  background-color: inherit;
 }
 
 table.chart td.rank {
@@ -100,83 +100,83 @@ table.chart td.failed {
 }
 
 /*------------------------------------------------------------------
-		運営情報など
+    運営情報など
  ------------------------------------------------------------------*/
 address {
-	font-style: normal;
-	text-align: right;
+  font-style: normal;
+  text-align: right;
 }
 
 div.footer {
-	text-align: right;
+  text-align: right;
 }
 
 /*------------------------------------------------------------------
-		パンくずリストとユーザ情報表示
+    パンくずリストとユーザ情報表示
  ------------------------------------------------------------------*/
 .top_navi {
-	margin: 0px 0px 2px 0px;
-	padding: 0px;
-	text-align: left;
+  margin: 0px 0px 2px 0px;
+  padding: 0px;
+  text-align: left;
 }
 
 .user_info {
-	float: right;
-	text-align: right;
+  float: right;
+  text-align: right;
 }
 
 /*------------------------------------------------------------------
-		各種強調表示
+    各種強調表示
  ------------------------------------------------------------------*/
 em {
-	font-style: normal;
-	font-weight: bold;
-	color: red;
+  font-style: normal;
+  font-weight: bold;
+  color: red;
 }
 strong {
-	font-size: larger;
-	font-style: normal;
-	font-weight: bold;
-	color: red;
+  font-size: larger;
+  font-style: normal;
+  font-weight: bold;
+  color: red;
 }
 
 /*------------------------------------------------------------------
-		
+    
  ------------------------------------------------------------------*/
 del, del * {
-	text-decoration: line-through;
-	color: gray;
+  text-decoration: line-through;
+  color: gray;
 }
 ins, ins * {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 address {
-		clear: both;
+    clear: both;
 }
 
 a img {
-		border: none;
+    border: none;
 }
 
 input[type=text] {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 div.sidebar * ul {
-	padding-left: 0;
+  padding-left: 0;
 }
 
 div.sidebar * li {
-	list-style-type: none;
-	margin-left: 0;
+  list-style-type: none;
+  margin-left: 0;
 }
 
 pre {
-	background-color: white;
-	padding: 2px 4px;
-	white-space: normal;
-	border-style: solid;
-	border-width: 1px 2px 2px 1px;
-	word-break:break-all;
+  background-color: white;
+  padding: 2px 4px;
+  white-space: normal;
+  border-style: solid;
+  border-width: 1px 2px 2px 1px;
+  word-break:break-all;
 }

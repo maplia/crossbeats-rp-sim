@@ -34,7 +34,7 @@ module CxbRank
 				end
 
 				if rate(diff)
-					unless send("#{$config.music_diffs[diff].downcase}_rate_before_type_cast").is_i?
+					unless send("#{$config.music_diffs[diff].downcase}_rate_before_type_cast").is_f?
 						return SKILL_ERRORS[diff][ERROR_RATE_NOT_NUMERIC]
 					end
 					unless (0..100).include?(rate(diff))
@@ -164,14 +164,6 @@ module CxbRank
 
 		def display_diff
 			return @ignore_locked ? iglock_best_diff : (best_diff == iglock_best_diff ? best_diff : iglock_best_diff)
-		end
-
-		def best_point_with_bonus
-			return best_point ? best_point * (best_diff == MUSIC_DIFF_UNL ? 1.01 : 1.00) : best_point 
-		end
-
-		def iglock_best_point_with_bonus
-			return iglock_best_point ? iglock_best_point * (iglock_best_diff == MUSIC_DIFF_UNL ? 1.01 : 1.00) : iglock_best_point 
 		end
 
 		def edit_uri
@@ -403,20 +395,6 @@ module CxbRank
 				next if type == MUSIC_TYPE_REV_BONUS
 				point_hash[type] = 0.0
 
-				if type == MUSIC_TYPE_REV_SINGLE
-					point_hash[MUSIC_TYPE_REV_BONUS] = 0.0
-					skills = skills.dup
-					skills.sort! do |a, b|
-						if (a.best_point_with_bonus || 0.0) != (b.best_point_with_bonus || 0.0)
-							-((a.best_point_with_bonus || 0.0) <=> (b.best_point_with_bonus || 0.0))
-						elsif (a.iglock_best_point_with_bonus || 0.0) != (b.iglock_best_point_with_bonus || 0.0)
-							-((a.iglock_best_point_with_bonus || 0.0) <=> (b.iglock_best_point_with_bonus || 0.0))
-						else
-							0
-						end
-					end
-				end
-
 				skills[0..(MUSIC_TYPE_ST_COUNTS[type]) - 1].each do |skill|
 					target_point = (options[:ignore_locked] ? skill.iglock_best_point : skill.best_point)
 					if type != MUSIC_TYPE_REV_COURSE
@@ -426,11 +404,15 @@ module CxbRank
 					next if (target_point || 0.0) == 0.0
 					point_hash[type] += target_point
 					skill.rp_target = true
-					if type == MUSIC_TYPE_REV_SINGLE and target_diff == MUSIC_DIFF_UNL
-						point_hash[MUSIC_TYPE_REV_BONUS] += target_point * 0.01
-					end
 				end
+
 				if type == MUSIC_TYPE_REV_SINGLE
+					point_hash[MUSIC_TYPE_REV_BONUS] = 0.0
+					skills.each do |skill|
+						if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (options[:ignore_locked] or !skill.locked?(MUSIC_DIFF_UNL))
+							point_hash[MUSIC_TYPE_REV_BONUS] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+						end
+					end
 					point_hash[MUSIC_TYPE_REV_BONUS] = (point_hash[MUSIC_TYPE_REV_BONUS] * 100.0).to_i / 100.0
 				end
 			end

@@ -6,13 +6,7 @@ require 'cxbrank/validate'
 
 module CxbRank
 	class SkillListMaker < PageMaker
-		private
-		def page_title
-			user = (@session ? @session[:user] : User.find(@params[:user_id].to_i))
-			return "#{user.name}さんのランクポイント表"
-		end
-		
-		def last_data_modified
+		def last_modified
 			user_id = (@session ? @session[:user].user_id : @params[:user_id])
 			updated_at_array = []
 			music_skills = Skill.find(:all, :conditions => {:user_id => user_id})
@@ -23,6 +17,12 @@ module CxbRank
 			end
 
 			return updated_at_array.max
+		end
+
+		private
+		def page_title
+			user = (@session ? @session[:user] : User.find(@params[:user_id].to_i))
+			return "#{user.name}さんのランクポイント表"
 		end
 	end
 
@@ -53,10 +53,6 @@ module CxbRank
 			@params = params
 			@edit = false
 			@template_html = 'skill/skill_list.html.erb'
-		end
-
-		def last_modified
-			return last_data_modified
 		end
 
 		def to_html

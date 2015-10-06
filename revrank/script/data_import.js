@@ -1,5 +1,5 @@
-var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/';
-var COMMON_SCRIPT_URI = MAPLIA_BASE_URI + 'script/revrank_common.js';
+var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revbeta.maplia.jp/';
+var COMMON_SCRIPT_URI = 'https://revrank.maplia.jp/' + 'script/revrank_common.js';
 
 var RPSIM_EDIT_URI = MAPLIA_BASE_URI + 'bml_edit';
 
@@ -9,7 +9,7 @@ var WAIT_MSEC = 1500;
 var DIALOG_TITLE = 'REV. RankPoint Simulator';
 var DIALOG_FONT_SIZE = '1.7em';
 var PROGRESS_OPTIONS = {
-	title: DIALOG_TITLE, width: 300, height: 160, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
+	title: DIALOG_TITLE, width: 300, height: 170, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
 };
 var ALERT_OPTIONS = {
 	title: DIALOG_TITLE, width: 300, height: 210, font_size: DIALOG_FONT_SIZE
@@ -110,7 +110,7 @@ function parseChallengeRp(document) {
 		return null;
 	} else {
 		// 対象クラスとチャレンジRPを取得して、post用データを作成する
-		var lookupKey = /challenge\/(.+)\.png/.exec($(document).find('.rpc-image')[0].src)[1];
+		var lookupKey = /challenge\/([^\.]+\.png)/.exec($(document).find('.rpc-image')[0].src)[1];
 		var point = parseFloat(/(\d+\.\d+)/.exec($(document).find('.rpc-cTxt')[0].textContent)[1]);
 		return {
 			'type': 'course', 'lookup_key': lookupKey,
