@@ -1,82 +1,82 @@
 <tr>
-  <% if $config.cxb_mode? %>
-  	<th rowspan="3" style="width: 3.0em">
-  		<% if music.limited? %>
-  			-
-  		<% else %>
-  			<%= music.number %>
-  		<% end %>
-  	</th>
-  <% end %>
+	<% if $config.cxb_mode? %>
+		<th rowspan="3" style="width: 3.0em">
+			<% if music.limited? %>
+				-
+			<% else %>
+				<%= music.number %>
+			<% end %>
+		</th>
+	<% end %>
 	<td rowspan="3" class="title text">
 		<%= music.title %>
-    <% if music.subtitle %>
-      <br/><%= music.subtitle %>
-    <% end %>
+		<% if music.subtitle %>
+			<br/><%= music.subtitle %>
+		<% end %>
 	</td>
 	<% $config.music_diffs.keys.sort.each do |diff| %>
-    <% if music.exist?(diff) %>
-  		<td rowspan="2" class="rank 
-  			<% if fullcombo?(diff) %>
-  				fullcombo
-  			<% elsif failed?(diff) %>
-  				failed
-  			<% end %>
-  		">
-  			<% if cleared?(diff) %>
-  				<%= SP_RANK_STATUSES[rank(diff)] %>
-  			<% elsif failed?(diff) %>
-  				F
-  			<% else %>
-  				&nbsp;
-  			<% end %>
-  		</td>
-    <% else %>
-      <td class="<%= $config.music_diffs[diff].downcase %> mark" colspan="2" rowspan="3">
-        -
-      </td>
-    <% end %>
-    <% if music.exist?(diff) %>
-  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
+		<% if music.exist?(diff) %>
+			<td rowspan="2" class="rank 
+				<% if fullcombo?(diff) %>
+					fullcombo
+				<% elsif failed?(diff) %>
+					failed
+				<% end %>
+			">
+				<% if cleared?(diff) %>
+					<%= SP_RANK_STATUSES[rank(diff)] %>
+				<% elsif failed?(diff) %>
+					F
+				<% else %>
+					&nbsp;
+				<% end %>
+			</td>
+		<% else %>
+			<td class="<%= $config.music_diffs[diff].downcase %> mark" colspan="2" rowspan="3">
+				-
+			</td>
+		<% end %>
+		<% if music.exist?(diff) %>
+			<td class="<%= $config.music_diffs[diff].downcase %> mark">
 				<%= point_to_s(diff) %>
-  		</td>
-    <% end %>
+			</td>
+		<% end %>
 	<% end %>
 </tr>
 <tr>
 	<% $config.music_diffs.keys.sort.each do |diff| %>
-    <% if music.exist?(diff) %>
-  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
-        <%= rate_to_s(diff) %>
-  		</td>
-    <% end %>
+		<% if music.exist?(diff) %>
+			<td class="<%= $config.music_diffs[diff].downcase %> mark">
+				<%= rate_to_s(diff) %>
+			</td>
+		<% end %>
 	<% end %>
 </tr>
 <tr>
 	<% $config.music_diffs.keys.sort.each do |diff| %>
-    <% if music.exist?(diff) %>
-  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
-  		  <% if music.exist?(diff) %>
-    			Lv.<%= music.level_to_s(diff) %>
-    			<% if locked?(diff) %>
-    				<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
-    			<% end %>
-    			<% if survival?(diff) %>
-    			  [S]
-          <% elsif ultimate?(diff) %>
-            [U]
-    			<% end %>
-        <% else %>
-          -
-        <% end %>
-  		</td>
-  		<td class="<%= $config.music_diffs[diff].downcase %> mark">
-  			<% if fullcombo?(diff) %>
-  				<%= SP_COMBO_STATUSES[combo(diff)] %>
-  			<% else %>
-  				&nbsp;
-  			<% end %>
-  		</td>
-    <% end %>
+		<% if music.exist?(diff) %>
+			<td class="<%= $config.music_diffs[diff].downcase %> mark">
+				<% if music.exist?(diff) %>
+					Lv.<%= music.level_to_s(diff) %>
+					<% if locked?(diff) %>
+						<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
+					<% end %>
+					<% if survival?(diff) %>
+						<img src="/images/survival.png" alt="[S]" height="12"/>
+					<% elsif ultimate?(diff) %>
+						<img src="/images/ultimate.png" alt="[U]" height="12"/>
+					<% end %>
+				<% else %>
+					-
+				<% end %>
+			</td>
+			<td class="<%= $config.music_diffs[diff].downcase %> mark">
+				<% if fullcombo?(diff) %>
+					<%= SP_COMBO_STATUSES[combo(diff)] %>
+				<% else %>
+					&nbsp;
+				<% end %>
+			</td>
+		<% end %>
 	<% end %>
 </tr>

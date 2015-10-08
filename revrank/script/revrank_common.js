@@ -9,6 +9,7 @@ var JQUERY_UI_STYLE_URI = 'https://code.jquery.com/ui/1.11.4/themes/eggplant/jqu
 
 var RPSIM_LOGIN_URI = MAPLIA_BASE_URI + 'bml_login';
 var RPSIM_UPDATE_MASTER_URI = MAPLIA_BASE_URI + 'bml_update_master';
+var RPSIM_LOGOUT_URI = MAPLIA_BASE_URI + 'bml_logout';
 
 var MESSAGE_SESSION_IS_DEAD = '処理の途中でセッションが終了しました。最初からやり直してください。';
 
@@ -103,6 +104,7 @@ function loginToRpSim(progress, userData) {
 		} else {
 			console.log('REV. RankPoint Simulator ユーザ登録確認');
 			userData.key = response.key;
+			userData.user_id = response.user_id;
 			deferred.resolve();
 		}
 	});
@@ -177,6 +179,20 @@ function updateMasterData(sessionKey, type, item) {
 			deferred.resolve();
 			break;
 		}
+	});
+	return deferred.promise();
+}
+
+// RPシミュレータからログアウトする
+function logoutFromRpSim(progress, userData) {
+	var deferred = $.Deferred();
+	$.post(RPSIM_LOGOUT_URI, 'key=' + userData.key, function (response) {
+		if (response.status != 200) {
+			console.log('ログアウト異常発生');
+		} else {
+			console.log('ログアウト');
+		}
+		deferred.resolve();
 	});
 	return deferred.promise();
 }

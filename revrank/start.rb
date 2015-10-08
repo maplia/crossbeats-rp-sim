@@ -242,7 +242,7 @@ post '/bml_edit' do
 	to_json(executor.execute)
 end
 
-get '/bml_logout' do
+post '/bml_logout' do
 	executor = CxbRank::BookmarkletSessionTerminator.new(params)
 	to_json(executor.execute)
 end

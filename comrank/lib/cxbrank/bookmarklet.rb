@@ -34,7 +34,7 @@ module CxbRank
 				return {:status => 500}
 			end
 
-			return {:status => 200, :key => bml_session.key}
+			return {:status => 200, :key => bml_session.key, :user_id => user.user_id}
 		end
 	end
 
@@ -125,6 +125,7 @@ module CxbRank
 					skill.send("#{diff_name}_stat=", body[diff_name.to_sym][:stat])
 					skill.send("#{diff_name}_point=", body[diff_name.to_sym][:point])
 					skill.send("#{diff_name}_rate=", body[diff_name.to_sym][:rate])
+					skill.send("#{diff_name}_rate_f=", 1)
 					skill.send("#{diff_name}_rank=", body[diff_name.to_sym][:rank])
 					skill.send("#{diff_name}_combo=", body[diff_name.to_sym][:combo])
 					skill.send("#{diff_name}_gauge=", body[diff_name.to_sym][:gauge])
@@ -176,7 +177,7 @@ module CxbRank
 				return {:status => 401}
 			end
 
-			bml_session = BookmarkletSession.find(:first, {:key => @params[:key]})
+			bml_session = BookmarkletSession.find(:first, :conditions => {:key => @params[:key]})
 			unless bml_session
 				return {:status => 401}
 			end

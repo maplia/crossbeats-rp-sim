@@ -106,6 +106,10 @@ module CxbRank
 			return locked(diff) == 1
 		end
 
+		def rate_is_f?(diff)
+			return send("#{$config.music_diffs[diff].downcase}_rate_f") == 1
+		end
+
 		def u_rate(diff)
 			unless survival?(diff) or ultimate?(diff)
 				return nil
@@ -175,7 +179,15 @@ module CxbRank
 		end
 
 		def rate_to_s(diff, nlv='&ndash;')
-			return (cleared?(diff) ? sprintf('%d%%', rate(diff)) : nlv)
+			unless cleared?(diff)
+				return nlv
+			else
+				if rate_is_f?(diff)
+					return sprintf('%d<small>.%02d</small>%%', rate(diff).to_i, (rate(diff) * 100).to_i % 100)
+				else
+					return sprintf('%d%%', rate(diff).to_i)
+				end
+			end
 		end
 
 		def u_rate_to_s(diff, nlv='')
@@ -410,9 +422,11 @@ module CxbRank
 					point_hash[MUSIC_TYPE_REV_BONUS] = 0.0
 					skills.each do |skill|
 						if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (options[:ignore_locked] or !skill.locked?(MUSIC_DIFF_UNL))
+							skill_hash[MUSIC_TYPE_REV_BONUS] << skill
 							point_hash[MUSIC_TYPE_REV_BONUS] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
 						end
 					end
+					skill_hash[MUSIC_TYPE_REV_BONUS].sort!
 					point_hash[MUSIC_TYPE_REV_BONUS] = (point_hash[MUSIC_TYPE_REV_BONUS] * 100.0).to_i / 100.0
 				end
 			end

@@ -1,7 +1,8 @@
-var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revbeta.maplia.jp/';
-var COMMON_SCRIPT_URI = 'https://revrank.maplia.jp/' + 'script/revrank_common.js';
+var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/';
+var COMMON_SCRIPT_URI = MAPLIA_BASE_URI + 'script/revrank_common.js';
 
 var RPSIM_EDIT_URI = MAPLIA_BASE_URI + 'bml_edit';
+var RPSIM_VIEW_URI = 'http://revtest.maplia.jp/' + 'view';
 
 var MUSIC_DIFFS = ['esy', 'std', 'hrd', 'mas', 'unl'];
 var GRADES = ['S++', 'S+', 'S', 'A+', 'A', 'B+', 'B', 'C', 'D', 'E'];
@@ -12,7 +13,7 @@ var PROGRESS_OPTIONS = {
 	title: DIALOG_TITLE, width: 300, height: 170, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
 };
 var ALERT_OPTIONS = {
-	title: DIALOG_TITLE, width: 300, height: 210, font_size: DIALOG_FONT_SIZE
+	title: DIALOG_TITLE, width: 300, height: 190, font_size: DIALOG_FONT_SIZE
 };
 
 var progress = null;
@@ -190,7 +191,7 @@ function parseMusicRp(document, lookupKey) {
 			var point = parseFloat($(element).find('.pdResultList dd')[2].textContent);
 			bodyDiff.point = point;
 			// クリアレート
-			var rate = parseInt($(element).find('.pdResultList dd')[1].textContent);
+			var rate = parseFloat($(element).find('.pdResultList dd')[1].textContent);
 			bodyDiff.rate = rate;
 			// ゲージタイプ
 			var gaugeSrc = ($(element).find('.clear p').length == 1 ? $(element).find('.clear p img')[0].src : 'bnr_dummy_CLEAR.png'); 
@@ -235,10 +236,15 @@ $.getScript(COMMON_SCRIPT_URI).done(function () {
 		return updateChallengeRp(progress, userData);
 	}).then(function () {
 		return updateMusicRps(progress, userData, musicList);
+	}).then(function () {
+		return logoutFromRpSim(progress, userData);
 	}).done(function () {
 		$('body').css('cursor', 'auto');
 		progress.close();
-		return $.alert('REV. RankPoint Simulatorの更新が完了しました。', ALERT_OPTIONS);
+		return $.confirm('REV. RankPoint Simulatorの更新が完了しました。ランクポイント表へ移動しますか?', ALERT_OPTIONS,
+			function () {
+				location.href = RPSIM_VIEW_URI + '/' + userData.user_id;
+			});
 	}).fail(function (e) {
 		$('body').css('cursor', 'auto');
 		if (progress) {

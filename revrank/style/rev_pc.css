@@ -47,5 +47,8 @@ input.point {
   width: 4.0em;
 }
 input.rate {
-  width: 2.5em;
+  width: 4.0em;
+}
+input.rate {
+  width: 4.0em;
 }

@@ -4,6 +4,10 @@ require 'cxbrank/util'
 require 'cxbrank/const'
 
 module CxbRank
+	class MusicEdit < ActiveRecord::Base
+		set_table_name '_musics'
+	end
+
 	class Music < ActiveRecord::Base
 		include Comparable
 		include ErbFileRead

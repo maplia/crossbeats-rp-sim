@@ -40,6 +40,11 @@
 				return this;
 			},
 			close: function () {
+				jQuery('#progress-message1').text('');
+				jQuery('#progress-massage2').text('');
+				jQuery('#progressbar').progressbar({
+					max: 0, value: false
+				});
 				jQuery('#progress-dialog').dialog('close');
 			},
 			cancel: function () {

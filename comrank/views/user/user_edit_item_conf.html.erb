@@ -39,7 +39,10 @@
 				<td>
 					<%= game_id %>
 					<% if game_id_display == 0 %>
-						（ユーザーID非公開）
+						<% if $mobile %>
+							<br/>
+						<% end %>
+						（REV.ID非公開）
 					<% end %>
 				</td>
 			<% end %>
@@ -47,7 +50,7 @@
 	<% end %>
 	<tr>
 		<% if $mobile %>
-			<th>ユーザー</th>
+			<th>コメント</th>
 		<% else %>
 			<th>ユーザーコメント</th>
 		<% end %>

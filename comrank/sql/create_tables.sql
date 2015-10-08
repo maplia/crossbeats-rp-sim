@@ -117,6 +117,7 @@ create table if not exists `skills` (
 	, `esy_gauge` int(1) default 0
 	, `esy_point` float
 	, `esy_rate` float
+	, `esy_rate_f` int(1)
 	, `esy_rank` int(2) default 0
 	, `esy_combo` int(2) default 0
 	, `std_stat` int(1) default 0
@@ -124,6 +125,7 @@ create table if not exists `skills` (
 	, `std_gauge` int(1) default 0
 	, `std_point` float
 	, `std_rate` float
+	, `std_rate_f` int(1)
 	, `std_rank` int(2) default 0
 	, `std_combo` int(2) default 0
 	, `hrd_stat` int(1) default 0
@@ -131,6 +133,7 @@ create table if not exists `skills` (
 	, `hrd_gauge` int(1) default 0
 	, `hrd_point` float
 	, `hrd_rate` float
+	, `hrd_rate_f` int(1)
 	, `hrd_rank` int(2) default 0
 	, `hrd_combo` int(2) default 0
 	, `mas_stat` int(1) default 0
@@ -138,6 +141,7 @@ create table if not exists `skills` (
 	, `mas_gauge` int(1) default 0
 	, `mas_point` float
 	, `mas_rate` float
+	, `mas_rate_f` int(1)
 	, `mas_rank` int(2) default 0
 	, `mas_combo` int(2) default 0
 	, `unl_stat` int(1) default 0
@@ -145,6 +149,7 @@ create table if not exists `skills` (
 	, `unl_gauge` int(1) default 0
 	, `unl_point` float
 	, `unl_rate` float
+	, `unl_rate_f` int(1)
 	, `unl_rank` int(2) default 0
 	, `unl_combo` int(2) default 0
 	, `comment` varchar(128)

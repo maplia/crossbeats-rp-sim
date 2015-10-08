@@ -69,6 +69,7 @@ module CxbRank
 				skill.send("#{music_diff_name}_stat=", @params["#{music_diff_name}_stat".to_sym])
 				skill.send("#{music_diff_name}_point=", @params["#{music_diff_name}_point".to_sym])
 				skill.send("#{music_diff_name}_rate=", @params["#{music_diff_name}_rate".to_sym])
+				skill.send("#{music_diff_name}_rate_f=", !@params["#{music_diff_name}_rate".to_sym].is_i?)
 				skill.send("#{music_diff_name}_rank=", @params["#{music_diff_name}_rank".to_sym])
 				skill.send("#{music_diff_name}_combo=", @params["#{music_diff_name}_combo".to_sym])
 				if @params["#{music_diff_name}_locked".to_sym]
@@ -221,81 +222,5 @@ module CxbRank
 	end
 
 	class CourseSkillEditRegistrar < SkillEditRegistrar
-	end
-
-	class SkillEditorDirect
-		def initialize(data)
-			@data = data
-		end
-
-		def execute
-			if @data.nil? or @data[:game_id].nil? or @data[:lookup_key].nil? or @data[:body].nil?
-				return {:status => 400}
-			end
-			
-			user = User.find_by_param_id(@data[:game_id])
-			unless user
-				return {:status => 401}
-			end
-
-			lookup_key = @data[:lookup_key]
-			body = @data[:body]
-
-			case @data[:type]
-			when 'music'
-				music = Music.find(:first, :conditions => {:lookup_key => lookup_key})
-				unless music
-					return {:status => 400}
-				end
-				skill = Skill.find(:first,
-					:conditions => {:user_id => user.id, :music_id => music.id})
-				unless skill
-					skill = Skill.new
-					skill.user_id = user.id
-					skill.music = music
-				end
-				body.keys.each do |diff_name|
-					skill.send("#{diff_name}_stat=", body[diff_name.to_sym][:stat])
-					skill.send("#{diff_name}_point=", body[diff_name.to_sym][:point])
-					skill.send("#{diff_name}_rate=", body[diff_name.to_sym][:rate])
-					skill.send("#{diff_name}_rank=", body[diff_name.to_sym][:rank])
-					skill.send("#{diff_name}_combo=", body[diff_name.to_sym][:combo])
-					skill.send("#{diff_name}_gauge=", body[diff_name.to_sym][:gauge])
-				end
-			when 'course'
-				course = Course.find(:first, :conditions => {:lookup_key => lookup_key})
-				unless course
-					return {:status => 400}
-				end
-				skill = CourseSkill.find(:first,
-					:conditions => {:user_id => user.id, :course_id => course.id})
-				unless skill
-					skill = CourseSkill.new
-					skill.user_id = user.id
-					skill.course = course
-				end
-				skill.stat = body[:stat]
-				skill.point = body[:point]
-			end
-			skill.calc!
-
-			if skill.id or skill.best_point > 0.0
-				begin
-					skill.save!
-				rescue
-					return {:status => 500}
-				end
-				skill_set = SkillSet.find_by_user(user)
-				user.point = skill_set.total_point
-				user.point_updated_at = Time.now
-				begin
-					user.save!
-				rescue
-					return {:status => 500}
-				end
-			end
-
-			return {:status => 200}
-		end
 	end
 end

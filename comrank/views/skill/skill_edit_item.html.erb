@@ -25,7 +25,7 @@
 						CLEAR RATE:
 						<input type="text" name="<%= name_init %>_rate" class="rate"
 							maxlength="<%= RATE_FIGURE %>" size="<%= RATE_FIGURE %>"
-							value="<%= rate(diff) ? rate_to_s(diff).gsub(/%/, '') : '' %>"
+							value="<%= rate(diff) ? rate_to_s(diff).gsub(/%/, '').gsub(/<\/?small>/, '') : '' %>"
 						/>%
 					</label>
 					<label>
