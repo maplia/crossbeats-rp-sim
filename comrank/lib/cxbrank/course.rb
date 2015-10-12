@@ -11,6 +11,11 @@ module CxbRank
 		include ERB::Util
 		has_many :course_musics
 
+		def self.last_modified
+			course = self.find(:first, :order => 'updated_at desc')
+			return (course ? course.updated_at : nil)
+		end
+
 		def notes
 			sum = 0
 			course_musics.each do |course_music|

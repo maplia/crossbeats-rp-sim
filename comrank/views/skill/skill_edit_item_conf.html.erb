@@ -6,7 +6,7 @@
 			<th class="mark">S/U</th>
 			<th class="point">RP</th>
 			<% if before %>
-				<th class="diff">差異</th>
+				<th class="point">差異</th>
 			<% end %>
 			<th class="rate">RATE</th>
 			<% if $config.rev_mode? %>
@@ -25,7 +25,7 @@
 			<% unless $mobile %>
 				<tr class="<%= $config.music_diffs[diff].downcase %>">
 					<th class="diff"><%= $config.music_diffs[diff] %></th>
-					<td><%= music.level_to_s(diff) %></td>
+					<td class="level"><%= music.level_to_s(diff) %></td>
 					<td class="mark">
 						<% if locked?(diff) %>
 							<img src="/images/padlock.png" alt="&#x1f512;" height="12"/>
@@ -33,9 +33,9 @@
 					</td>
 					<td class="mark">
 						<% if survival?(diff) %>
-							SURV
+							<img src="/images/survival.png" alt="S" height="12"/>
 						<% elsif ultimate?(diff) %>
-							ULT
+							<img src="/images/ultimate.png" alt="U" height="12"/>
 						<% end %>
 					</td>
 					<td class="point">
@@ -44,7 +44,7 @@
 					<% if before %>
 						<% difference = (point(diff) || 0.0) - (before.point(diff) || 0.0) %>
 						<% if difference == 0.0 %>
-							<td class="rate">&ndash;</td>
+							<td class="rate">&plusmn;0.00</td>
 						<% else %>
 							<% diff_class = (difference > 0.0 ? 'inc' : 'dec') %>
 							<td class="rate <%= diff_class %>"><%= sprintf('%+.2f', difference) %></td>

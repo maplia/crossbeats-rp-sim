@@ -20,9 +20,8 @@ module CxbRank
 				return make_error_page(ERROR_SESSION_IS_DEAD, SITE_TOP_URI)
 			end
 
-			unless @params
+			if @session[:music]
 				music = @session[:music]
-				skill = @session[:temp_skill]
 			else
 				text_id = @params[:text_id]
 				error_no = validate_music_text_id(text_id)
@@ -32,19 +31,26 @@ module CxbRank
 
 				music = Music.find(:first, :conditions => {:text_id => text_id})
 				@session[:music] = music
-				skill = Skill.find(:first, :conditions => {
-					:user_id => @session[:user].id, :music_id => music.id,
-				})
-				if skill
-					@session[:before_skill] = skill
+			end
+
+			before_skill = Skill.find(:first, :conditions => {
+				:user_id => @session[:user].id, :music_id => music.id,
+			})
+
+			if @session[:temp_skill]
+				skill = @session[:temp_skill]
+			else
+				if before_skill
+					skill = before_skill
 				else
 					skill = Skill.new
-					skill.user_id = @session[:user].user_id
+					skill.user_id = @session[:user].id
 					skill.music = music
 				end
 				@session[:temp_skill] = skill
 			end
-			page_title = "ランクポイント編集 [{music.full_title}]"
+
+			page_title = "ランクポイント編集 [#{music.full_title}]"
 
 			return ERB.new(read_template).result(binding)
 		end
@@ -62,6 +68,10 @@ module CxbRank
 				return make_error_page(ERROR_SESSION_IS_DEAD, SITE_TOP_URI)
 			end
 
+			before_skill = Skill.find(:first, :conditions => {
+				:user_id => @session[:user].id, :music_id => @session[:music].id,
+			})
+
 			skill = @session[:temp_skill]
 			skill.comment = @params[:comment]
 			$config.music_diffs.keys.each do |diff|
@@ -69,7 +79,11 @@ module CxbRank
 				skill.send("#{music_diff_name}_stat=", @params["#{music_diff_name}_stat".to_sym])
 				skill.send("#{music_diff_name}_point=", @params["#{music_diff_name}_point".to_sym])
 				skill.send("#{music_diff_name}_rate=", @params["#{music_diff_name}_rate".to_sym])
-				skill.send("#{music_diff_name}_rate_f=", !@params["#{music_diff_name}_rate".to_sym].is_i?)
+				if @params["#{music_diff_name}_rate".to_sym] and !@params["#{music_diff_name}_rate".to_sym].is_i?
+					skill.send("#{music_diff_name}_rate_f=", 1)
+				else
+					skill.send("#{music_diff_name}_rate_f=", 0)
+				end
 				skill.send("#{music_diff_name}_rank=", @params["#{music_diff_name}_rank".to_sym])
 				skill.send("#{music_diff_name}_combo=", @params["#{music_diff_name}_combo".to_sym])
 				if @params["#{music_diff_name}_locked".to_sym]
@@ -154,9 +168,8 @@ module CxbRank
 				return make_error_page(ERROR_SESSION_IS_DEAD, SITE_TOP_URI)
 			end
 
-			unless @params
+			if @session[:course]
 				course = @session[:course]
-				skill = @session[:temp_skill]
 			else
 				text_id = @params[:text_id]
 				error_no = validate_course_text_id(text_id)
@@ -166,18 +179,25 @@ module CxbRank
 
 				course = Course.find(:first, :conditions => {:text_id => text_id})
 				@session[:course] = course
-				skill = CourseSkill.find(:first, :conditions => {
-					:user_id => @session[:user].id, :course_id => course.id,
-				})
-				if skill
-					@session[:before_skill] = skill
+			end
+
+			before_skill = CourseSkill.find(:first, :conditions => {
+				:user_id => @session[:user].id, :course_id => course.id,
+			})
+
+			if @session[:temp_skill]
+				skill = @session[:temp_skill]
+			else
+				if before_skill
+					skill = before_skill
 				else
 					skill = CourseSkill.new
-					skill.user_id = @session[:user].user_id
+					skill.user_id = @session[:user].id
 					skill.course = course
 				end
 				@session[:temp_skill] = skill
 			end
+
 			page_title = "ランクポイント編集 [{course.name}]"
 
 			return ERB.new(read_template).result(binding)
@@ -195,6 +215,10 @@ module CxbRank
 			unless @session[:user]
 				return make_error_page(ERROR_SESSION_IS_DEAD, SITE_TOP_URI)
 			end
+
+			before_skill = CourseSkill.find(:first, :conditions => {
+				:user_id => @session[:user].id, :course_id => @session[:course].id,
+			})
 
 			skill = @session[:temp_skill]
 			skill.comment = @params[:comment]

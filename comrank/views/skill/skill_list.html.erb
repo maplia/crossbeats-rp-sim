@@ -61,10 +61,12 @@
 								<th>#</th>
 								<% if type == MUSIC_TYPE_REV_COURSE %>
 									<th class="title">コース名</th>
+									<th class="mark">レベル</th>
+									<th class="mark">完奏</th>
 								<% else %>
 									<th class="title">タイトル</th>
+									<th class="level">レベル</th>
 								<% end %>
-								<th class="level">レベル</th>
 								<th class="point">RP</th>
 								<th class="rate">RATE</th>
 								<% if skill_set.skill_hash[type][0].instance_of?(Skill) %>
@@ -83,7 +85,7 @@
 						<% row = 1 %>
 						<% skill_set.skill_hash[type].each do |skill| %>
 							<% next if !@edit and (skill.iglock_best_point || 0.0) == 0.0 %>
-							<%= skill.to_html(@edit, row, ignore_locked) %>
+							<%= skill.to_html(@edit, row, type == MUSIC_TYPE_REV_BONUS) %>
 							<% row = row + 1 %>
 						<% end %>
 					</tbody>

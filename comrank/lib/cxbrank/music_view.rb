@@ -12,17 +12,22 @@ module CxbRank
 		end
 
 		def last_modified
-			return [Music.maximum('updated_at'), Course.maximum('updated_at')].max 
+			updated_at_array = []
+			updated_at_array << Music.last_modified if Music.last_modified
+			if $config.rev_mode?
+				updated_at_array << Course.last_modified if Course.last_modified
+			end
+
+			return updated_at_array.max
 		end
 
 		def to_html
-			courses = Course.find(:all).sort
 			musics = Music.find(:all).sort
 
 			music_hash = {}
 			if $config.rev_mode?
 				music_hash[MUSIC_TYPE_REV_SINGLE] = musics
-				music_hash[MUSIC_TYPE_REV_COURSE] = courses
+				music_hash[MUSIC_TYPE_REV_COURSE] = Course.find(:all).sort
 				music_hash[MUSIC_TYPE_REV_BONUS] = []
 			else
 				music_hash[MUSIC_TYPE_NORMAL] = []
@@ -50,6 +55,7 @@ module CxbRank
 		end
 
 		def last_modified
+			musics = Music.find(:all)
 			return Music.maximum('updated_at')
 		end
 

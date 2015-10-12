@@ -6,7 +6,7 @@
 		<h2>入力情報</h2>
 		<div class="subunit">
 			<% if @session[:operation] == OPERATION_UPDATE %>
-				<%= skill.to_html_confirm(@session[:before_skill]) %>
+				<%= skill.to_html_confirm(before_skill) %>
 			<% else %>
 				<%= skill.to_html_confirm %>
 			<% end %>

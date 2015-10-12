@@ -10,10 +10,15 @@
 				<%= course.name %>
 			<% end %>
 		</td>
-		<% unless cleared? %>
-			<td colspan="4" class="none">記録なし</td>
+		<% unless played? %>
+			<td colspan="5" class="none">記録なし</td>
 		<% else %>
-			<td class="level"><%= course.level_to_s %></td>
+			<td class="mark"><%= course.level_to_s %></td>
+			<% if stat == SP_COURSE_STATUS_CLEAR %>
+				<td class="mark">○</td>
+			<% else %>
+				<td class="mark">×</td>
+			<% end %>
 			<td class="number"><%= point_to_s %></td>
 			<td class="number"><%= rate_to_s %></td>
 			<td class="mark"><%= SP_COMBO_STATUSES[combo] %></td>
@@ -34,10 +39,15 @@
 		</td>
 	</tr>
 	<tr class="<%= css_class %>">
-		<% unless cleared? %>
-			<td colspan="4" class="none">記録なし</td>
+		<% unless played? %>
+			<td colspan="5" class="none">記録なし</td>
 		<% else %>
 			<td class="level"><%= course.level_to_s %></td>
+			<% if stat == SP_COURSE_STATUS_CLEAR %>
+				<td class="mark">○</td>
+			<% else %>
+				<td class="mark">×</td>
+			<% end %>
 			<td class="number"><%= point_to_s %></td>
 			<td class="number"><%= rate_to_s %></td>
 			<td class="mark"><%= SP_COMBO_STATUSES[combo] %></td>

@@ -18,14 +18,14 @@
 						RP:
 						<input type="text" name="<%= name_init %>_point" class="point"
 							maxlength="<%= POINT_FIGURE %>" size="<%= POINT_FIGURE %>"
-							value="<%= point(diff) ? point_to_s(diff) : '' %>"
+							value="<%= point(diff) ? point_to_s(diff, '') : '' %>"
 						/>
 					</label>
 					<label>
 						CLEAR RATE:
 						<input type="text" name="<%= name_init %>_rate" class="rate"
 							maxlength="<%= RATE_FIGURE %>" size="<%= RATE_FIGURE %>"
-							value="<%= rate(diff) ? rate_to_s(diff).gsub(/%/, '').gsub(/<\/?small>/, '') : '' %>"
+							value="<%= rate(diff) ? rate_to_s(diff, '').gsub(/%/, '').gsub(/<\/?small>/, '') : '' %>"
 						/>%
 					</label>
 					<label>

@@ -56,6 +56,7 @@
 				<dt>■Wiki/個人サイト</dt>
 				<dd>
 					<ul>
+						<li><a href="http://crossbeatsrev.wiki.fc2.com/">crossbeats REV.Wiki</a></li>
 						<li><a href="http://wiki.maplia.jp/?crossbeats%20REV.">MapWiki - crossbeats REV.</a></li>
 					</ul>
 				</dd>
@@ -72,23 +73,45 @@
 				<dt>これは何ですか?</dt>
 				<dd>
 					<p><a href="http://www.capcom.co.jp/">カプコン</a>のアーケードゲーム「<a href="http://www.capcom.co.jp/arcade/rev/">crossbeats REV.（クロスビーツ レヴ）</a>」のランクポイント管理Webアプリケーションです。</p>
-					<p>登録はご自由にどうぞ。</p>
+					<p><del>登録はご自由にどうぞ。</del></p>
+					<p>現状はまだ作成中のため、<em>バグ出しとその修正を目的としたテスト公開</em>としています。本公開の際にはここに登録されたデータは引き継ぐ予定がありませんので、ご了承のうえ利用してください。</p>
 				</dd>
 				<dt>ブックマークレット</dt>
 				<dd>
 					<p>「REV.」では<a href="https://rev-www.ac.capcom.jp/weblogin">Web上のMY DATAページ</a>でプレイデータの閲覧を行うことができるため、このデータを取り込むことができるようにするためにブックマークレットによる更新方法を用意しています。</p>
-					<p>使用するには以下のURLをブックマークに登録し、<a href="https://rev-www.ac.capcom.jp/profile">MY DATAにログインした直後に表示されるページ</a>にいる状態で先ほど登録したブックマークを開きます。</p>
-					<pre>javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://secure508.sakura.ne.jp/revtest.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()</pre>
+					<p>使用するには以下のURLをブックマークに登録し、<a href="https://rev-www.ac.capcom.jp/profile">MY DATAにログインした直後に表示されるページ</a>にいる状態で登録したブックマークを開きます。</p>
+					<pre>javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://revrank.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()</pre>
 					<dl>
 						<dt>ブックマーク登録 (PC)</dt>
 						<dd>
-							<p>PCの場合は<a href="javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://secure508.sakura.ne.jp/revtest.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()">このリンク</a>をブックマークとして登録します。</p>
+							<p>PCの場合は<a href="javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://revrank.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()">このリンク</a>をブックマークとして登録します。</p>
+							<p>※Windows 7の、ChromeおよびFirefox（ともに最新版）での動作を確認しています</p>
 						</dd>
 						<dt>ブックマーク登録 (スマートフォン)</dt>
 						<dd>
-							<p>スマートフォンの場合は<a href="./#javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://secure508.sakura.ne.jp/revtest.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()">このリンク</a>をブックマークとして登録した後、ブックマークの編集で「javascript:」よりも前の部分を削除してください。</p>
+							<p>スマートフォンの場合は<a href="./#javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://revrank.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()">このリンク</a>をブックマークとして登録した後、ブックマークの編集でURLから「javascript:」よりも前の部分を削除してください。</p>
+							<p>※iPhone 5S（iOS 8.4搭載）の、Safariでの動作を確認しています</p>
 						</dd>
 					</dl>
+				</dd>
+				<dt>ランクポイント算出方法</dt>
+				<dd>
+					<p>ランクポイントは現在以下の項目の合計で算出しています。誤りがあれば修正される可能性があります。</p>
+					<ol>
+						<li><u>単曲RPのうち、数値が大きい順に並べた上位20曲分のRP合計</u>
+							<ul>
+								<li>以前の仕様にあったUNLIMITED譜面RPの1%ボーナスはありません</li>
+							</ul>
+						</li>
+						<li><u>単曲RPのうち、<em>上位20曲から漏れた曲に限った</em>、UNLIMITED譜面RPの1%の合計</u>
+							<ul>
+								<li>RPの1%を合計したあとに、その小数点以下第2位未満を切り捨てます</li>
+								<li>MASTER以下の譜面がその曲の最大RPになっていても合計対象です</li>
+							</ul>
+						</li>
+						<li><u>チャレンジRPのうち、数値が最も大きい1コースのRP</u></li>
+					</ol>
+					<p>クリアレートからRP算出するまでの処理はこのRPシミュレータでは行っていないので省きます。</p>
 				</dd>
 			</dl>
 		</div>

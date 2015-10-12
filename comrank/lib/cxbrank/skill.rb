@@ -13,6 +13,21 @@ module CxbRank
 		include ERB::Util
 		belongs_to :music
 
+		@@ignore_locked = false
+
+		def self.ignore_locked=(ignore_locked)
+			@@ignore_locked = ignore_locked
+		end
+
+		def self.ignore_locked
+			return @@ignore_locked
+		end
+
+		def self.last_modified(user)
+			skill = self.find(:first, :conditions => {:user_id => user.id}, :order => 'updated_at desc')
+			return (skill ? skill.updated_at : nil)
+		end
+
 		def validate
 			$config.music_diffs.keys.sort.each do |diff|
 				next unless music.exist?(diff)
@@ -132,7 +147,7 @@ module CxbRank
 			$config.music_diffs.keys.each do |diff|
 				if music.exist?(diff)
 					if point(diff).nil? and rate(diff)
-						temp_point = music.level(diff) * ((rate(diff) || 0) / 100.0)
+						temp_point = music.level(diff) * ((rate(diff) ? rate(diff).to_i : 0) / 100.0)
 						if survival?(diff)
 							temp_point = temp_point * BONUS_RATE_SURVIVAL
 						elsif ultimate?(diff)
@@ -162,12 +177,12 @@ module CxbRank
 			return @target == true
 		end
 
-		def ignore_locked=(flag)
-			@ignore_locked = flag
+		def target_diff
+			return @@ignore_locked ? iglock_best_diff : (best_diff == iglock_best_diff ? best_diff : iglock_best_diff)
 		end
 
-		def display_diff
-			return @ignore_locked ? iglock_best_diff : (best_diff == iglock_best_diff ? best_diff : iglock_best_diff)
+		def target_point
+			return point(target_diff)
 		end
 
 		def edit_uri
@@ -175,7 +190,11 @@ module CxbRank
 		end
 
 		def point_to_s(diff, nlv='&ndash;')
-			return (cleared?(diff) ? sprintf('%.2f', point(diff)) : nlv)
+			return cleared?(diff) ? sprintf('%.2f', point(diff)) : nlv
+		end
+
+		def point_bonus_to_s(diff, nlv='&ndash;')
+			return cleared?(diff) ? sprintf('%.2f', BigDecimal((point(diff) * BONUS_RATE_UNLIMITED).to_s).floor(2)) : nlv
 		end
 
 		def rate_to_s(diff, nlv='&ndash;')
@@ -203,7 +222,7 @@ module CxbRank
 			end
 		end
 
-		def to_html(edit, row, ignore_locked=false)
+		def to_html(edit, row, bonus=false)
 			template_html = 'skill/skill_list_item.html.erb'
 			return ERB.new(read_erb_file(template_html)).result(binding)
 		end
@@ -228,12 +247,18 @@ module CxbRank
 		end
 
 		def <=>(other)
-			if (best_point || 0.0) != (other.best_point || 0.0)
-				return -((best_point || 0.0) <=> (other.best_point || 0.0))
-			elsif (iglock_best_point || 0.0) != (other.iglock_best_point || 0.0)
-				return -((iglock_best_point || 0.0) <=> (other.iglock_best_point || 0.0))
+			if @@ignore_locked
+				if (iglock_best_point || 0.0) != (other.iglock_best_point || 0.0)
+					return -((iglock_best_point || 0.0) <=> (other.iglock_best_point || 0.0))
+				else
+					return music.sort_key <=> other.music.sort_key
+				end
 			else
-				return music.sort_key <=> other.music.sort_key
+				if (best_point || 0.0) != (other.best_point || 0.0)
+					return -((best_point || 0.0) <=> (other.best_point || 0.0))
+				else
+					return music.sort_key <=> other.music.sort_key
+				end
 			end
 		end
 	end
@@ -243,6 +268,11 @@ module CxbRank
 		include ErbFileRead
 		include ERB::Util
 		belongs_to :course
+
+		def self.last_modified(user)
+			skill = self.find(:first, :conditions => {:user_id => user.id}, :order => 'updated_at desc')
+			return (skill ? skill.updated_at : nil)
+		end
 
 		def validate
 			if cleared? and point.nil? and rate.nil?
@@ -279,12 +309,20 @@ module CxbRank
 			return point
 		end
 
+		def target_point
+			return point
+		end
+
 		def cleared?
-			return stat == SP_STATUS_CLEAR
+			return stat == SP_COURSE_STATUS_CLEAR
+		end
+
+		def played?
+			return stat != SP_COURSE_STATUS_NO_PLAY
 		end
 
 		def calc!
-			if cleared?
+			if played?
 				if point.nil? and rate
 					temp_point = course.level * ((rate || 0.0) / 100.0)
 					temp_point = BigDecimal.new((temp_point * 100).to_s).truncate.to_f / 100.0
@@ -308,11 +346,11 @@ module CxbRank
 		end
 
 		def point_to_s(nlv='&ndash;')
-			return (cleared? ? sprintf('%.2f', point) : nlv)
+			return (played? ? sprintf('%.2f', point) : nlv)
 		end
 
 		def rate_to_s(nlv='&ndash;')
-			return (cleared? ? sprintf('%.1f%%', rate) : nlv)
+			return (played? ? sprintf('%.1f%%', rate) : nlv)
 		end
 
 		def to_html(edit, row, dummy=false)
@@ -363,11 +401,6 @@ module CxbRank
 					end
 				end
 			end
-			if options[:ignore_locked] == true
-				music_skills.each do |skill|
-					skill.ignore_locked = options[:ignore_locked]
-				end
-			end
 			music_skills.sort!
 
 			if $config.rev_mode?
@@ -408,25 +441,28 @@ module CxbRank
 				point_hash[type] = 0.0
 
 				skills[0..(MUSIC_TYPE_ST_COUNTS[type]) - 1].each do |skill|
-					target_point = (options[:ignore_locked] ? skill.iglock_best_point : skill.best_point)
-					if type != MUSIC_TYPE_REV_COURSE
-						target_diff = (options[:ignore_locked] ? skill.iglock_best_diff : skill.best_diff)
-					end
-					
-					next if (target_point || 0.0) == 0.0
-					point_hash[type] += target_point
+					next if (skill.target_point || 0.0) == 0.0
+					point_hash[type] += skill.target_point
 					skill.rp_target = true
 				end
 
 				if type == MUSIC_TYPE_REV_SINGLE
 					point_hash[MUSIC_TYPE_REV_BONUS] = 0.0
 					skills.each do |skill|
-						if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (options[:ignore_locked] or !skill.locked?(MUSIC_DIFF_UNL))
+						if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL)
 							skill_hash[MUSIC_TYPE_REV_BONUS] << skill
-							point_hash[MUSIC_TYPE_REV_BONUS] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+							if Skill.ignore_locked or !skill.locked?(MUSIC_DIFF_UNL)
+								point_hash[MUSIC_TYPE_REV_BONUS] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+							end
 						end
 					end
-					skill_hash[MUSIC_TYPE_REV_BONUS].sort!
+					skill_hash[MUSIC_TYPE_REV_BONUS].sort! do |a, b|
+						if a.locked?(MUSIC_DIFF_UNL) != b.locked?(MUSIC_DIFF_UNL)
+							(a.locked?(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked?(MUSIC_DIFF_UNL) ? 1 : 0)
+						else
+							-a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
+						end
+					end
 					point_hash[MUSIC_TYPE_REV_BONUS] = (point_hash[MUSIC_TYPE_REV_BONUS] * 100.0).to_i / 100.0
 				end
 			end

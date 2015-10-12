@@ -12,6 +12,11 @@ module CxbRank
 		include Comparable
 		include ErbFileRead
 
+		def self.last_modified
+			music = self.find(:first, :order => 'updated_at desc')
+			return (music ? music.updated_at : nil)
+		end
+
 		def self.find_by_param_id(param_id)
 			if param_id.is_i? and params_id.to_i > 0
 				return self.find(:first, :conditions => {:number => param_id.to_i})

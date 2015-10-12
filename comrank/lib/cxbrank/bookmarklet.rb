@@ -155,7 +155,7 @@ module CxbRank
 				end
 				skill_set = SkillSet.find_by_user(user)
 				user.point = skill_set.total_point
-				user.point_updated_at = Time.now
+				user.point_updated_at = [Skill.last_modified(user), CourseSkill.last_modified(user)].max
 				begin
 					user.save!
 				rescue

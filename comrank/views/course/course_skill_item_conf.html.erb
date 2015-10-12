@@ -2,9 +2,10 @@
 	<% unless $mobile %>
 		<thead>
 			<tr><th>レベル</th>
+			<th>完奏</th>
 			<th class="point">RP</th>
 			<% if before %>
-				<th class="diff">差異</th>
+				<th class="point">差異</th>
 			<% end %>
 			<th>RATE</th><th>コンボ</th>
 			</tr>
@@ -13,19 +14,30 @@
 	<tbody>
 		<tr class="etc">
 			<% unless $mobile %>
-				<td><%= course.level_to_s %></td>
+				<td class="level"><%= course.level_to_s %></td>
+			<% end %>
+			<% if $mobile %>
+				<td><%= SP_COURSE_STATUSES[stat] %></td>
+			<% else %>
+				<% if stat == SP_COURSE_STATUS_CLEAR %>
+					<td class="mark">○</td>
+				<% elsif stat == SP_COURSE_STATUS_FAILED %>
+					<td class="mark">×</td>
+				<% else %>
+					<td class="mark">－</td>
+				<% end %>
 			<% end %>
 			<td class="point"><%= point_to_s %></td>
 			<% if before %>
 				<% difference = (point || 0.0) - (before.point || 0.0) %>
 				<% if difference == 0.0 %>
-					<td class="rate">&ndash;</td>
+					<td class="rate">&plusmn;0.00</td>
 				<% else %>
 					<% diff_class = (difference > 0.0 ? 'inc' : 'dec') %>
 					<td class="rate <%= diff_class %>"><%= sprintf('%+.2f', difference) %></td>
 				<% end %>
 			<% end %>
-			<% unless cleared? %>
+			<% unless played? %>
 				<td colspan="2" class="none"><%= SP_STATUSES[stat] %></td>
 			<% else %>
 				<td class="rate"><%= rate_to_s %></td>

@@ -34,6 +34,7 @@ end
 configure do
 	$config = CxbRank::SiteConfig.new
 	use Rack::Session::Cookie,
+		:path => '/',
 		:key => "#{$config.session_key}.session",
 		:expire_after => CxbRank::EXPIRE_MINUTES * 60
 	enable :cross_origin
@@ -100,13 +101,7 @@ end
 get '/edit/:text_id' do
 	session[:music] = nil
 	session[:temp_skill] = nil
-	session[:before_skill] = nil
 	maker = CxbRank::SkillEditFormMaker.new(params, session)
-	maker.to_html
-end
-
-get '/edit' do
-	maker = CxbRank::SkillEditFormMaker.new(nil, session)
 	maker.to_html
 end
 
@@ -131,13 +126,7 @@ end
 get '/edit_course/:text_id' do
 	session[:course] = nil
 	session[:temp_skill] = nil
-	session[:before_skill] = nil
 	maker = CxbRank::CourseSkillEditFormMaker.new(params, session)
-	maker.to_html
-end
-
-get '/edit_course' do
-	maker = CxbRank::CourseSkillEditFormMaker.new(nil, session)
 	maker.to_html
 end
 
