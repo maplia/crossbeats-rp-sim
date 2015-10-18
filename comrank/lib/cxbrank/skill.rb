@@ -182,7 +182,7 @@ module CxbRank
 		end
 
 		def target_point
-			return point(target_diff)
+			return @@ignore_locked ? iglock_best_point : best_point
 		end
 
 		def edit_uri
@@ -256,6 +256,8 @@ module CxbRank
 			else
 				if (best_point || 0.0) != (other.best_point || 0.0)
 					return -((best_point || 0.0) <=> (other.best_point || 0.0))
+				elsif (iglock_best_point || 0.0) != (other.iglock_best_point || 0.0)
+					return -((iglock_best_point || 0.0) <=> (other.iglock_best_point || 0.0))
 				else
 					return music.sort_key <=> other.music.sort_key
 				end

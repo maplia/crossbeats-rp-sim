@@ -8,6 +8,10 @@ require 'cxbrank/skill'
 
 module CxbRank
 	class BookmarkletSession < ActiveRecord::Base
+		belongs_to :user
+	end
+
+	class JsonLog < ActiveRecord::Base
 	end
 
 	class BookmarkletAuthenticator
@@ -147,20 +151,12 @@ module CxbRank
 			end
 			skill.calc!
 
-			if skill.id or skill.best_point > 0.0
-				begin
+			if skill.id or (skill.best_point || 0.0) > 0.0
+#				begin
 					skill.save!
-				rescue
-					return {:status => 500}
-				end
-				skill_set = SkillSet.find_by_user(user)
-				user.point = skill_set.total_point
-				user.point_updated_at = [Skill.last_modified(user), CourseSkill.last_modified(user)].max
-				begin
-					user.save!
-				rescue
-					return {:status => 500}
-				end
+#				rescue
+#					return {:status => 500}
+#				end
 			end
 
 			return {:status => 200}
@@ -181,7 +177,15 @@ module CxbRank
 			unless bml_session
 				return {:status => 401}
 			end
-			bml_session.delete
+			skill_set = SkillSet.find_by_user(bml_session.user)
+			user.point = skill_set.total_point
+			user.point_updated_at = [Skill.last_modified(bml_session.user), CourseSkill.last_modified(bml_session.user)].max
+			begin
+				user.save!
+			rescue
+				return {:status => 500}
+			end
+			bml_session.destroy
 
 			return {:status => 200}
 		end

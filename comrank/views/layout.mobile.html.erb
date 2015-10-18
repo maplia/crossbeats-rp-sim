@@ -14,7 +14,11 @@
 				$("form").disableOnSubmit();
 			});
 		</script>
-		<title><%= page_title %> - <%= $config.name %></title>
+		<% if page_title %>
+			<title><%= page_title %> - <%= $config.name %></title>
+		<% else %>
+			<title><%= $config.name %></title>
+		<% end %>
 		<%= make_tracker %>
 	</head>
 	<body>

@@ -1,7 +1,7 @@
 module CxbRank
 	# エンジン名
 	ENGINE_NAME = 'CxB RankPoint Simulator REV.'
-	ENGINE_VERSION = '1.3.1 &beta;'
+	ENGINE_VERSION = '1.3.0 &beta; 2'
 
 	# URI
 	SITE_TOP_URI = '/'                                # サイトトップ
@@ -16,7 +16,9 @@ module CxbRank
 	SKILL_LIST_EDIT_URI = '/list'                     # ユーザ側スキル表
 	SKILL_ITEM_EDIT_URI = '/edit'                     # スキル情報編集（単曲）
 	SKILL_COURSE_ITEM_EDIT_URI = '/edit_course'       # スキル情報編集（コース）
+
 	MUSIC_LIST_VIEW_URI = '/musics'                   # 登録曲リスト
+	RANK_CALC_URI = '/rankcalc'                       # 許容ミス数計算機
 
 	# 画像ファイルを置いておくディレクトリへのパス
 	IMAGE_PATH = 'images/'

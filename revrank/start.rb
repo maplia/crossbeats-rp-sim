@@ -7,6 +7,7 @@ require 'sinatra'
 require 'sinatra/json'
 require 'sinatra/jsonp'
 require 'sinatra/cross_origin'
+require 'sinatra/default_charset'
 require 'rack/mobile-detect'
 require 'active_record'
 require 'cxbrank/util'
@@ -19,8 +20,9 @@ require 'cxbrank/skill_form'
 require 'cxbrank/skill_chart'
 require 'cxbrank/user_view'
 require 'cxbrank/user_form'
-require 'cxbrank/user'
+require 'cxbrank/calc'
 require 'cxbrank/bookmarklet'
+require 'cxbrank/user'
 
 def to_json(data, callback=nil)
 	cross_origin
@@ -39,6 +41,8 @@ configure do
 		:expire_after => CxbRank::EXPIRE_MINUTES * 60
 	enable :cross_origin
 	use Rack::MobileDetect
+	register Sinatra::DefaultCharset
+	set :default_charset, 'utf-8'
 end
 
 before do
@@ -214,21 +218,41 @@ get '/api/musics' do
 	to_json(hashes, params[:callback])
 end
 
+get '/rankcalc' do
+	maker = CxbRank::RankCalculatorMaker.new
+	last_modified maker.last_modified
+	maker.to_html
+end
+
 post '/bml_login' do
 	executor = CxbRank::BookmarkletAuthenticator.new(params)
 	to_json(executor.execute)
 end
 
 post '/bml_update_master' do
-	data = JSON.parse(request.body.read, {:symbolize_names => true})
+	json = request.body.read
+	log = CxbRank::JsonLog.new
+	log.json = json
+	log.save!
+	data = JSON.parse(json, {:symbolize_names => true})
 	executor = CxbRank::BookmarkletMasterUpdater.new(data)
 	to_json(executor.execute)
 end
 
 post '/bml_edit' do
-	body = JSON.parse(request.body.read, {:symbolize_names => true})
-	executor = CxbRank::BookmarkletSkillEditor.new(body)
-	to_json(executor.execute)
+	begin
+		json = request.body.read
+		data = JSON.parse(json, {:symbolize_names => true})
+		executor = CxbRank::BookmarkletSkillEditor.new(data)
+		to_json(executor.execute)
+	rescue
+		log = CxbRank::JsonLog.new
+		log.json = json
+		log.user_id = CxbRank::BookmarkletSession.find(:first, :conditions => {:key => data[:key]})[:user_id]
+		log.message = $!.message
+		log.save!
+		to_json({:status => 500, :message => $!.message})
+	end
 end
 
 post '/bml_logout' do

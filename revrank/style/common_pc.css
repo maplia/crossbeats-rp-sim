@@ -132,7 +132,17 @@ input.point {
   width: 4.0em;
 }
 input.rate {
-  width: 2.5em;
+  width: 4.0em;
+}
+
+table.calc th.diff {
+  width: 3.0em;
+}
+table.calc th.level {
+  width: 2.0em;
+}
+table.calc th.notes {
+  width: 3.0em;
 }
 
 /*------------------------------------------------------------------
@@ -184,17 +194,21 @@ td.none {                       /* 登録データなしなどのデータセル
     text-align: center;
 }
 
+table.chart th.title {
+  width: 14.0em !important;
+}
+
 table.chart td.rank {
 	font-size: 200%;
-	width: 3.5em;
+	width: 2.5em;
 }
 
 table.chart td.mark {
-	width: 4.0em;
+	width: 3.0em;
 }
 
 table.list td.level {
-	width: 6.0em;
+	width: 5.0em;
 }
 
 table.summary th.sum,

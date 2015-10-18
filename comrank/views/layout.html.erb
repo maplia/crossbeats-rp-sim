@@ -8,7 +8,11 @@
 		<meta name="generator" content="<%= ENGINE_NAME %>"/>
 		<meta name="robots" content="noindex, nofollow"/>
 		<link rel="stylesheet" type="text/css" href="<%= $config.style %>"/>
-		<title><%= page_title %> - <%= $config.name %></title>
+		<% if page_title %>
+			<title><%= page_title %> - <%= $config.name %></title>
+		<% else %>
+			<title><%= $config.name %></title>
+		<% end %>
 		<script type="text/javascript" src="http://maplia.jp/script/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript" src="http://maplia.jp/script/jquery.disableOnSubmit.js"></script>
 		<script type="text/javascript">

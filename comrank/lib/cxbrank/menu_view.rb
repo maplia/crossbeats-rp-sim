@@ -16,7 +16,7 @@ module CxbRank
 		end
 
 		def to_html
-			page_title = $config.name
+			page_title = nil
 			return ERB.new(read_template).result(binding)
 		end
 	end
