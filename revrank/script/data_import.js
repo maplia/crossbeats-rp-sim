@@ -1,8 +1,9 @@
-var MAPLIA_BASE_URI = 'https://revrank.maplia.jp/';
-var COMMON_SCRIPT_URI = MAPLIA_BASE_URI + 'script/revrank_common.js';
+var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revbeta.maplia.jp/';
+var COMMON_SCRIPT_URI = 'https://revrank.maplia.jp/' + 'script/revrank_common.js';
 
 var RPSIM_EDIT_URI = MAPLIA_BASE_URI + 'bml_edit';
-var RPSIM_VIEW_URI = 'http://revbeta.maplia.jp/' + 'view';
+var RPSIM_POINT_URI = MAPLIA_BASE_URI + 'bml_point';
+var RPSIM_VIEW_URI = 'http://revrank.maplia.jp/' + 'view';
 
 var MUSIC_DIFFS = ['esy', 'std', 'hrd', 'mas', 'unl'];
 var GRADES = ['S++', 'S+', 'S', 'A+', 'A', 'B+', 'B', 'C', 'D', 'E'];
@@ -10,7 +11,7 @@ var WAIT_MSEC = 1500;
 var DIALOG_TITLE = 'REV. RankPoint Simulator';
 var DIALOG_FONT_SIZE = '1.7em';
 var PROGRESS_OPTIONS = {
-	title: DIALOG_TITLE, width: 300, height: 170, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
+	title: DIALOG_TITLE, cancelable: false, width: 300, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
 };
 var ALERT_OPTIONS = {
 	title: DIALOG_TITLE, width: 300, height: 190, font_size: DIALOG_FONT_SIZE
@@ -20,24 +21,13 @@ var progress = null;
 var userData = {};
 var musicList = [];
 
-// 待ち合わせダイアログの表示
-function openProgressDialog(progress) {
-	var deferred = $.Deferred();
-	progress = $.progress(PROGRESS_OPTIONS);
-	progress.open(function () {
-		progress.cancel();
-	});
-	deferred.resolve();
-	return deferred.promise();
-}
-
 // RPの更新
 function updateRp(progress, postData, item) {
 	if (progress.isCanceled()) {
-		return $.Deferred.reject('処理がキャンセルされました').promise();
+		return $.Deferred().reject('処理がキャンセルされました').promise();
 	} else {
 		var deferred = $.Deferred();
-		$.post(RPSIM_EDIT_URI, JSON.stringify(postData), function (response) {
+		$.postWithRetries(RPSIM_EDIT_URI, JSON.stringify(postData), function (response) {
 			if (postData.type == 'music') {
 				var logLabel = 'ミュージックRP [' + item.title + ']';
 			} else {
@@ -77,8 +67,9 @@ function updateRp(progress, postData, item) {
 function updateChallengeRp(progress, userData) {
 	var deferred = $.Deferred();
 	progress.setMessage1('チャレンジRPを更新中です');
+	progress.setMessage2('');
 	// RP対象曲一覧のチャレンジRP部分を参照する
-	$.get('rplist', function (document) {
+	$.getWithRetries('rplist', function (document) {
 		if (!isMyDataSessionAlive(document)) {
 			console.log('チャレンジRP: セッション無効');
 			deferred.reject(MESSAGE_SESSION_IS_DEAD);
@@ -128,11 +119,15 @@ function updateMusicRps(progress, userData, musicList) {
 	var deferred_each = $.Deferred();
 	var chain = deferred_each;
 	progress.setMessage1('ミュージックRPを更新中です');
+	progress.setMessage2('');
 	$.each(musicList, function (i, musicItem) {
 		chain = chain.then(function () {
 			return updateMusicRp(progress, userData, musicItem);
 		}).then(function () {
 			return wait(WAIT_MSEC);
+		}).then(function () {
+			progress.incProgressbarValue();
+			return $.Deferred().resolve().promise();
 		});
 	});
 	chain.done(function () {
@@ -148,7 +143,7 @@ function updateMusicRps(progress, userData, musicList) {
 function updateMusicRp(progress, userData, musicItem) {
 	var deferred = $.Deferred();
 	progress.setMessage2(musicItem.title);
-	$.get(musicItem.uri, function (document) {
+	$.getWithRetries(musicItem.uri, function (document) {
 		if (!isMyDataSessionAlive(document)) {
 			console.log('ミュージックRP: セッション無効');
 			deferred.reject(MESSAGE_SESSION_IS_DEAD);
@@ -159,7 +154,6 @@ function updateMusicRp(progress, userData, musicItem) {
 			musicItem = parseMusicItem(document);
 			musicItem.lookup_key = postData.lookup_key; 
 			updateRp(progress, postData, musicItem).done(function () {
-				progress.incProgressbarValue();
 				deferred.resolve();
 			}).fail(function (e) {
 				deferred.reject(e);
@@ -224,10 +218,61 @@ function parseMusicRp(document, lookupKey) {
 	};
 }
 
+// 総合RPの更新
+function updateTotalRp(progress, userData) {
+	if (progress.isCanceled()) {
+		return $.Deferred().reject('処理がキャンセルされました').promise();
+	} else {
+		var deferred = $.Deferred();
+		$.getWithRetries('profile', function (document) {
+			if (!isMyDataSessionAlive(document)) {
+				console.log('総合RP: セッション無効');
+				deferred.reject(MESSAGE_SESSION_IS_DEAD);
+			} else {
+				progress.setMessage1('総合RPを更新中です');
+				progress.setMessage2('');
+				var postData = parseTotalRp(document);
+				postData.key = userData.key;
+				$.postWithRetries(RPSIM_POINT_URI, JSON.stringify(postData), function (response) {
+					switch (response.status) {
+					case 401:
+						console.log('総合RP: セッション無効');
+						deferred.reject(MESSAGE_SESSION_IS_DEAD);
+						break;
+					case 500:
+						console.log('総合RP: 更新失敗');
+						alert('データベースの処理エラーが発生したため、総合RPの更新をスキップします。');
+						progress.incProgressbarValue();
+						deferred.resolve();
+						break;
+					default:
+						console.log('総合RP: 更新成功');
+						progress.incProgressbarValue();
+						deferred.resolve();
+						break;
+					}
+				});
+			}
+		});
+		return deferred.promise();
+	}
+}
+
+// 総合RPの取得
+function parseTotalRp(document) {
+	body = {};
+	body.point = parseFloat($(document).find('.f220')[0].textContent + $(document).find('.f200')[0].textContent);
+	return {
+		'body': body
+	};
+}
+
 $('body').css('cursor', 'wait');
 $.getScript(COMMON_SCRIPT_URI).done(function () {
-	initJQueryUiDialog().done(function() {
-		return openProgressDialog(progress);
+	loadJQueryLibrary(function () {
+		progress = $.progress(PROGRESS_OPTIONS);
+		progress.open();
+		console.log('ダイアログ初期化完了');
 	}).then(function () {
 		return loginToRpSim(progress, userData);
 	}).then(function () {
@@ -237,15 +282,21 @@ $.getScript(COMMON_SCRIPT_URI).done(function () {
 	}).then(function () {
 		return updateMusicRps(progress, userData, musicList);
 	}).then(function () {
+		return updateTotalRp(progress, userData);
+	}).then(function () {
 		return logoutFromRpSim(progress, userData);
 	}).done(function () {
 		$('body').css('cursor', 'auto');
 		progress.close();
+		progress = undefined;
 		return $.confirm('REV. RankPoint Simulatorの更新が完了しました。ランクポイント表へ移動しますか?', ALERT_OPTIONS,
 			function () {
-				location.href = RPSIM_VIEW_URI + '/' + userData.user_id;
+				location.href = RPSIM_VIEW_URI + '/' + userData.user_id + '?' + new Date().getTime();
 			});
 	}).fail(function (e) {
+		if (userData.key) {
+			logoutFromRpSim(progress, userData);
+		}
 		$('body').css('cursor', 'auto');
 		if (progress) {
 			progress.close();

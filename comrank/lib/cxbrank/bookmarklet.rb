@@ -14,6 +14,17 @@ module CxbRank
 	class JsonLog < ActiveRecord::Base
 	end
 
+	class BookmarkletExecutor
+		def get_session(key)
+			return BookmarkletSession.find(:first, :conditions => {:key => key})
+		end
+
+		def get_user(key)
+			session = get_session(key)
+			return session ? session.user : nil
+		end
+	end
+
 	class BookmarkletAuthenticator
 		def initialize(params)
 			@params = params
@@ -42,13 +53,13 @@ module CxbRank
 		end
 	end
 
-	class BookmarkletMasterUpdater
+	class BookmarkletMasterUpdater < BookmarkletExecutor
 		def initialize(data)
 			@data = data
 		end
 
 		def execute
-			unless BookmarkletSession.exists?({:key => @data[:key]})
+			unless get_session(@data[:key])
 				return {:status => 401}
 			end
 
@@ -83,17 +94,13 @@ module CxbRank
 				end
 			end
 
-			begin
-				item.save!
-			rescue
-				return {:status => 500}
-			end
+			item.save!
 
 			return {:status => 200}
 		end
 	end
 
-	class BookmarkletSkillEditor
+	class BookmarkletSkillEditor < BookmarkletExecutor
 		def initialize(data)
 			@data = data
 		end
@@ -102,12 +109,11 @@ module CxbRank
 			if @data.nil? or @data[:key].nil? or @data[:lookup_key].nil? or @data[:body].nil?
 				return {:status => 400}
 			end
-			
-			session = BookmarkletSession.find(:first, :conditions => {:key => @data[:key]})
-			unless session
+
+			user = get_user(@data[:key])
+			unless user
 				return {:status => 401}
 			end
-			user = User.find(session.user_id)
 
 			lookup_key = @data[:lookup_key]
 			body = @data[:body]
@@ -119,10 +125,10 @@ module CxbRank
 					return {:status => 400}
 				end
 				skill = Skill.find(:first,
-					:conditions => {:user_id => session.user_id, :music_id => music.id})
+					:conditions => {:user_id => user.id, :music_id => music.id})
 				unless skill
 					skill = Skill.new
-					skill.user_id = user.user_id
+					skill.user_id = user.id
 					skill.music = music
 				end
 				body.keys.each do |diff_name|
@@ -140,10 +146,10 @@ module CxbRank
 					return {:status => 400}
 				end
 				skill = CourseSkill.find(:first,
-					:conditions => {:user_id => session.user_id, :course_id => course.id})
+					:conditions => {:user_id => user.id, :course_id => course.id})
 				unless skill
 					skill = CourseSkill.new
-					skill.user_id = user.user_id
+					skill.user_id = user.id
 					skill.course = course
 				end
 				skill.stat = body[:stat]
@@ -152,40 +158,51 @@ module CxbRank
 			skill.calc!
 
 			if skill.id or (skill.best_point || 0.0) > 0.0
-#				begin
-					skill.save!
-#				rescue
-#					return {:status => 500}
-#				end
+				skill.save!
 			end
 
 			return {:status => 200}
 		end
 	end
 
-	class BookmarkletSessionTerminator
+	class BookmarkletPointEditor < BookmarkletExecutor
+		def initialize(data)
+			@data = data
+		end
+
+		def execute
+			if @data.nil? or @data[:key].nil? or @data[:body].nil?
+				return {:status => 400}
+			end
+
+			user = get_user(@data[:key])
+			unless user
+				return {:status => 401}
+			end
+
+			body = @data[:body]
+			user.point = body[:point]
+			user.point_direct = true
+			user.point_updated_at = Time.now
+
+			user.save!
+
+			return {:status => 200}
+		end
+	end
+
+	class BookmarkletSessionTerminator < BookmarkletExecutor
 		def initialize(params)
 			@params = params
 		end
 
 		def execute
-			unless @params[:key]
+			session = get_session(@params[:key])
+			unless session
 				return {:status => 401}
 			end
 
-			bml_session = BookmarkletSession.find(:first, :conditions => {:key => @params[:key]})
-			unless bml_session
-				return {:status => 401}
-			end
-			skill_set = SkillSet.find_by_user(bml_session.user)
-			user.point = skill_set.total_point
-			user.point_updated_at = [Skill.last_modified(bml_session.user), CourseSkill.last_modified(bml_session.user)].max
-			begin
-				user.save!
-			rescue
-				return {:status => 500}
-			end
-			bml_session.destroy
+			session.destroy
 
 			return {:status => 200}
 		end

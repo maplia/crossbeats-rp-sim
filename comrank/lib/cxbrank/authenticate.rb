@@ -22,7 +22,7 @@ module CxbRank
 				return make_error_page(error_no, SITE_TOP_URI)
 			end
 
-			@session[:user] = User.find(user_id.to_i)
+			@session[:user] = User.find_by_param_id(user_id)
 
 			return SKILL_LIST_EDIT_URI
 		end
@@ -39,7 +39,7 @@ module CxbRank
 				return ERROR_USERID_OR_PASS_IS_WRONG
 			end
 
-			user = User.find(user_id.to_i)
+			user = User.find_by_param_id(user_id)
 			unless user
 				return ERROR_USERID_OR_PASS_IS_WRONG
 			end

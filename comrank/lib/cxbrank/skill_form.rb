@@ -137,6 +137,7 @@ module CxbRank
 			end
 
 			user = @session[:user]
+			user.point_direct = false
 			skill_set = SkillSet.find_by_user(user)
 			user.point = skill_set.total_point
 			user.point_updated_at = Time.now

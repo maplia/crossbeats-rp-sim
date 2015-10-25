@@ -34,6 +34,9 @@ module CxbRank
 			if password_confirmation and password != password_confirmation
 				return ERROR_PASSWORDS_ARE_NOT_EQUAL
 			end
+			unless point_before_type_cast.is_f?
+				return ERROR_REAL_RP_NOT_NUMERIC
+			end
 
 			return NO_ERROR
 		end

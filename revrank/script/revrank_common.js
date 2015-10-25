@@ -5,6 +5,7 @@ if (!DEBUG) {
 
 var JQUERY_UI_SCRIPT_URI = 'https://code.jquery.com/ui/1.11.4/jquery-ui.min.js';
 var JQUERY_DIALOG_SCRIPT_URI = 'https://marines.sakura.ne.jp/script/jquery.dialog.js';
+var JQUERY_RETRYAJAX_SCRIPT_URI = 'https://marines.sakura.ne.jp/script/jquery.retryAjax.js';
 var JQUERY_UI_STYLE_URI = 'https://code.jquery.com/ui/1.11.4/themes/eggplant/jquery-ui.css';
 
 var RPSIM_LOGIN_URI = MAPLIA_BASE_URI + 'bml_login';
@@ -12,8 +13,6 @@ var RPSIM_UPDATE_MASTER_URI = MAPLIA_BASE_URI + 'bml_update_master';
 var RPSIM_LOGOUT_URI = MAPLIA_BASE_URI + 'bml_logout';
 
 var MESSAGE_SESSION_IS_DEAD = '処理の途中でセッションが終了しました。最初からやり直してください。';
-
-var progress = null;
 
 // MY DATAページのセッションが継続しているか確認
 function isMyDataSessionAlive(document) {
@@ -34,14 +33,17 @@ function wait(msec) {
 	return deferred.promise();
 }
 
-// jQuery UIライブラリの読み込み
-function getJQueryUiLibrary() {
+// jQueryライブラリの読み込み
+function loadJQueryLibrary(callback) {
 	var deferred = $.Deferred();
 	var deferred_script = $.Deferred();
 	$('head').append($('<link/>', {
 		type: 'text/css', rel: 'stylesheet', href: JQUERY_UI_STYLE_URI
 	}));
 	console.log('読み込み完了: ' + JQUERY_UI_STYLE_URI);
+	$.ajaxSetup({
+		cache: false
+	});
 	deferred_script.then(function () {
 		return $.getScript(JQUERY_UI_SCRIPT_URI).done(function () {
 			console.log('読み込み完了: ' + JQUERY_UI_SCRIPT_URI);
@@ -50,43 +52,18 @@ function getJQueryUiLibrary() {
 		return $.getScript(JQUERY_DIALOG_SCRIPT_URI).done(function () {
 			console.log('読み込み完了: ' + JQUERY_DIALOG_SCRIPT_URI);
 		});
+	}).then(function () {
+		return $.getScript(JQUERY_RETRYAJAX_SCRIPT_URI).done(function () {
+			console.log('読み込み完了: ' + JQUERY_RETRYAJAX_SCRIPT_URI);
+		});
 	}).done(function () {
+		if (callback) {
+			callback();
+		}
 		deferred.resolve();
 	});
 	deferred_script.resolve();
 	return deferred.promise();
-}
-
-// ダイアログ表示準備
-function initJQueryUiDialog() {
-	var deferred = $.Deferred();
-	getJQueryUiLibrary().done(function () {
-		progress = $.progress();
-		progress.open();
-		console.log('ダイアログ設定完了');
-		deferred.resolve();
-	});
-	return deferred.promise();
-}
-
-// ダイアログ表示テキスト設定（処理種別）
-function setJQueryUiDialogProcType(procType) {
-	progress.setMessage1(procType);
-}
-
-// ダイアログ表示テキスト設定（処理データ）
-function setJQueryUiDialogProcTitle(procTitle) {
-	progress.setMessage2(procTitle);
-}
-
-// ダイアログ表示プログレス設定（最大件数）
-function setJQueryUiDialogProgMax(max) {
-	progress.setProgressbarMax(max);
-}
-
-// ダイアログ表示プログレス設定（最大件数）
-function incJQueryUiDialogProg() {
-	progress.incProgressbarValue();
 }
 
 // RPシミュレータにログインする
@@ -97,6 +74,7 @@ function loginToRpSim(progress, userData) {
 	console.log('REV.ユーザID: ' + userData.revUserId);
 	// REV.ユーザIDの登録確認
 	progress.setMessage1('ユーザー登録を確認中です。');
+	progress.setMessage2('');
 	$.post(RPSIM_LOGIN_URI, 'game_id=' + userData.revUserId, function (response) {
 		if (response.status != 200) {
 			console.log('REV. RankPoint Simulator ユーザ未登録');
@@ -115,21 +93,25 @@ function loginToRpSim(progress, userData) {
 function getMusicList(progress, musicList, isForRpUpdate) {
 	var deferred = $.Deferred();
 	// ミュージックデータのリンクリストから情報を取得する
-	$.get('playdatamusic', function (document) {
+	$.getWithRetries('playdatamusic', function (document) {
 		if (!isMyDataSessionAlive(document)) {
 			deferred.reject(MESSAGE_SESSION_IS_DEAD);
 		} else {
 			$.each($(document).find('.pdMusicData'), function (i, element) {
 				if ($(element).find('a').length > 0) {
+					href = $(element).find('a')[0].href;
+					if ((href.split('/').length > 3) && (href.split('/')[2] != location.hostname)) {
+						return false;
+					}
 					var musicItem = {};
 					musicItem.title = $(element).find('.pdMtitle').first().text();
-					musicItem.uri = $(element).find('a')[0].href;
+					musicItem.uri = href;
 					musicList.push(musicItem);
 				}
 			});
 			console.log('楽曲件数: ' + musicList.length);
 			if (isForRpUpdate) {
-				progress.setProgressbarMax(musicList.length + 1);
+				progress.setProgressbarMax(musicList.length + 2);
 			} else {
 				progress.setProgressbarMax(musicList.length);
 			}
@@ -163,7 +145,7 @@ function updateMasterData(sessionKey, type, item) {
 	var postData = {
 		'key': sessionKey, 'type': type, 'body': item
 	};
-	$.post(RPSIM_UPDATE_MASTER_URI, JSON.stringify(postData), function (response) {
+	$.postWithRetries(RPSIM_UPDATE_MASTER_URI, JSON.stringify(postData), function (response) {
 		if (postData.type == 'music') {
 			var logLabel = 'ミュージック [' + item.title + ']';
 		} else {
@@ -186,7 +168,7 @@ function updateMasterData(sessionKey, type, item) {
 // RPシミュレータからログアウトする
 function logoutFromRpSim(progress, userData) {
 	var deferred = $.Deferred();
-	$.post(RPSIM_LOGOUT_URI, 'key=' + userData.key, function (response) {
+	$.postWithRetries(RPSIM_LOGOUT_URI, 'key=' + userData.key, function (response) {
 		if (response.status != 200) {
 			console.log('ログアウト異常発生');
 		} else {

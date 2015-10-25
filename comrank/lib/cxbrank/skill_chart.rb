@@ -16,8 +16,7 @@ module CxbRank
 		end
 
 		def last_modified
-			music_skill = Skill.find(:first, :conditions => {:user_id => @params[:user_id].to_i}, :order => 'updated_at desc')
-			return music_skill ? music_skill.updated_at : nil
+			return Skill.last_modified(User.find_by_param_id(@params[:user_id]))
 		end
 
 		def to_html
@@ -26,7 +25,7 @@ module CxbRank
 				return make_error_page(error_no)
 			end
 
-			user = User.find(@params[:user_id].to_i)
+			user = User.find_by_param_id(@params[:user_id])
 			musics = Music.find(:all)
 			skills = Skill.find(:all, :conditions => {:user_id => user.id})
 			musics.each do |music|

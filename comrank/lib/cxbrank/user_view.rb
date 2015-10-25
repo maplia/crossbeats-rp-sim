@@ -14,8 +14,7 @@ module CxbRank
 		end
 
 		def to_html
-			users = User.find(:all,
-				:conditions => 'display = 1 and point_updated_at is not null')
+			users = User.find(:all, :conditions => 'display = 1 and point_updated_at is not null')
 			users.sort!
 			users.reverse!
 			page_title = '登録ユーザー一覧'

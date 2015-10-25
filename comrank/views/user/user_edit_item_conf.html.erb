@@ -47,6 +47,12 @@
 				</td>
 			<% end %>
 		</tr>
+		<% if id %>
+			<tr>
+				<th>実RP</th>
+				<td><%= sprintf('%.2f', point) %></td>
+			</tr>
+		<% end %>
 	<% end %>
 	<tr>
 		<% if $mobile %>

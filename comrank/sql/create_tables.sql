@@ -16,8 +16,8 @@ create table if not exists `_musics` (
 	, `mas_notes` int(4)
 	, `unl_level` float
 	, `unl_notes` int(4)
-	, `limited` int(1) not null default 0
-	, `display` int(1) not null default 1
+	, `limited` tinyint(1) not null default 0
+	, `display` tinyint(1) not null default 1
 	, `created_at` datetime default null
 	, `updated_at` datetime default null
 	, primary key (`id`)
@@ -98,11 +98,12 @@ create table if not exists `users` (
 	, `name` varchar(64) not null
 	, `password` varchar(64) not null
 	, `game_id` varchar(16)
-	, `game_id_display` int default 0
+	, `game_id_display` tinyint(1) default 0
 	, `comment` text
 	, `point` float default 0
+	, `point_direct` tinyint(1) default 0
 	, `point_updated_at` datetime default null
-	, `display` int(1) default 1
+	, `display` tinyint(1) default 1
 	, `created_at` datetime default null
 	, `updated_at` datetime default null
 	, primary key (`id`)
@@ -210,4 +211,14 @@ create table if not exists `bookmarklet_sessions` (
 	, `updated_at` datetime default null
 	, primary key (`id`)
 	, unique key `key` (`key`)
+) default charset=utf8;
+
+create table if not exists `json_logs` (
+	  `id` int(4) not null auto_increment
+	, `user_id` int(4) not null
+	, `json` varchar(1024) not null
+	, `message` varchar(256) not null
+	, `created_at` datetime default null
+	, `updated_at` datetime default null
+	, primary key (`id`)
 ) default charset=utf8;

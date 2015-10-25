@@ -39,6 +39,12 @@
 				<input type="checkbox" name="game_id_display" value="1" <%= game_id_display == 1 ? 'checked="checked"' : '' %> /> REV.ユーザーIDを公開する
 			</label>
 		</dd>
+		<% if id %>
+			<dt>実RP</dt>
+			<dd>
+				<input type="text" name="point" size="7" maxlength="7" value="<%= sprintf('%.2f', point) %>" />
+			</dd>
+		<% end %>
 	<% end %>
 	<dt>ユーザーコメント（HTMLタグによる文字装飾はできません。URLには自動的にリンクが設定されます）</dt>
 	<dd>

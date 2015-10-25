@@ -447,26 +447,31 @@ module CxbRank
 					point_hash[type] += skill.target_point
 					skill.rp_target = true
 				end
+			end
 
-				if type == MUSIC_TYPE_REV_SINGLE
-					point_hash[MUSIC_TYPE_REV_BONUS] = 0.0
-					skills.each do |skill|
-						if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL)
-							skill_hash[MUSIC_TYPE_REV_BONUS] << skill
-							if Skill.ignore_locked or !skill.locked?(MUSIC_DIFF_UNL)
-								point_hash[MUSIC_TYPE_REV_BONUS] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
-							end
-						end
-					end
-					skill_hash[MUSIC_TYPE_REV_BONUS].sort! do |a, b|
-						if a.locked?(MUSIC_DIFF_UNL) != b.locked?(MUSIC_DIFF_UNL)
-							(a.locked?(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked?(MUSIC_DIFF_UNL) ? 1 : 0)
-						else
-							-a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
-						end
-					end
-					point_hash[MUSIC_TYPE_REV_BONUS] = (point_hash[MUSIC_TYPE_REV_BONUS] * 100.0).to_i / 100.0
+			music_skills.each do |skill|
+				if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL)
+					skill_hash[MUSIC_TYPE_REV_BONUS] << skill
 				end
+			end
+			skill_hash[MUSIC_TYPE_REV_BONUS].sort! do |a, b|
+				if a.locked?(MUSIC_DIFF_UNL) != b.locked?(MUSIC_DIFF_UNL)
+					(a.locked?(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked?(MUSIC_DIFF_UNL) ? 1 : 0)
+				else
+					-a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
+				end
+			end
+
+			if user.point_direct
+				point_hash[MUSIC_TYPE_REV_BONUS] = user.point - point_hash[MUSIC_TYPE_REV_SINGLE] - point_hash[MUSIC_TYPE_REV_COURSE]
+			else
+				point_hash[MUSIC_TYPE_REV_BONUS] = 0.0
+				skill_hash[MUSIC_TYPE_REV_BONUS].each do |skill|
+					if Skill.ignore_locked or !skill.locked?(MUSIC_DIFF_UNL)
+						point_hash[MUSIC_TYPE_REV_BONUS] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+					end
+				end
+				point_hash[MUSIC_TYPE_REV_BONUS] = (point_hash[MUSIC_TYPE_REV_BONUS] * 100.0).to_i / 100.0
 			end
 
 			return self.new(skill_hash, point_hash)

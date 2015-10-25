@@ -34,7 +34,7 @@ module CxbRank
 			user.password = @params['password']
 			user.password_confirmation = @params['password_confirmation']
 			user.game_id = @params['game_id']
-			user.game_id_display = (@params['game_id_display'] || 0)
+			user.game_id_display = (@params['game_id_display'] || false)
 			user.comment = @params['comment']
 			@session[:temp_user] = user
 
@@ -125,7 +125,8 @@ module CxbRank
 				user.password_confirmation = @params['password_confirmation']
 			end
 			user.game_id = @params['game_id']
-			user.game_id_display = (@params['game_id_display'] || 0)
+			user.game_id_display = (@params['game_id_display'] || false)
+			user.point = @params['point']
 			user.comment = @params['comment']
 			@session[:temp_user] = user
 
@@ -157,6 +158,10 @@ module CxbRank
 				password_backup = user.password
 				user.password = Digest::MD5.hexdigest(password_backup)
 				user.password_confirmation = Digest::MD5.hexdigest(password_backup)
+			end
+			if user.point_changed?
+				user.point_direct = true
+				user.point_updated_at = Time.now
 			end
 
 			begin

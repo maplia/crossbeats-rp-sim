@@ -7,20 +7,18 @@ require 'cxbrank/validate'
 module CxbRank
 	class SkillListMaker < PageMaker
 		def last_modified
-			user = (@session ? @session[:user] : User.find(@params[:user_id].to_i))
-			updated_at_array = []
-			updated_at_array << Skill.last_modified(user) if Skill.last_modified(user)
-			if $config.rev_mode?
-				updated_at_array << CourseSkill.last_modified(user) if CourseSkill.last_modified(user)
-			end
-
-			return updated_at_array.max
+			user = get_user
+			return user ? user.point_updated_at : nil
 		end
 
 		private
 		def page_title
-			user = (@session ? @session[:user] : User.find(@params[:user_id].to_i))
+			user = get_user
 			return "#{user.name}さんのランクポイント表"
+		end
+
+		def get_user
+			return @session ? @session[:user] : User.find_by_param_id(@params[:user_id])
 		end
 	end
 
@@ -60,7 +58,7 @@ module CxbRank
 			end
 
 			Skill.ignore_locked = false
-			user = User.find(@params[:user_id].to_i)
+			user = get_user
 			skill_set = SkillSet.find_by_user(user)
 			ignore_locked = false
 
@@ -76,7 +74,7 @@ module CxbRank
 			end
 
 			Skill.ignore_locked = true
-			user = User.find(@params[:user_id].to_i)
+			user = get_user
 			skill_set = SkillSet.find_by_user(user, {:ignore_locked => true})
 			ignore_locked = true
 

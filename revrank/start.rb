@@ -1,4 +1,4 @@
-$LOAD_PATH << '../comtest/lib'
+$LOAD_PATH << '../combeta/lib'
 ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 
 require 'rubygems'
@@ -27,10 +27,19 @@ require 'cxbrank/user'
 def to_json(data, callback=nil)
 	cross_origin
 	if callback
-		jsonp data, callback
+		return jsonp(data, callback)
 	else
-		json data
+		return json(data)
 	end
+end
+
+def log_bml_error(json, key)
+	log = CxbRank::JsonLog.new
+	log.json = json
+	log.user_id = CxbRank::BookmarkletSession.find(:first, :conditions => {:key => key}).user.id
+	log.message = $!.message
+	log.save!
+	return to_json({:status => 500, :message => $!.message})
 end
 
 configure do
@@ -230,13 +239,14 @@ post '/bml_login' do
 end
 
 post '/bml_update_master' do
-	json = request.body.read
-	log = CxbRank::JsonLog.new
-	log.json = json
-	log.save!
-	data = JSON.parse(json, {:symbolize_names => true})
-	executor = CxbRank::BookmarkletMasterUpdater.new(data)
-	to_json(executor.execute)
+	begin
+		json = request.body.read
+		data = JSON.parse(json, {:symbolize_names => true})
+		executor = CxbRank::BookmarkletMasterUpdater.new(data)
+		to_json(executor.execute)
+	rescue
+		log_bml_error(json, data[:key])
+	end
 end
 
 post '/bml_edit' do
@@ -246,12 +256,18 @@ post '/bml_edit' do
 		executor = CxbRank::BookmarkletSkillEditor.new(data)
 		to_json(executor.execute)
 	rescue
-		log = CxbRank::JsonLog.new
-		log.json = json
-		log.user_id = CxbRank::BookmarkletSession.find(:first, :conditions => {:key => data[:key]})[:user_id]
-		log.message = $!.message
-		log.save!
-		to_json({:status => 500, :message => $!.message})
+		log_bml_error(json, data[:key])
+	end
+end
+
+post '/bml_point' do
+	begin
+		json = request.body.read
+		data = JSON.parse(json, {:symbolize_names => true})
+		executor = CxbRank::BookmarkletPointEditor.new(data)
+		to_json(executor.execute)
+	rescue
+		log_bml_error(json, data[:key])
 	end
 end
 

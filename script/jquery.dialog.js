@@ -1,33 +1,40 @@
 (function(jQuery) {
 	// プログレスダイアログ
 	jQuery.progress = function (options) {
-		options = options || {};
 		if (jQuery('body').find('#progress-dialog').length == 0) {
-			jQuery('body').append('<div id="progress-dialog"><table id="progress-table"><tbody><tr><td id="progress-message1"></td></tr><tr><td id="progress-message2"></td></tr><tr><td><div id="progressbar"></div></td></tr></tbody></table></div>');
+			jQuery('body').append('<div id="progress-dialog"><p id="progress-message1"></p><p id="progress-message2"></p><div id="progressbar"></div></div>');
+			jQuery('#progress-message1').css('font-size', options.font_size);
+			jQuery('#progress-message1').css('height', options.font_size);
+			jQuery('#progress-message1').css('width', '100%');
+			jQuery('#progress-message2').css('font-size', options.font_size);
+			jQuery('#progress-message2').css('height', options.detail_height || options.font_size);
+			jQuery('#progress-message2').css('width', '100%');
+			jQuery('#progressbar').css('height', jQuery('#progress-message1').height() * 1.3);
+			jQuery('#progressbar').css('width', '100%');
 		}
+		options = options || {};
+		options.buttons = (options.cancelable ? {
+			'キャンセル': function () {
+				jQuery.progress.cancel();
+				if (jQuery.progress.cancelCallback) {
+					jQuery.progress.cancelCallback();
+				}
+			}
+		} : {});
 		jQuery('#progress-dialog').dialog({
 			title: options.title || '', autoOpen: false, modal: true,
-			width: options.width || 'auto', height: options.height || 'auto',
-			draggable: false, resizable: false, closeOnEscape: false
-//			buttons: {
-//				'キャンセル': function () {
-//					jQuery.progress.cancel();
-//					if (jQuery.progress.cancelCallback) {
-//						jQuery.progress.cancelCallback();
-//					}
-//				}
-//			}
+			width: options.width || 'auto', height: 'auto',
+			draggable: false, resizable: false, closeOnEscape: false,
+			buttons: options.buttons
 		});
 		jQuery('.ui-dialog').css('z-index', '30000');
 		jQuery('.ui-widget-overlay').css('z-index', '25000');
 		jQuery('.ui-dialog-title').css('font-size', options.font_size);
+		jQuery('.ui-dialog-title').css('margin', '0');
+		jQuery('.ui-dialog-title').css('padding', '0');
 		jQuery('.ui-button-text').css('font-size', options.font_size);
-		jQuery('#progress-table').css('width', '100%');
-		jQuery('#progress-dialog').css('font-size', options.font_size);
-		jQuery('#progress-table tr td').css('height', options.font_size);
-		jQuery('#progress-message2').css('height', options.detail_height || options.font_size);
 		return this.extend(jQuery.progress, {
-			open: function (cancelCallback) {
+			open: function (options, cancelCallback) {
 				this.canceled = false;
 				this.cancelCallback = cancelCallback;
 				jQuery('#progress-message1').text('');
@@ -103,8 +110,8 @@
 		options = options || {};
 		var deferred = jQuery.Deferred();
 		jQuery.confirm.self = this;
-		jQuery.confirm.self.acceptCallback = acceptCallback;
-		jQuery.confirm.self.cancelCallback = cancelCallback;
+		jQuery.confirm.self.acceptCallback = (acceptCallback || function () {});
+		jQuery.confirm.self.cancelCallback = (cancelCallback || function () {});
 		if (jQuery('body').find('#confirm-dialog').length == 0) {
 			jQuery('body').append('<div id="confirm-dialog"><p id="confirm-message"></p></div>');
 		}
