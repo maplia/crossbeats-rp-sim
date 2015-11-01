@@ -1,4 +1,4 @@
-$LOAD_PATH << '../combeta/lib'
+$LOAD_PATH << '../comrank/lib'
 ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 
 require 'rubygems'
