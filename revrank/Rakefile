@@ -1,0 +1,75 @@
+$LOAD_PATH << '../comrank/lib'
+
+require 'yaml'
+require 'csv'
+require 'rubygems'
+require 'active_record'
+require 'sinatra/activerecord'
+require 'sinatra/activerecord/rake'
+require 'cxbrank/const'
+require 'cxbrank/music'
+require 'cxbrank/course'
+
+env = (ENV['ENV'] ? ENV['ENV'].to_sym : :development)
+ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
+ActiveRecord::Base.establish_connection(env)
+
+namespace :revrank do
+	desc 'initialize music master'
+	task :init_master do
+		CSV.open('./db/master/musics.tsv', 'r', "\t") do |row|
+			music = CxbRank::Music.find(:first, :conditions => {:lookup_key => row[0]})
+			unless music
+				music = CxbRank::Music.new
+				music.lookup_key = row[0]
+			end
+			music.text_id = row[1]
+			music.title = row[2]
+			music.subtitle = row[3]
+			music.sort_key = row[4]
+			music.esy_level = row[5]
+			music.esy_notes = row[6]
+			music.std_level = row[7]
+			music.std_notes = row[8]
+			music.hrd_level = row[9]
+			music.hrd_notes = row[10]
+			music.mas_level = row[11]
+			music.mas_notes = row[12]
+			music.unl_level = row[13]
+			music.unl_notes = row[14]
+			music.limited = row[15]
+			music.hidden = row[16]
+			music.display = row[17]
+			music.save!
+		end
+
+		CSV.open('./db/master/courses.tsv', 'r', "\t") do |row|
+			course = CxbRank::Course.find(:first, :conditions => {:lookup_key => row[0]})
+			unless course
+				course = CxbRank::Course.new
+				course.lookup_key = row[0]
+			end
+			course.text_id = row[1]
+			course.name = row[2]
+			course.sort_key = row[3]
+			course.level = row[4]
+			course.limited = row[5]
+			course.hidden = row[6]
+			course.display = row[7]
+			course.save!
+		end
+
+		CSV.open('./db/master/course_musics.tsv', 'r', "\t") do |row|
+			course_id = CxbRank::Course.find(:first, :conditions => {:text_id => row[0]}).id
+			cmusic = CxbRank::CourseMusic.find(:first, :conditions => {:course_id => course_id, :seq => row[1]})
+			unless cmusic
+				cmusic = CxbRank::CourseMusic.new
+				cmusic.course_id = course_id
+				cmusic.seq = row[1]
+			end
+			cmusic.music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[2]}).id
+			cmusic.diff = row[3]
+			cmusic.save!
+		end
+	end
+end

@@ -25,6 +25,7 @@ module CxbRank
 
 	# プログラムの設定ファイル
 	CONFIGURATION_FILE = 'config/config.yml'
+	DATABASE_FILE = 'config/database.yml'
 
 	# 動作モード
 	MODE_CXB = 'cxb'
@@ -209,9 +210,9 @@ module CxbRank
 	USER_ID_FIGURE = 5          # ユーザID
 
 	# 入力受付桁数
-	POINT_FIGURE = 6            # RP入力の最大桁数（0.00〜xxx.xx）
-	RATE_FIGURE = 6             # 達成率入力の最大桁数（0.00〜100.00）
-	COURSE_RATE_FIGURE = 5      # 達成率入力の最大桁数（0.0〜100.0）
+	POINT_FIGURE = 6            # RP入力の最大桁数（0.00～xxx.xx）
+	RATE_FIGURE = 6             # 達成率入力の最大桁数（0.00～100.00）
+	COURSE_RATE_FIGURE = 5      # 達成率入力の最大桁数（0.0～100.0）
 
 	# セッションの有効期限（単位: 分）
 	EXPIRE_MINUTES = 60
