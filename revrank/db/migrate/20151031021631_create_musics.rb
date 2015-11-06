@@ -2,7 +2,7 @@ $LOAD_PATH << '../comrank/lib'
 require 'cxbrank/const'
 
 class CreateMusics < ActiveRecord::Migration
-	MUSIC_DIFFS = CxbRank::MUSIC_DIFFS[CxbRank::MODE_REV]
+	music_diffs = CxbRank::MUSIC_DIFFS[CxbRank::MODE_REV]
 
 	def self.up
 		create_table :musics do |t|
@@ -12,7 +12,7 @@ class CreateMusics < ActiveRecord::Migration
 			t.string :subtitle
 			t.string :lookup_key, :null => false
 			t.string :sort_key, :null => false
-			MUSIC_DIFFS.keys.sort.each do |key|
+			music_diffs.keys.sort.each do |key|
 				t.float "#{MUSIC_DIFFS[key].downcase}_level".to_sym
 				t.integer "#{MUSIC_DIFFS[key].downcase}_notes".to_sym
 			end

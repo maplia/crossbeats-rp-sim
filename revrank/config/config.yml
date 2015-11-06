@@ -1,20 +1,9 @@
-site:
-  name: REV. RankPoint Simulator
-  style_pc: /style/pc.css
-  style_sp: /style/sp.css
-  mode: rev
-  key: rev
+site_name: REV. RankPoint Simulator
+style_pc: 
+style_sp: 
+mode: 
+session_key: 
+secret: 
 
-db:
-  adapter: mysql2
-  host:
-  username:
-  password:
-  database:
-
-view:
-  basedir: ../comrank/views
-
-tracker:
-  id: 
-  domain: 
+tracker_id:
+domain: 

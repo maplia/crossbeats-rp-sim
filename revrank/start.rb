@@ -4,6 +4,7 @@ ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 require 'rubygems'
 require 'json'
 require 'sinatra'
+require 'sinatra/config_file'
 require 'sinatra/json'
 require 'sinatra/jsonp'
 require 'sinatra/cross_origin'
@@ -42,27 +43,49 @@ def log_bml_error(json, key)
 	return to_json({:status => 500, :message => $!.message})
 end
 
+config_file CxbRank::CONFIGURATION_FILE
+
 configure do
 	$config = CxbRank::SiteConfig.new
 	use Rack::Session::Cookie,
 		:path => '/',
 		:key => "#{$config.session_key}.session",
-		:expire_after => CxbRank::EXPIRE_MINUTES * 60
+		:expire_after => CxbRank::EXPIRE_MINUTES * 60,
+		:secret => $config.secret
 	enable :cross_origin
 	use Rack::MobileDetect
 	register Sinatra::DefaultCharset
 	set :default_charset, 'utf-8'
+	set :views, ['views', '../comrank/views']
+end
+
+helpers do
+	def site_top?
+		return request.path_info.blank? || (request.path_info == CxbRank::SITE_TOP_URI)
+	end
+
+	def mobile?
+		return request.env['X_MOBILE_DEVICE'].present?
+	end
+
+	def find_template(views, name, engine, &block)
+		Array(views).each do |v|
+			super(v, name, engine, &block)
+		end
+	end
 end
 
 before do
-	ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIGURATION_FILE)['db'])
-	$mobile = !request.env['X_MOBILE_DEVICE'].nil?
+	ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
+	ActiveRecord::Base.establish_connection(settings.environment)
+	$mobile = request.env['X_MOBILE_DEVICE'].present?
 end
 
 get '/' do
-	maker = CxbRank::SiteTopMaker.new
-	last_modified maker.last_modified
-	maker.to_html
+	last_modified [File.mtime('views/index.erb'), File.mtime('views/index_news.erb')].max
+	erb :index, :layout => true, :locals => {:page_title => nil} do
+		erb :index_news
+	end
 end
 
 get '/musics' do

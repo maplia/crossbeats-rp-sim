@@ -9,15 +9,15 @@ module CxbRank
 		end
 
 		def name
-			return @config['site']['name']
+			return @config['site_name']
 		end
 
 		def mode
-			return @config['site']['mode']
+			return @config['site_mode']
 		end
 
 		def style
-			return $mobile ? @config['site']['style_sp'] : @config['site']['style_pc'] 
+			return $mobile ? @config['style_sp'] : @config['style_pc'] 
 		end
 
 		def cxb_mode?
@@ -41,19 +41,23 @@ module CxbRank
 		end
 
 		def view_basedir
-			return @config['view']['basedir']
+			return '../comrank/views'
 		end
 
 		def tracker_id
-			return @config['tracker']['id']
+			return @config['tracker_id']
 		end
 
 		def tracker_domain
-			return @config['tracker']['domain']
+			return @config['domain']
 		end
 
 		def session_key
-			return @config['site']['key']
+			return @config['session_key']
+		end
+
+		def secret
+			return @config['secret']
 		end
 	end
 

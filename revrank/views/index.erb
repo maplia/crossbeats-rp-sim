@@ -1,3 +1,5 @@
+<% require 'cxbrank/const' %>
+
 <p class="top_navi"><%= $mobile ? '' : $config.name %> トップ</p>
 <h1><%= $config.name %></h1>
 <div class="sidebar">
@@ -7,15 +9,15 @@
 			<dl>
 				<dt>■ユーザー登録済の方</dt>
 				<dd>
-					<form method="post" action="<%= USER_LOGIN_URI %>">
-						<p>ユーザーID: <input type="text" name="user_id" size="<%= USER_ID_FIGURE %>" maxlength="<%= USER_ID_FIGURE %>" /></p>
+					<form method="post" action="<%= CxbRank::USER_LOGIN_URI %>">
+						<p>ユーザーID: <input type="text" name="user_id" size="<%= CxbRank::USER_ID_FIGURE %>" maxlength="<%= CxbRank::USER_ID_FIGURE %>" /></p>
 						<p>パスワード: <input type="password" name="password" size="12" maxlength="80" /></p>
 						<p><input type="submit" value="ログインする" /></p>
 					</form>
 				</dd>
 				<dt>■ユーザー未登録の方</dt>
 				<dd>
-					<p><a href="<%= USER_ADD_URI %>">新規ユーザー登録</a></p>
+					<p><a href="<%= CxbRank::USER_ADD_URI %>">新規ユーザー登録</a></p>
 				</dd>
 			</dl>
 		</div>
@@ -24,21 +26,21 @@
 	<div class="unit">
 		<h2>登録ユーザーリスト</h2>
 		<div class="subunit">
-			<p><a href="<%= USER_LIST_URI %>">登録ユーザーリスト</a></p>
+			<p><a href="<%= CxbRank::USER_LIST_URI %>">登録ユーザーリスト</a></p>
 		</div>
 	</div>
 
 	<div class="unit">
 		<h2>登録曲リスト</h2>
 		<div class="subunit">
-			<p><a href="<%= MUSIC_LIST_VIEW_URI %>">登録曲リスト</a></p>
+			<p><a href="<%= CxbRank::MUSIC_LIST_VIEW_URI %>">登録曲リスト</a></p>
 		</div>
 	</div>
 
 	<div class="unit">
 		<h2>その他ツール</h2>
 		<div class="subunit">
-			<p><a href="<%= RANK_CALC_URI %>">ランク別許容ミス数計算機</a></p>
+			<p><a href="<%= CxbRank::RANK_CALC_URI %>">ランク別許容ミス数計算機</a></p>
 			<p><del>得点率計算ツール</del></p>
 		</div>
 	</div>
@@ -120,7 +122,7 @@
 	<div class="unit">
 		<h2>最新の運営情報</h2>
 		<div class="subunit">
-			<%= File.open('views/index_news.html.erb').read %>
+			<%= yield %>
 		</div>
 	</div>
 </div>
