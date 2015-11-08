@@ -6,7 +6,7 @@ class CreateUsers < ActiveRecord::Migration
 			t.string :game_id
 			t.boolean :game_id_display, :default => false
 			t.string :comment
-			t.float :point, :default => 0.0
+			t.float :point
 			t.boolean :point_direct, :default => false
 			t.datetime :point_updated_at
 			t.boolean :display, :default => true

@@ -1,0 +1,20 @@
+- if courses.present?
+  %div.unit
+    %h2= type_name
+    %div.subunit
+      %table.music_list
+        - unless mobile?
+          %thead
+            %tr
+              %th.title{:rowspan => 2} コース名
+              %th.level{:rowspan => 2} Lv
+              %th.notes{:rowspan => 2} Notes
+              %th{:colspan => 5} コース構成曲
+            %tr
+              %th.number #
+              %th.title タイトル
+              %th.level{:colspan => 2} Lv
+              %th.notes Notes
+        %tbody
+          - courses.each do |course|
+            = haml :_course, :locals => {:course => course}

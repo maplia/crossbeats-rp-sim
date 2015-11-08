@@ -1,0 +1,9 @@
+- if defined? error_no
+  %p= CxbRank::ERRORS[error_no]
+- else
+  %p 入力内容にエラーがあります
+  %ul
+    - errors.each do |error|
+      %li= error[1]
+- if defined? back_uri
+  %p= link_to '戻る', back_uri

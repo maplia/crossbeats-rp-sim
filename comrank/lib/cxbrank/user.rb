@@ -1,16 +1,23 @@
-require 'erb'
 require 'rubygems'
 require 'active_record'
-require 'util'
-require 'cxbrank/util'
 require 'cxbrank/const'
 
 module CxbRank
 	class User < ActiveRecord::Base
-		include ErbFileRead
-		include ERB::Util
+		validates_presence_of :name, :message => ERRORS[ERROR_USERNAME_IS_UNINPUTED]
+		validates_presence_of :password, :message => ERRORS[ERROR_PASSWORD1_IS_UNINPUTED]
+		validates_confirmation_of :password, :message => ERRORS[ERROR_PASSWORDS_ARE_NOT_EQUAL]
+		validates_format_of :game_id, :allow_nil => true, :allow_blank => true,
+			:with => /\A\d+\z/, :message => ERRORS[ERROR_GAME_ID_NOT_NUMERIC]
+		validates_length_of :game_id, :allow_nil => true, :allow_blank => true,
+			:is => GAME_ID_FIGURE, :message => ERRORS[ERROR_GAME_ID_LENGTH_IS_INVALID]
+		validates_format_of :point_before_type_cast, :allow_nil => true, :allow_blank => true,
+			:with => /\A\d+\.\d\d\z/, :message => ERRORS[ERROR_REAL_RP_NOT_NUMERIC]
 
-		validates_confirmation_of :password
+		def self.last_modified
+			user = self.find(:first, :order => 'updated_at desc')
+			return (user ? user.updated_at : Time.now)
+		end
 
 		def self.find_by_param_id(param_id)
 			if param_id.size == USER_ID_FIGURE
@@ -19,26 +26,6 @@ module CxbRank
 				return self.find(:first,
 					:conditions => {:game_id => param_id}, :order => 'point_updated_at desc')
 			end
-		end
-
-		def validate
-			if name.empty?
-				return ERROR_USERNAME_IS_UNINPUTED
-			end
-			if password.empty?
-				return ERROR_PASSWORD1_IS_UNINPUTED
-			end
-			if password_confirmation and password_confirmation.empty?
-				return ERROR_PASSWORD2_IS_UNINPUTED
-			end
-			if password_confirmation and password != password_confirmation
-				return ERROR_PASSWORDS_ARE_NOT_EQUAL
-			end
-			unless point_before_type_cast.is_f?
-				return ERROR_REAL_RP_NOT_NUMERIC
-			end
-
-			return NO_ERROR
 		end
 
 		def user_id
@@ -55,21 +42,6 @@ module CxbRank
 
 		def skill_chart_uri
 			return "#{CLEAR_LIST_VIEW_URI}/#{user_id}"
-		end
-
-		def to_html(edit)
-			template_html = 'user/user_item.html.erb'
-			return ERB.new(read_erb_file(template_html)).result(binding)
-		end
-
-		def to_html_edit
-			template_html = 'user/user_edit_item.html.erb'
-			return ERB.new(read_erb_file(template_html)).result(binding)
-		end
-
-		def to_html_confirm
-			template_html = 'user/user_edit_item_conf.html.erb'
-			return ERB.new(read_erb_file(template_html)).result(binding)
 		end
 
 		def to_hash

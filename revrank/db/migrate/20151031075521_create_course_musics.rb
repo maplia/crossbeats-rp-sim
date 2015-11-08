@@ -1,5 +1,5 @@
 class CreateCourseMusics < ActiveRecord::Migration
-  def self.up
+	def self.up
 		create_table :course_musics do |t|
 			t.references :course, :null => false
 			t.integer :seq, :null => false
@@ -10,9 +10,9 @@ class CreateCourseMusics < ActiveRecord::Migration
 		change_table :course_musics do |t|
 			t.index ['Course'.foreign_key, :seq], :unique => true
 		end
-  end
+	end
 
-  def self.down
+	def self.down
 		drop_table :course_musics
-  end
+	end
 end

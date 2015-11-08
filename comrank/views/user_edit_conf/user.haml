@@ -1,0 +1,45 @@
+%div.unit
+  %h2 入力内容
+  %div.subunit
+    - form_tag action, :method => 'put' do
+      %table.info
+        - if user.id
+          %tr
+            %th ユーザーID
+            %td= user.user_id
+        %tr
+          %th ユーザー名
+          %td&= user.name
+        %tr
+          %th パスワード
+          %td
+            - if user.password_changed?
+              = '*' * user.password.size
+            - else
+              （変更なし）
+        %tr
+          %th= (cxb_mode? ? (mobile? ? 'C&times;B ID' : 'CROSS&times;BEATS ID') : (mobile? ? 'REV.ID' : 'REV.ユーザーID'))
+          %td
+            - if user.game_id.blank?
+              入力なし
+            - else
+              = user.game_id
+              - if rev_mode? and !user.game_id_display 
+                - if mobile?
+                  %br
+                （REV.ID非公開）
+        - if user.id
+          %tr
+            %th 実RP
+            %td= sprintf('%.2f', user.point)
+        %tr
+          %th= (mobile? ? 'コメント' : 'ユーザーコメント')
+          %td
+            - if user.comment.blank?
+              入力なし
+            - else
+              = multiline(user.comment, true)
+      %p 以上のユーザー情報を登録します。よろしいですか?
+      %p
+        = submit_tag 'はい', :name => 'y'
+        = submit_tag 'いいえ', :name => 'n'

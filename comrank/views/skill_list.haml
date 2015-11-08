@@ -1,0 +1,96 @@
+<p class="top_navi"><a href="<%= SITE_TOP_URI %>"><%= $mobile ? '' : $config.name %> トップ</a> &gt; ランクポイント表</p>
+<h1>ランクポイント表</small></h1>
+
+<% if last_modified %>
+  <p class="last_modified">最終更新時刻: <%= last_modified.strftime('%Y-%m-%d %H:%M:%S') %></p>
+<% end %>
+
+<%= user.to_html(@edit) %>
+
+<div class="unit">
+  <h2>ランクポイント</h2>
+  <div class="subunit">
+    <table class="summary">
+      <% if $mobile %>
+        <tbody>
+          <% $config.music_types.keys.sort.each do |type| %>
+            <tr>
+              <th><%= $config.music_types[type].sub(/RP対象曲/, '') %></th>
+              <td><%= sprintf('%.2f', skill_set.point_hash[type]) %></td>
+            </tr>
+          <% end %>
+          <tr>
+            <th>合計RP</th>
+            <td><%= sprintf('%.2f', skill_set.total_point) %></td>
+          </tr>
+        </tbody>
+      <% else %>
+        <thead>
+          <tr>
+            <% $config.music_types.keys.sort.each do |type| %>
+              <th class="part"><%= $config.music_types[type] %></th>
+            <% end %>
+            <th class="sum">合計RP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <% $config.music_types.keys.sort.each do |type| %>
+              <td><%= sprintf('%.2f', skill_set.point_hash[type]) %></td>
+            <% end %>
+            <td><%= sprintf('%.2f', skill_set.total_point) %></td>
+          </tr>
+        </tbody>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<% skill_set.skill_hash.keys.sort.each do |type| %>
+  <% next if MUSIC_TYPE_ST_COUNTS[type] == 0 %>
+  <div class="unit">
+    <h2><%= $config.music_types[type] %></h2>
+    <div class="subunit">
+      <% if skill_set.skill_hash[type].empty? %>
+        <p>該当する曲のプレイ成績がありません</p>
+      <% else %>
+        <table class="list">
+          <% unless $mobile %>
+            <thead>
+              <tr>
+                <th>#</th>
+                <% if type == MUSIC_TYPE_REV_COURSE %>
+                  <th class="title">コース名</th>
+                  <th class="mark">レベル</th>
+                  <th class="mark">完奏</th>
+                <% else %>
+                  <th class="title">タイトル</th>
+                  <th class="level">レベル</th>
+                <% end %>
+                <th class="point">RP</th>
+                <th class="rate">RATE</th>
+                <% if skill_set.skill_hash[type][0].instance_of?(Skill) %>
+                  <% if $config.rev_mode? %>
+                    <th class="u_rate">S/U</th>
+                  <% else %>
+                    <th class="rate">ULT</th>
+                  <% end %>
+                  <th class="mark">ランク</th>
+                <% end %>
+                <th class="mark">コンボ</th><th>コメント</th>
+              </tr>
+            </thead>
+          <% end %>
+          <tbody>
+            <% row = 1 %>
+            <% skill_set.skill_hash[type].each do |skill| %>
+              <% next if !@edit and (skill.iglock_best_point || 0.0) == 0.0 %>
+              <%= skill.to_html(@edit, row, type == MUSIC_TYPE_REV_BONUS) %>
+              <% row = row + 1 %>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+  </div>
+<% end %>

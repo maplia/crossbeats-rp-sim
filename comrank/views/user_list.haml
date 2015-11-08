@@ -1,0 +1,24 @@
+=haml :_navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+%div.unit
+  %h2 ユーザー一覧
+  %div.subunit
+    - unless users.present?
+      %p 表示対象のユーザーは存在しません
+    - else
+      %table.list
+        - unless mobile?
+          %thead
+            %tr
+              %th ユーザーID
+              %th ユーザー名
+              - if cxb_mode?
+                %th CxB ID
+              - else
+                %th REV.ID
+              %th RP
+              %th コメント
+              %th 最終更新時刻
+        %tbody
+          - users.each do |user|
+            = haml :user, :locals => {:user => user}

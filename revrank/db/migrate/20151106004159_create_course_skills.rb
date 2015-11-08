@@ -1,5 +1,5 @@
 class CreateCourseSkills < ActiveRecord::Migration
-  def self.up
+	def self.up
 		create_table :course_skills do |t|
 			t.references :user, :null => false
 			t.references :course, :null => false
@@ -14,9 +14,9 @@ class CreateCourseSkills < ActiveRecord::Migration
 		change_table :course_skills do |t|
 			t.index ['User'.foreign_key, 'Course'.foreign_key], :unique => true
 		end
-  end
+	end
 
-  def self.down
+	def self.down
 		drop_table :course_skills
-  end
+	end
 end

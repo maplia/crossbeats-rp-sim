@@ -1,19 +1,15 @@
-require 'erb'
 require 'rubygems'
 require 'active_record'
-require 'cxbrank/util'
 require 'cxbrank/const'
 
 module CxbRank
 	class Course < ActiveRecord::Base
 		include Comparable
-		include ErbFileRead
-		include ERB::Util
 		has_many :course_musics
 
 		def self.last_modified
 			course = self.find(:first, :order => 'updated_at desc')
-			return (course ? course.updated_at : nil)
+			return (course ? course.updated_at : Time.now)
 		end
 
 		def notes
@@ -26,16 +22,11 @@ module CxbRank
 		end
 
 		def level_to_s
-			return (level == 0) ? '-' : sprintf($config.level_format, level)
+			return (level == 0) ? '-' : sprintf(LEVEL_FORMATS[MODE_REV], level)
 		end
 
 		def notes_to_s
 			return (notes == 0) ? '???' : sprintf('%d', notes)
-		end
-
-		def to_html
-			template_html = 'course/course_item.html.erb'
-			return ERB.new(read_erb_file(template_html)).result(binding)
 		end
 
 		def <=>(other)
@@ -45,12 +36,30 @@ module CxbRank
 	
 	class CourseMusic < ActiveRecord::Base
 		include Comparable
-		include ErbFileRead
 		belongs_to :music
 
-		def to_html
-			template_html = 'course/course_music_item.html.erb'
-			return ERB.new(read_erb_file(template_html)).result(binding)
+		def title
+			return music.title
+		end
+
+		def subtitle
+			return music.subtitle
+		end
+
+		def level
+			return music.level(diff)
+		end
+
+		def level_to_s
+			return music.level_to_s(diff)
+		end
+
+		def notes
+			return music.notes(diff)
+		end
+
+		def notes_to_s
+			return music.notes_to_s(diff)
 		end
 
 		def <=>(other)

@@ -1,0 +1,47 @@
+- form_for user, action do |f|
+  %p <em>*印</em>がついている項目は入力必須項目です。ここで入力した項目はユーザー登録後も変更可能です。
+  %dl
+    - if user.id
+      %dt ユーザーID
+      %dd= user.user_id
+    %dt ユーザー名 <em>*</em>（文字種の制限はありません。全角文字OKです）
+    %dd
+      = f.text_field :name, :size => 30, :maxlength => 30
+    - if user.id
+      %dt パスワード（変更しない場合は空欄にしてください）
+      %dd
+        = f.password_field :password, :size => 20, :maxlength => 50, :value => (user.password_changed? ? user.password : '')
+      %dt 確認用パスワード（変更しない場合は空欄にしてください）
+      %dd
+        = f.password_field :password_confirmation, :size => 20, :maxlength => 50
+    - else
+      %dt パスワード <em>*</em>
+      %dd
+        = f.password_field :password, :size => 20, :maxlength => 50
+      %dt 確認用パスワード <em>*</em>
+      %dd
+        = f.password_field :password_confirmation, :size => 20, :maxlength => 50
+    - if cxb_mode?
+      %dt CROSS&times;BEAT ID
+      %dd
+        = f.text_field :game_id, :size => 8, :maxlength => 8
+    - else
+      %dt REV.ユーザーID（MY DATAからのデータインポートに使用します）
+      %dd
+        = f.text_field :game_id, :size => 8, :maxlength => 8
+        %label
+          = f.check_box :game_id_display
+          REV.ユーザーIDを公開する
+      - if user.id
+        %dt 実RP
+        %dd
+          = f.text_field :point, :size => '2000.00'.size, :maxlength => '2000.00'.size, :value => sprintf('%.2f', user.point)
+    %dt ユーザーコメント（HTMLタグによる文字装飾はできません。URLには自動的にリンクが設定されます）
+    %dd
+      - if mobile?
+        = f.text_area :comment, :rows => 6, :style => 'width: 100%;'
+      - else
+        = f.text_area :comment, :rows => 6, :cols => 70
+  %p
+    = f.submit '次へ進む'
+    = input_tag :reset, :value=> '入力リセット'

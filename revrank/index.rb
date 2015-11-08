@@ -1,9 +1,6 @@
 #!/usr/local/bin/ruby -Ku
 
-load 'start.rb'
-
-set :run, false
-#set :environment, :cgi
+load './app.rb'
 
 STDOUT.binmode
-Rack::Handler::CGI.run Sinatra::Application
+Rack::Handler::CGI.run RevRankApp

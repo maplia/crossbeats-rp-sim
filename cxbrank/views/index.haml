@@ -1,0 +1,94 @@
+= haml :_navi
+%h1= settings.site_name
+%div.sidebar
+  %div.unit
+    %h2 ログイン
+    %div.subunit
+      %dl
+        %dt ■ユーザー登録済の方
+        %dd
+          - form_tag CxbRank::USER_LOGIN_URI do
+            %p
+              = label_tag :user_id, :caption => 'ユーザーID: '
+              = text_field_tag :user_id, :id => :user_id, :size => CxbRank::USER_ID_FIGURE, :maxlength => CxbRank::USER_ID_FIGURE
+            %p
+              = label_tag :password, :caption => 'パスワード: '
+              = password_field_tag :password, :id => :password ,:size => 12, :maxlength => 80
+            = submit_tag 'ログイン'
+        %dt ■ユーザー未登録の方
+        %dd
+          %ul
+            %li #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_ADD_URI], CxbRank::USER_ADD_URI}
+  %div.unit
+    %h2 登録ユーザーリスト
+    %div.subunit
+      %ul
+        %li #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_LIST_URI], CxbRank::USER_LIST_URI}
+  %div.unit
+    %h2 登録曲リスト
+    %div.subunit
+      %ul
+        %li #{link_to CxbRank::PAGE_TITLES[CxbRank::MUSIC_LIST_VIEW_URI], CxbRank::MUSIC_LIST_VIEW_URI}
+  %div.unit
+    %h2 その他ツール
+    %div.subunit
+      %ul
+        %li #{link_to 'ランク別許容ミス数計算機', CxbRank::RANK_CALC_URI}
+        %li
+          %del 得点率計算ツール
+  %div.unit
+    %h2 リンク
+    %div.subunit
+      %dl
+        %dt ■公式サイト
+        %dd
+          %ul
+            %li #{link_to '公式サイト', 'http://www.capcom.co.jp/arcade/rev/'}
+        %dt ■Wiki/個人サイト
+        %dd
+          %ul
+            %li #{link_to 'crossbeats REV.Wiki', 'http://crossbeatsrev.wiki.fc2.com/'}
+            %li #{link_to 'MapWiki - crossbeats REV.', 'http://wiki.maplia.jp/?crossbeats%20REV.'}
+%div.main
+  %div.unit
+    %h2 このサイトについて
+    %div.subunit
+      %dl
+        %dt これは何ですか?
+        %dd
+          %p #{link_to 'カプコン', 'http://www.capcom.co.jp/'}のアーケードゲーム「#{link_to 'crossbeats REV.（クロスビーツ レヴ）', 'http://www.capcom.co.jp/arcade/rev/'}」のランクポイント管理Webアプリケーションです。
+          %p
+            %del 登録はご自由にどうぞ。
+          %p 現状はまだ作成中のため、<em>バグ出しとその修正を目的としたテスト公開</em>としています。本公開の際にはここに登録されたデータは引き継ぐ予定がありませんので、ご了承のうえ利用してください。
+        %dt ブックマークレット
+        %dd
+          %p 「REV.」では#{link_to 'Web上のMY DATAページ', 'https://rev-www.ac.capcom.jp/weblogin'}でプレイデータの閲覧を行うことができるため、このデータを取り込むことができるようにするためにブックマークレットによる更新方法を用意しています。
+          %p 使用するには以下のURLをブックマークに登録し、#{link_to 'MY DATAにログインした直後に表示されるページ', 'https://rev-www.ac.capcom.jp/profile'}にいる状態で登録したブックマークを開きます。
+          %pre
+            javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://revrank.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()
+          %dl
+            %dt ブックマーク登録 (PC)
+            %dd
+              %p PCの場合は#{link_to 'このリンク', "javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://revrank.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()"}をブックマークとして登録します。
+              %p ※ChromeおよびFirefox（ともに最新版 @ Windows10）での動作を確認しています
+            %dt ブックマーク登録 (スマートフォン)
+            %dd
+              %p スマートフォンの場合は#{link_to 'このリンク', "./#javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://revrank.maplia.jp/script/data_import.js';document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()"}をブックマークとして登録した後、ブックマークの編集でURLから「javascript:」よりも前の部分を削除してください。
+              %p ※iPhone 5S（iOS 8.4搭載）の、Safariでの動作を確認しています
+        %dt ランクポイント算出方法
+        %dd
+          %p ランクポイントは現在以下の項目の合計で算出しています。誤りがあれば修正される可能性があります。
+          %ol
+            %li <u>単曲RPのうち、数値が大きい順に並べた上位20曲分のRP合計</u>
+            %ul
+              %li 以前の仕様にあったUNLIMITED譜面RPの1%ボーナスはありません
+            %li <u>単曲RPのうち、<em>上位20曲から漏れた曲に限った</em>、UNLIMITED譜面RPの1%の合計</u>
+            %ul
+              %li RPの1%を合計したあとに、その小数点以下第2位未満を切り捨てます
+              %li MASTER以下の譜面がその曲の最大RPになっていても合計対象です
+            %li <u>チャレンジRPのうち、数値が最も大きい1コースのRP</u>
+          %p クリアレートからRP算出するまでの処理はこのRPシミュレータでは行っていないので省きます。
+  %div.unit
+    %h2 最新の運営情報
+    %div.subunit
+      = yield

@@ -53,14 +53,3 @@ end
 def normalize_textarea_data(data)
 	return data.gsub(/\r\n/, "\n")
 end
-
-def textarea_data_to_html(data, autolink=false)
-	if data
-		html = data.dup
-		html.gsub!(/(\r\n|\r|\n)/, '<br/>')
-		html = Rinku.auto_link(html) if autolink
-	else
-		html = data
-	end
-	return html
-end

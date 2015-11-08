@@ -1,0 +1,3 @@
+= haml :_navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+= haml :user, :locals => {:user => session[:temp_user], :action => CxbRank::USER_ADD_URI}

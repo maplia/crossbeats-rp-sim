@@ -1,0 +1,10 @@
+=haml :_navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+- if music_set.last_modified
+  %p.last_modified 最終更新時刻: #{music_set.last_modified.strftime('%Y-%m-%d %H:%M:%S')}
+%p 間違いがあれば、ご指摘ください。確認の上、修正を行います。
+- music_types.keys.sort.each do |type|
+  - if type == CxbRank::MUSIC_TYPE_REV_COURSE
+    = haml :courses, :locals => {:courses => music_set[type], :type_name => music_types[type]}
+  - else
+    = haml :musics, :locals => {:musics => music_set[type], :type_name => music_types[type]}

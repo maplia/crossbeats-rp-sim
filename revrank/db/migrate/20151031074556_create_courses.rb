@@ -1,5 +1,5 @@
 class CreateCourses < ActiveRecord::Migration
-  def self.up
+	def self.up
 		create_table :courses do |t|
 			t.string :text_id, :null => false
 			t.string :name, :null => false
@@ -15,9 +15,9 @@ class CreateCourses < ActiveRecord::Migration
 			t.index :text_id, :unique => true
 			t.index :lookup_key, :unique => true
 		end
-  end
+	end
 
-  def self.down
+	def self.down
 		drop_table :courses
-  end
+	end
 end

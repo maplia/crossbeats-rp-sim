@@ -20,11 +20,19 @@ module CxbRank
 	MUSIC_LIST_VIEW_URI = '/musics'                   # 登録曲リスト
 	RANK_CALC_URI = '/rankcalc'                       # 許容ミス数計算機
 
+	# ページ名
+	PAGE_TITLES = {
+		SITE_TOP_URI => 'トップ',
+		MUSIC_LIST_VIEW_URI => '登録曲リスト',
+		USER_ADD_URI => '新規ユーザー登録',
+		USER_LIST_URI => '登録ユーザーリスト',
+	}
+
 	# 画像ファイルを置いておくディレクトリへのパス
 	IMAGE_PATH = 'images/'
 
 	# プログラムの設定ファイル
-	CONFIGURATION_FILE = 'config/config.yml'
+	CONFIG_FILE = 'config/config.yml'
 	DATABASE_FILE = 'config/database.yml'
 
 	# 動作モード
@@ -213,6 +221,7 @@ module CxbRank
 	POINT_FIGURE = 6            # RP入力の最大桁数（0.00～xxx.xx）
 	RATE_FIGURE = 6             # 達成率入力の最大桁数（0.00～100.00）
 	COURSE_RATE_FIGURE = 5      # 達成率入力の最大桁数（0.0～100.0）
+	GAME_ID_FIGURE = 8          # ゲームIDの桁数
 
 	# セッションの有効期限（単位: 分）
 	EXPIRE_MINUTES = 60
@@ -240,7 +249,11 @@ module CxbRank
 	ERROR_PASSWORD2_IS_UNINPUTED_TEXT = '確認用のパスワードが入力されていません。'
 	ERROR_PASSWORDS_ARE_NOT_EQUAL = '14'
 	ERROR_PASSWORDS_ARE_NOT_EQUAL_TEXT = '入力されたパスワードが一致しません。'
-	ERROR_REAL_RP_NOT_NUMERIC = '15'
+	ERROR_GAME_ID_NOT_NUMERIC = '15'
+	ERROR_GAME_ID_NOT_NUMERIC_TEXT = 'ゲームIDが正しい数字ではありません。'
+	ERROR_GAME_ID_LENGTH_IS_INVALID = '16'
+	ERROR_GAME_ID_LENGTH_IS_INVALID_TEXT = 'ゲームIDの長さが正しくありません。'
+	ERROR_REAL_RP_NOT_NUMERIC = '17'
 	ERROR_REAL_RP_NOT_NUMERIC_TEXT = '実RPが正しい数値でありません。'
 	# ユーザログイン関係
 	ERROR_USERID_IS_UNINPUTED = '21'
@@ -335,6 +348,8 @@ module CxbRank
 		ERROR_PASSWORD2_IS_UNINPUTED     => ERROR_PASSWORD2_IS_UNINPUTED_TEXT,
 		ERROR_PASSWORDS_ARE_NOT_EQUAL    => ERROR_PASSWORDS_ARE_NOT_EQUAL_TEXT,
 		ERROR_REAL_RP_NOT_NUMERIC        => ERROR_REAL_RP_NOT_NUMERIC_TEXT,
+		ERROR_GAME_ID_NOT_NUMERIC        => ERROR_GAME_ID_NOT_NUMERIC_TEXT,
+		ERROR_GAME_ID_LENGTH_IS_INVALID  => ERROR_GAME_ID_LENGTH_IS_INVALID_TEXT,
 		ERROR_USERID_IS_UNINPUTED        => ERROR_USERID_IS_UNINPUTED_TEXT,
 		ERROR_USERID_IS_UNREGISTERED     => ERROR_USERID_IS_UNREGISTERED_TEXT,
 		ERROR_USERID_OR_PASS_IS_WRONG    => ERROR_USERID_OR_PASS_IS_WRONG_TEXT,

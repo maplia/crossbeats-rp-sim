@@ -1,20 +1,20 @@
 require 'rubygems'
 require 'active_record'
-require 'cxbrank/util'
 require 'cxbrank/const'
+require 'cxbrank/course'
 
 module CxbRank
-	class MusicEdit < ActiveRecord::Base
-		set_table_name '_musics'
-	end
-
 	class Music < ActiveRecord::Base
 		include Comparable
-		include ErbFileRead
+		has_many :monthlies
+
+		def self.set_mode(mode)
+			@@mode = mode
+		end
 
 		def self.last_modified
 			music = self.find(:first, :order => 'updated_at desc')
-			return (music ? music.updated_at : nil)
+			return (music ? music.updated_at : Time.now)
 		end
 
 		def self.find_by_param_id(param_id)
@@ -30,11 +30,11 @@ module CxbRank
 		end
 
 		def level(diff)
-			return send("#{$config.music_diffs[diff].downcase}_level")
+			return send("#{MUSIC_DIFFS[@@mode][diff].downcase}_level")
 		end
 
 		def notes(diff)
-			return send("#{$config.music_diffs[diff].downcase}_notes")
+			return send("#{MUSIC_DIFFS[@@mode][diff].downcase}_notes")
 		end
 
 		def max_notes
@@ -50,8 +50,13 @@ module CxbRank
 			return !level(diff).nil?
 		end
 
-		def monthly?
-			return monthly == 1
+		def monthly?(date=Time.now)
+			monthlies.each do |monthly|
+				if (monthly.span_s..monthly.span_e).include?(date)
+					return true
+				end
+			end
+			return false
 		end
 
 		def limited?
@@ -62,7 +67,7 @@ module CxbRank
 			unless exist?(diff)
 				return '-'
 			else
-				return (level(diff) == 0) ? '-' : sprintf($config.level_format, level(diff))
+				return (level(diff) == 0) ? '-' : sprintf(LEVEL_FORMATS[@@mode], level(diff))
 			end
 		end
 
@@ -72,11 +77,6 @@ module CxbRank
 			else
 				return (notes(diff) == 0) ? '???' : sprintf('%d', notes(diff))
 			end
-		end
-
-		def to_html
-			template_html = 'music/music_list_item.html.erb'
-			return ERB.new(read_erb_file(template_html)).result(binding)
 		end
 
 		def to_hash
@@ -100,6 +100,34 @@ module CxbRank
 			else
 				return sort_key <=> other.sort_key
 			end
+		end
+	end
+
+	class Monthly < ActiveRecord::Base
+	end
+
+	class MusicSet < Hash
+		attr_accessor :last_modified
+		def self.load(mode)
+			music_set = self.new
+			musics = Music.find(:all, :conditions => {:display => true}).sort
+			if mode == MODE_CXB
+				music_set[MUSIC_TYPE_NORMAL] = []
+				music_set[MUSIC_TYPE_SPECIAL] = []
+				musics.each do |music|
+					if music.monthly?
+						music_set[MUSIC_TYPE_SPECIAL] << music
+					else
+						music_set[MUSIC_TYPE_NORMAL] << music
+					end
+				end
+			else
+				music_set[MUSIC_TYPE_REV_SINGLE] = musics
+				courses = Course.find(:all, :conditions => {:display => true}).sort
+				music_set[MUSIC_TYPE_REV_COURSE] = courses
+			end
+			music_set.last_modified = [Music.last_modified, Course.last_modified].max
+			return music_set
 		end
 	end
 end

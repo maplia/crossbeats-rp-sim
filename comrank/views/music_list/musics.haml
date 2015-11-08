@@ -1,0 +1,22 @@
+- if musics.present?
+  %div.unit
+    %h2= type_name
+    %div.subunit
+      %table.music_list
+        - unless mobile?
+          %thead
+            %tr
+              - if cxb_mode?
+                %th.number{:rowspan => 2} #
+              %th.title{:rowspan => 2} タイトル
+              - music_diffs.keys.sort.each do |diff|
+                - diff_class = music_diffs[diff].downcase
+                %th{:class => diff_class, :colspan => 2}= music_diffs[diff]
+            %tr
+              - music_diffs.keys.sort.each do |diff|
+                - diff_class = music_diffs[diff].downcase
+                %th{:class => diff_class} Lv
+                %th{:class => diff_class} Notes
+        %tbody
+          - musics.each do |music|
+            = haml :_music, :locals => {:music => music}

@@ -4,6 +4,7 @@ ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 require 'rubygems'
 require 'json'
 require 'sinatra'
+require 'sinatra_more'
 require 'sinatra/config_file'
 require 'sinatra/json'
 require 'sinatra/jsonp'
@@ -14,8 +15,6 @@ require 'active_record'
 require 'cxbrank/util'
 require 'cxbrank/const'
 require 'cxbrank/authenticate'
-require 'cxbrank/menu_view'
-require 'cxbrank/music_view'
 require 'cxbrank/skill_view'
 require 'cxbrank/skill_form'
 require 'cxbrank/skill_chart'
@@ -56,7 +55,8 @@ configure do
 	use Rack::MobileDetect
 	register Sinatra::DefaultCharset
 	set :default_charset, 'utf-8'
-	set :views, ['views', '../comrank/views']
+	set :views, ['views', '../comrank/views', '../comrank/views/application']
+	register Sinatra::
 end
 
 helpers do
@@ -64,8 +64,36 @@ helpers do
 		return request.path_info.blank? || (request.path_info == CxbRank::SITE_TOP_URI)
 	end
 
+	def page_title(path_info=request.path_info)
+		if path_info.blank? or path_info == CxbRank::SITE_TOP_URI
+			return (mobile? ? '' : settings.site_name) << ' ' << CxbRank::PAGE_TITLES[CxbRank::SITE_TOP_URI]
+		else
+			return CxbRank::PAGE_TITLES[path_info]
+		end
+	end
+
 	def mobile?
 		return request.env['X_MOBILE_DEVICE'].present?
+	end
+
+	def cxb_mode?
+		return settings.site_mode == CxbRank::MODE_CXB
+	end
+
+	def rev_mode?
+		return settings.site_mode == CxbRank::MODE_REV
+	end
+
+	def music_diffs
+		return CxbRank::MUSIC_DIFFS[settings.site_mode]
+	end
+
+	def music_types
+		return CxbRank::MUSIC_TYPES[settings.site_mode]
+	end
+
+	def link_to(uri, text=url)
+		return %Q(<a href="#{uri}">#{text}</a>)
 	end
 
 	def find_template(views, name, engine, &block)
@@ -83,15 +111,43 @@ end
 
 get '/' do
 	last_modified [File.mtime('views/index.erb'), File.mtime('views/index_news.erb')].max
-	erb :index, :layout => true, :locals => {:page_title => nil} do
+	erb :index, :layout => true do
 		erb :index_news
 	end
 end
 
 get '/musics' do
-	maker = CxbRank::MusicListMaker.new
-	last_modified maker.last_modified
-	maker.to_html
+	settings.views << '../comrank/views/music_list'
+	last_modified = [CxbRank::Music.last_modified, CxbRank::Course.last_modified].max
+	last_modified last_modified
+	musics = CxbRank::Music.find(:all, :conditions => {:display => true}).sort
+	courses = CxbRank::Course.find(:all, :conditions => {:display => true}).sort
+	erb :music_list, :layout => true,
+		:locals => {
+			:last_modified => last_modified, :musics => musics, :courses => courses
+		}
+end
+
+get '/user_add' do
+	settings.views << '../comrank/views/user_edit'
+	session[:temp_user] ||= CxbRank::User.new
+	erb :user_add, :layout => true
+end
+
+post '/user_add' do
+	settings.views << '../comrank/views/user_edit_conf'
+	
+	erb :user_add_conf, :layout => true
+end
+
+put '/user_add' do
+	if params['n'].present?
+		settings.views << '../comrank/views/user_edit'
+		erb :user_add, :layout => true
+	else
+		settings.views << '../comrank/views/user_add_result'
+		erb :user_add_result, :layout => true
+	end
 end
 
 post '/login' do
@@ -181,24 +237,6 @@ post '/edit_course' do
 		else
 			redirect result
 		end
-	end
-end
-
-get '/user_add' do
-	maker = CxbRank::UserAddFormMaker.new(session)
-	maker.to_html
-end
-
-post '/user_add' do
-	if params['y'].nil? and params['n'].nil?
-		maker = CxbRank::UserAddCertifier.new(params, session)
-		maker.to_html
-	elsif params['n']
-		maker = CxbRank::UserAddFormMaker.new(session)
-		maker.to_html
-	else
-		maker = CxbRank::UserAddRegistrar.new(session)
-		maker.to_html
 	end
 end
 
