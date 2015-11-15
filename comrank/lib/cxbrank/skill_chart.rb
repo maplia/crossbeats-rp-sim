@@ -1,5 +1,4 @@
 require 'erb'
-require 'cxbrank/util'
 require 'cxbrank/pagemaker'
 require 'cxbrank/user'
 require 'cxbrank/music'

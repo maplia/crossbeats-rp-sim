@@ -17,4 +17,4 @@
               %th.notes Notes
         %tbody
           - courses.each do |course|
-            = haml :_course, :locals => {:course => course}
+            = haml :course, :locals => {:course => course}

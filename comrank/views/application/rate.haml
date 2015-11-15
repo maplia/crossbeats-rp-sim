@@ -1,0 +1,7 @@
+- if skill.cleared?(diff)
+  - if skill.rate_f(diff)
+    = sprintf('%d<small>.%2d</small>%%', skill.rate(diff).to_i, (skill.rate(diff) * 100).to_i % 100)
+  - else
+    = sprintf('%d%%', skill.rate(diff).to_i)
+- else
+  = '&ndash;'

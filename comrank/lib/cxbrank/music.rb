@@ -4,130 +4,133 @@ require 'cxbrank/const'
 require 'cxbrank/course'
 
 module CxbRank
-	class Music < ActiveRecord::Base
-		include Comparable
-		has_many :monthlies
+  class Music < ActiveRecord::Base
+    include Comparable
+    has_many :monthlies
 
-		def self.set_mode(mode)
-			@@mode = mode
-		end
+    @@mode = nil
+    @@ignore_locked = false
 
-		def self.last_modified
-			music = self.find(:first, :order => 'updated_at desc')
-			return (music ? music.updated_at : Time.now)
-		end
+    def self.mode=(mode)
+      @@mode = mode
+    end
 
-		def self.find_by_param_id(param_id)
-			if param_id.is_i? and params_id.to_i > 0
-				return self.find(:first, :conditions => {:number => param_id.to_i})
-			else
-				return self.find(:first, :conditions => {:text_id => param_id})
-			end
-		end
+    def music_diffs
+      return MUSIC_DIFFS[@@mode]
+    end
 
-		def full_title
-			return subtitle ? "#{title} #{subtitle}" : title
-		end
+    def level_format
+      return LEVEL_FORMATS[@@mode]
+    end
 
-		def level(diff)
-			return send("#{MUSIC_DIFFS[@@mode][diff].downcase}_level")
-		end
+    def self.last_modified
+      music = self.find(:first, :order => 'updated_at desc')
+      return (music ? music.updated_at : nil)
+    end
 
-		def notes(diff)
-			return send("#{MUSIC_DIFFS[@@mode][diff].downcase}_notes")
-		end
+    def self.find_by_param_id(param_id)
+      return self.find(:first, :conditions => {:text_id => param_id})
+    end
 
-		def max_notes
-			note_data = []
-			$config.music_diffs.keys.each do |diff|
-				note_data << notes(diff)
-			end
+    def full_title
+      return subtitle ? "#{title} #{subtitle}" : title
+    end
 
-			return note_data.max
-		end
+    def level(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
+    end
 
-		def exist?(diff)
-			return !level(diff).nil?
-		end
+    def notes(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
+    end
 
-		def monthly?(date=Time.now)
-			monthlies.each do |monthly|
-				if (monthly.span_s..monthly.span_e).include?(date)
-					return true
-				end
-			end
-			return false
-		end
+    def max_notes
+      note_data = []
+      music_diffs.keys.each do |diff|
+        note_data << notes(diff)
+      end
+      return note_data.max
+    end
 
-		def limited?
-			return limited == 1
-		end
+    def exist?(diff)
+      return !level(diff).nil?
+    end
 
-		def level_to_s(diff)
-			unless exist?(diff)
-				return '-'
-			else
-				return (level(diff) == 0) ? '-' : sprintf(LEVEL_FORMATS[@@mode], level(diff))
-			end
-		end
+    def monthly?(date=Time.now)
+      monthlies.each do |monthly|
+        if (monthly.span_s..monthly.span_e).include?(date)
+          return true
+        end
+      end
+      return false
+    end
 
-		def notes_to_s(diff)
-			unless exist?(diff)
-				return '-'
-			else
-				return (notes(diff) == 0) ? '???' : sprintf('%d', notes(diff))
-			end
-		end
+    def level_to_s(diff)
+      unless exist?(diff)
+        return '-'
+      else
+        return (level(diff) == 0) ? '-' : sprintf(level_format, level(diff))
+      end
+    end
 
-		def to_hash
-			hash = {
-				:text_id => text_id, :number => number,
-				:title => title, :subtitle => subtitle, :full_title => full_title,
-				:monthly => monthly?, :limited => limited?,
-			}
-			$config.music_diffs.each do |diff, diff_name|
-				hash[diff_name.downcase] = {
-					:level => level(diff), :notes => notes(diff),
-				}
-			end
+    def notes_to_s(diff)
+      unless exist?(diff)
+        return '-'
+      else
+        return (notes(diff) == 0) ? '???' : sprintf('%d', notes(diff))
+      end
+    end
 
-			return hash
-		end
+    def to_hash
+      hash = {
+        :text_id => text_id, :number => number,
+        :title => title, :subtitle => subtitle, :full_title => full_title,
+        :monthly => monthly?, :limited => limited?,
+      }
+      $config.music_diffs.each do |diff, diff_name|
+        hash[diff_name.downcase] = {
+          :level => level(diff), :notes => notes(diff),
+        }
+      end
 
-		def <=>(other)
-			if number != other.number
-				return number <=> other.number
-			else
-				return sort_key <=> other.sort_key
-			end
-		end
-	end
+      return hash
+    end
 
-	class Monthly < ActiveRecord::Base
-	end
+    def <=>(other)
+      if number != other.number
+        return number <=> other.number
+      else
+        return sort_key <=> other.sort_key
+      end
+    end
+  end
 
-	class MusicSet < Hash
-		attr_accessor :last_modified
-		def self.load(mode)
-			music_set = self.new
-			musics = Music.find(:all, :conditions => {:display => true}).sort
-			if mode == MODE_CXB
-				music_set[MUSIC_TYPE_NORMAL] = []
-				music_set[MUSIC_TYPE_SPECIAL] = []
-				musics.each do |music|
-					if music.monthly?
-						music_set[MUSIC_TYPE_SPECIAL] << music
-					else
-						music_set[MUSIC_TYPE_NORMAL] << music
-					end
-				end
-			else
-				music_set[MUSIC_TYPE_REV_SINGLE] = musics
-				courses = Course.find(:all, :conditions => {:display => true}).sort
-				music_set[MUSIC_TYPE_REV_COURSE] = courses
-			end
-			music_set.last_modified = [Music.last_modified, Course.last_modified].max
-			return music_set
-		end
-	end
+  class Monthly < ActiveRecord::Base
+  end
+
+  class MusicSet < Hash
+    attr_accessor :last_modified
+
+    def self.load(mode)
+      music_set = self.new
+      musics = Music.find(:all, :conditions => {:display => true}).sort
+      if mode == MODE_CXB
+        music_set[MUSIC_TYPE_NORMAL] = []
+        music_set[MUSIC_TYPE_SPECIAL] = []
+        musics.each do |music|
+          if music.monthly?
+            music_set[MUSIC_TYPE_SPECIAL] << music
+          else
+            music_set[MUSIC_TYPE_NORMAL] << music
+          end
+        end
+      else
+        music_set[MUSIC_TYPE_REV_SINGLE] = musics
+        courses = Course.find(:all, :conditions => {:display => true}).sort
+        music_set[MUSIC_TYPE_REV_COURSE] = courses
+      end
+      music_set.last_modified = [Music.last_modified, Course.last_modified].compact.max
+      return music_set
+    end
+  end
 end

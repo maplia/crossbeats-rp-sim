@@ -1,0 +1,24 @@
+%div.unit
+  %h2= type_name
+  %div.subunit
+    - unless skills.present?
+      %p 該当するコースのプレイ成績がありません
+    - else
+      %table.list
+        - unless mobile?
+          %thead
+            %tr
+              %th #
+              %th.title コース名
+              %th.level レベル
+              %th.mark 完奏
+              %th.point RP
+              %th.rate RATE
+              %th.mark コンボ
+              %th コメント
+        %tbody
+          - row = 1
+          - skills.each do |skill|
+            - next if !edit and (skill.iglock_best_point || 0.0) == 0.0
+            = haml :course_skill, :locals => {:skill => skill, :edit => edit, :row => row}
+            - row = row + 1

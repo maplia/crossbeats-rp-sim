@@ -1,0 +1,29 @@
+%div.unit
+  %h2= type_name
+  %div.subunit
+    - unless skills.present?
+      %p 該当する曲のプレイ成績がありません
+    - else
+      %table.list
+        - unless mobile?
+          %thead
+            %tr
+              %th #
+              %th.title タイトル
+              %th.level レベル
+              %th.point RP
+              %th.rate RATE
+              - if rev_mode?
+                %th.u_rate S/U
+              - else
+                %th.rate ULT
+              %th.mark ランク
+              %th.mark コンボ
+              %th コメント
+        %tbody
+          - row = 1
+          - skills.each do |skill|
+            - next if !edit and (skill.iglock_best_point || 0.0) == 0.0
+            = haml :music_skill, :locals => {:skill => skill,
+              :edit => edit, :ignore_locked => ignore_locked, :row => row, :bonus => bonus}
+            - row = row + 1

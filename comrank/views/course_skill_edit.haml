@@ -1,0 +1,17 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SKILL_LIST_EDIT_URI]}
+%h1
+  = page_title
+  %small= "[#{curr_skill.course.title}]"
+- if curr_skill.id
+  %p.last_modified= "最終更新時刻: #{curr_skill.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
+%div.unit
+  %h2 現在の登録情報
+  %div.subunit
+    - unless curr_skill.id
+      %p このコースのプレイ情報は登録されていません。
+    - else
+      = haml :skill, :locals => {:skill => curr_skill}
+%div.unit
+  %h2 編集フォーム
+  %div.subunit
+    = haml :temp_skill, :locals => {:skill => temp_skill}

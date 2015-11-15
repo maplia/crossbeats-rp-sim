@@ -12,8 +12,8 @@ class CreateMusics < ActiveRecord::Migration
 			t.string :lookup_key, :null => false
 			t.string :sort_key, :null => false
 			music_diffs.keys.sort.each do |key|
-				t.float "#{music_diffs[key].downcase}_level".to_sym
-				t.integer "#{music_diffs[key].downcase}_notes".to_sym
+				t.float "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_level".to_sym
+				t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_notes".to_sym
 			end
 			t.boolean :limited, :null => false, :default => false
 			t.boolean :hidden, :null => false, :default => false

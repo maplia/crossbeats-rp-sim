@@ -1,0 +1,46 @@
+- css_class = (skill.id ? 'played' : 'etc')
+- unless mobile?
+  %tr{:class => css_class}
+    %th{:class => "number #{skill.rp_target? ? 'st' : 'sn'}"}= row
+    %td.title.text
+      - if edit
+        %a{:href => skill.edit_uri}
+          = skill.course.name
+      - else
+        = skill.course.name
+    - unless skill.played?
+      %td.none{:colspan => 5} 記録なし
+    - else
+      %td.mark= skill.course.level_to_s
+      - if skill.cleared?
+        %td.mark ○
+      - else
+        %td.mark ×
+      %td.number= skill.point_to_s
+      %td.number= skill.rate_to_s
+      %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
+    %td.text= Rinku.auto_link(escape_html skill.comment)
+- else
+  - row_count = (skill.comment.present? ? 3 : 2)
+  %tr{:class => css_class}
+    %th{:rowspan => row_count, :class => "number #{skill.rp_target? ? 'st' : 'sn'}"}= row
+    %td.title.text{:colspan => 4}
+      - if edit
+        %a{:href => skill.edit_uri}
+          = skill.course.name
+      - else
+        = skill.course.name
+  %tr{:class => css_class}
+    - unless skill.played?
+      %td.none{:colspan => 5}= 記録なし
+    - else
+      - if skill.cleared?
+        %td.mark ○
+      - else
+        %td.mark ×
+      %td.number= skill.point_to_s
+      %td.number= skill.rate_to_s
+      %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
+  - if skill.comment.present?
+    %tr{:class => css_class}
+      %td.text{:colspan => 4}= Rinku.auto_link(escape_html skill.comment)

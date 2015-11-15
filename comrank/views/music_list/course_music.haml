@@ -1,9 +1,7 @@
-- diff_class = music_diffs[course_music.diff].downcase
+- diff_class = CxbRank::MUSIC_DIFF_CLASSES[course_music.diff]
 %th.number= course_music.seq
 %td.text.title
-  = course_music.title
-  - if course_music.subtitle
-    %small= course_music.subtitle
+  = haml :music_title, :locals => {:music => course_music.music}
 %td{:class => "#{diff_class} level"}= music_diffs[course_music.diff]
 %td{:class => "#{diff_class} level"}= course_music.level_to_s
 %td{:class => "#{diff_class} notes"}= course_music.notes_to_s

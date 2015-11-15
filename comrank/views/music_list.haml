@@ -1,4 +1,4 @@
-=haml :_navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
 %h1= page_title
 - if music_set.last_modified
   %p.last_modified 最終更新時刻: #{music_set.last_modified.strftime('%Y-%m-%d %H:%M:%S')}

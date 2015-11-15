@@ -1,0 +1,9 @@
+- if defined? link_uri
+  %a{:href => link_uri}<
+    %span= music.title
+    - if music.subtitle
+      %small= music.subtitle
+-else
+  = music.title
+  - if music.subtitle
+    %small= music.subtitle

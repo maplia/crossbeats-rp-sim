@@ -1,8 +1,8 @@
 site_name: CxB RankPoint Simulator
-style_pc: 
-style_sp: 
-mode: 
-session_key: 
+site_mode: cxb 
+style_pc: /style/pc.css
+style_sp: /style/sp.css
+session_key: cxbrank
 secret: 
 
 tracker_id:

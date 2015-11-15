@@ -3,10 +3,10 @@
     %td.text{:rowspan => course.course_musics.size}= course.name
     %td.level{:rowspan => course.course_musics.size}= course.level_to_s
     %td.notes{:rowspan => course.course_musics.size}= course.notes_to_s
-    = haml :_course_music, :locals => {:course_music => course.course_musics.sort[0]}
+    = haml :course_music, :locals => {:course_music => course.course_musics.sort[0]}
   - course.course_musics.sort[1..-1].each do |course_music|
     %tr
-      = haml :_course_music, :locals => {:course_music => course_music}
+      = haml :course_music, :locals => {:course_music => course_music}
 - else
   %tr
     %td.text{:colspan => 2}= course.name

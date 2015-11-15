@@ -3,9 +3,7 @@
     - if cxb_mode?
       %th.number= music.number
     %td.text
-      = music.title
-      - if music.subtitle
-        %small= music.subtitle
+      = haml :music_title, :locals => {:music => music}
       - if rev_mode? and music.hidden
         = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
     - music_diffs.keys.sort.each do |diff|

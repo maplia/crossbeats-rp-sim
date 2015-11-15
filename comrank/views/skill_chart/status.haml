@@ -1,0 +1,55 @@
+%table
+  %tbody
+    %tr
+      %th クリア譜面数
+      %td.mark= "#{status[:clear][:count]}譜面"
+      - if rev_mode?
+        %th MASTER以上クリア譜面数
+      - else
+        %th MASTERクリア譜面数
+      %td.mark= "#{status[:clear_mas][:count]}譜面"
+    %tr
+      %th Sランク以上クリア譜面数
+      %td.mark= "#{status[:s_rank][:count]}譜面"
+      %th 最高クリアレベル
+      %td.mark
+        - if status[:clear][:max_level] > 0
+          = "Lv.#{sprintf(level_format, status[:clear][:max_level])}"
+        - else
+          &ndash;
+    %tr
+      %th フルコンボ譜面数
+      %td.mark= "#{status[:fullcombo][:count]}譜面"
+      %th 最高フルコンボレベル
+      %td.mark
+        - if status[:fullcombo][:max_level] > 0
+          = "Lv.#{sprintf(level_format, status[:fullcombo][:max_level])}"
+        - else
+          &ndash;
+    %tr
+      %th 100%クリア譜面数
+      %td.mark= "#{status[:rate_100][:count]}譜面"
+      %th 最高100%クリアレベル
+      %td.mark
+        - if status[:rate_100][:max_level] > 0
+          = "Lv.#{sprintf(level_format, status[:rate_100][:max_level])}"
+        - else
+          &ndash;
+    %tr
+      %th ULTIMATE譜面数
+      %td.mark= "#{status[:ultimate][:count]}譜面"
+      %th 最高ULTIMATEレベル
+      %td.mark
+        - if status[:ultimate][:max_level] > 0
+          = "Lv.#{sprintf(level_format, status[:ultimate][:max_level])}"
+        - else
+          &ndash;
+    %tr
+      %th MASTER以上ULT譜面数
+      %td.mark= "#{status[:ult_mas][:count]}譜面"
+      %th MASTER以上最高ULTレベル
+      %td.mark
+        - if status[:ult_mas][:max_level] > 0
+          = "Lv.#{sprintf(level_format, status[:ult_mas][:max_level])}"
+        - else
+          &ndash;

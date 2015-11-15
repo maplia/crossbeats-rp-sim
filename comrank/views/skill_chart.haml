@@ -1,0 +1,13 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+- if skill_chart.last_modified
+  %p.last_modified 最終更新時刻: #{skill_chart.last_modified.strftime('%Y-%m-%d %H:%M:%S')}
+= haml :user, :locals => {:user => user, :edit => false}
+%div.unit
+  %h2 クリア状況
+  %div.subunit
+    = haml :status, :locals => {:status => skill_chart[:status]}
+%div.unit
+  %h2 曲リスト
+  %div.subunit
+    = haml :skills, :locals => {:skills => skill_chart[:skills]}

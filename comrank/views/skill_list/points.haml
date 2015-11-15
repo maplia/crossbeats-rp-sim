@@ -1,0 +1,21 @@
+%table.summary
+  - unless mobile?
+    %thead
+      %tr
+        - music_types.keys.sort.each do |type|
+          %th.part= music_types[type]
+        %th.sum 合計RP
+    %tbody
+      %tr
+        - music_types.keys.sort.each do |type|
+          %td= sprintf('%.2f', skill_set[type][:point])
+        %td= sprintf('%.2f', skill_set.total_point)
+  - else
+    %tbody
+      - music_types.keys.sort.each do |type|
+        %tr
+          %th= music_types[type].sub(/RP対象曲/, '')
+          %td= sprintf('%.2f', skill_set[type][:point])
+      %tr
+        %th 合計RP
+        %td= sprintf('%.2f', skill_set.total_point)

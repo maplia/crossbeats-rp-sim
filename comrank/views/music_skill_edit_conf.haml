@@ -1,0 +1,15 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SKILL_LIST_EDIT_URI]}
+%h1
+  = "#{page_title}確認"
+  %small= "[#{curr_skill.music.full_title}]"
+%div.unit
+  %h2 入力情報
+  %div.subunit
+    = haml :skill, :locals => {:prev_skill => curr_skill, :skill => temp_skill}
+    - form_tag CxbRank::SKILL_ITEM_EDIT_URI, :method => method do
+      - if method == 'put'
+        %p 以上のプレイ情報を登録します。よろしいですか?
+      - else
+        %p 以上のプレイ情報を削除します。よろしいですか?
+      = submit_tag 'はい', :name => 'y'
+      = submit_tag 'いいえ', :name => 'n'

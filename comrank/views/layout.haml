@@ -16,6 +16,10 @@
       %link{:rel => 'stylesheet', :href => settings.style_pc}
     - if site_top?
       %title= settings.site_name
+    - elsif defined? fixed_title
+      %title= "#{fixed_title} - #{settings.site_name}"
+    - elsif defined? error_no or defined? errors
+      %title= "エラー - #{settings.site_name}"
     - else
       %title= "#{page_title} - #{settings.site_name}"
     %script{:src => 'http://maplia.jp/script/jquery-2.1.0.min.js'}
