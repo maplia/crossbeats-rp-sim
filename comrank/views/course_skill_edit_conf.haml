@@ -6,10 +6,10 @@
   %h2 入力情報
   %div.subunit
     = haml :skill, :locals => {:prev_skill => curr_skill, :skill => temp_skill}
-    - form_tag CxbRank::SKILL_COURSE_ITEM_EDIT_URI, :method => method do
-      - if method == 'put'
-        %p 以上のプレイ情報を登録します。よろしいですか?
-      - else
-        %p 以上のプレイ情報を削除します。よろしいですか?
-      = submit_tag 'はい', :name => 'y'
-      = submit_tag 'いいえ', :name => 'n'
+- form_tag CxbRank::SKILL_COURSE_ITEM_EDIT_URI, :method => method do
+  - if method == 'put'
+    %p 以上のプレイ情報を登録します。よろしいですか?
+  - else
+    %p 以上のプレイ情報を削除します。よろしいですか?
+  = submit_tag 'はい', :name => 'y'
+  = submit_tag 'いいえ', :name => 'n'

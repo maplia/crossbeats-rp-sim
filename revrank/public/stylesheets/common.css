@@ -1,0 +1,103 @@
+@charset 'utf-8';
+
+/********
+  table cell common colors
+ ********/
+th.esy, tr.esy th {
+  color: #000066;
+  background-color: #bbeeee;
+}
+td.esy, tr.esy td {
+  color: #000066;
+  background-color: #cceeff;
+}
+th.std, tr.std th {
+  color: #006600;
+  background-color: #ccffcc;
+}
+td.std, tr.std td {
+  color: #006600;
+  background-color: #ddffdd;
+}
+th.hrd, tr.hrd th {
+  color: #444400;
+  background-color: #ffffcc;
+}
+td.hrd, tr.hrd td {
+  color: #444400;
+  background-color: #ffffdd;
+}
+th.mas, tr.mas th {
+  color: #660000;
+  background-color: #ffcccc;
+}
+td.mas, tr.mas td {
+  color: #660000;
+  background-color: #ffdddd;
+}
+th.unl, tr.unl th {
+  color: #440066;
+  background-color: #ccbbee;
+}
+td.unl, tr.unl td {
+  color: #440066;
+  background-color: #ddccff;
+}
+td.played, tr.played td {
+  color: #000066;
+  background-color: #dfeeee;
+}
+td.etc, tr.etc td {
+  color: inherit;
+  background-color: white;
+}
+
+/********
+  border
+ ********/
+table {
+  border-collapse: collapse;
+  border-style: solid;
+  border-color: inherit;
+  border-width: 1px 2px 2px 1px;
+}
+th, td {
+  padding: 1px 3px;
+  border-style: solid;
+  border-color: inherit;
+  border-width: 1px;
+}
+
+/********
+  del
+ ********/
+del {
+  color: #aaaaaa;
+}
+
+/********
+  pre
+ ********/
+pre {
+  background-color: white;
+  pargin: 2px 0;
+  padding: 2px 4px;
+  white-space: normal;
+  border-style: solid;
+  border-width: 1px 2px 2px 1px;
+  word-break: break-all;
+}
+
+/********
+  em, strong
+ ********/
+em {
+  color: red;
+  font-style: normal;
+  font-weight: bold;
+}
+strong {
+  color: red;
+  font-weight: bold;
+  font-size: larger;
+}

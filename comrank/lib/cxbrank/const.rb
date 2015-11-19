@@ -87,9 +87,9 @@ module CxbRank
   # 曲種別ごとの最大スキル対象曲数
   MUSIC_TYPE_ST_COUNTS = {
     MUSIC_TYPE_NORMAL     => 20,
-    MUSIC_TYPE_SPECIAL    => -1,
+    MUSIC_TYPE_SPECIAL    => nil,
     MUSIC_TYPE_REV_SINGLE => 20,
-    MUSIC_TYPE_REV_BONUS  => -1,
+    MUSIC_TYPE_REV_BONUS  => nil,
     MUSIC_TYPE_REV_COURSE => 1,
   }
 

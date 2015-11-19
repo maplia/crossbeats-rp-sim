@@ -1,35 +1,50 @@
 - form_for skill, CxbRank::SKILL_ITEM_EDIT_URI do |f|
-  %table.edit
+  %table.skill_edit
     %tbody
       - music_diffs.keys.sort.each do |diff|
         - next unless skill.music.exist?(diff)
         - diff_prefix = CxbRank::MUSIC_DIFF_PREFIXES[diff]
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
-          %th{:rowspan => 2}= music_diffs[diff]
+          %th{:rowspan => (mobile? ? 4 : 2)}= music_diffs[diff]
           %td
             %label<
               = f.radio_button "#{diff_prefix}_stat".to_sym,
                 :value => CxbRank::SP_STATUS_CLEAR, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_CLEAR)
               = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_CLEAR] + ':'
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
             %label
               RP:
               = f.text_field "#{diff_prefix}_point".to_sym,
                 :size => CxbRank::POINT_FIGURE, :maxlength => CxbRank::POINT_FIGURE,
                 :value => skill.point_to_input_value(diff)
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
             %label
               CLEAR RATE:
               = f.text_field "#{diff_prefix}_rate".to_sym,
                 :size => CxbRank::RATE_FIGURE, :maxlength => CxbRank::RATE_FIGURE,
                 :value => skill.rate_to_input_value(diff)
               \ %
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
             %label
               ランク:
               = f.select "#{diff_prefix}_rank".to_sym,
                 :options => CxbRank::SP_RANK_STATUS_OPTIONS, :selected => skill.rank(diff)
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
             %label
               フルコンボ:
               = f.select "#{diff_prefix}_combo".to_sym,
                 :options => CxbRank::SP_COMBO_STATUS_OPTIONS, :selected => skill.combo(diff)
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
             - if cxb_mode?
               %label<
                 = f.check_box "#{diff_prefix}_gauge".to_sym, :checked => skill.ultimate?(diff)
@@ -39,24 +54,43 @@
                 ゲージ:
                 = f.select "#{diff_prefix}_gauge".to_sym,
                   :options => CxbRank::SP_GAUGE_STATUS_OPTIONS, :selected => skill.gauge(diff)
-        %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
-          %td
-            %label<
-              = f.radio_button "#{diff_prefix}_stat".to_sym,
-                :value => CxbRank::SP_STATUS_FAILED, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_FAILED)
-              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_FAILED]
-            \ /
-            %label<
-              = f.radio_button "#{diff_prefix}_stat".to_sym,
-                :value => CxbRank::SP_STATUS_NO_PLAY, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_NO_PLAY)
-              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_NO_PLAY]
-            %label<
-              = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
-              = '未取得/ロック譜面'
+        - unless mobile?
+          %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
+            %td
+              %label<
+                = f.radio_button "#{diff_prefix}_stat".to_sym,
+                  :value => CxbRank::SP_STATUS_FAILED, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_FAILED)
+                = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_FAILED]
+              \ /
+              %label<
+                = f.radio_button "#{diff_prefix}_stat".to_sym,
+                  :value => CxbRank::SP_STATUS_NO_PLAY, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_NO_PLAY)
+                = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_NO_PLAY]
+              %label<
+                = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
+                = '未取得/ロック譜面'
+        - else
+          %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
+            %td
+              %label<
+                = f.radio_button "#{diff_prefix}_stat".to_sym,
+                  :value => CxbRank::SP_STATUS_FAILED, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_FAILED)
+                = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_FAILED]
+          %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
+            %td
+              %label<
+                = f.radio_button "#{diff_prefix}_stat".to_sym,
+                  :value => CxbRank::SP_STATUS_NO_PLAY, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_NO_PLAY)
+                = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_NO_PLAY]
+          %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
+            %td
+              %label<
+                = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
+                = '未取得/ロック譜面'
       %tr
         %th コメント
-        %td
-          = f.text_field :comment, :style => 'width: 100%;', :value => skill.comment
+        %td.comment
+          = f.text_field :comment, :value => skill.comment
   %p
     = f.submit '登録', :name => 'update'
     = f.submit '削除', :name => 'delete', :disabled => skill.id.blank?

@@ -23,6 +23,26 @@ module CxbRank
       return LEVEL_FORMATS[@@mode]
     end
 
+    def self.create_by_request(body)
+      music = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
+      unless music
+        music = self.new
+        music.number = 0
+        music.text_id = body[:text_id]
+        music.title = body[:title]
+        music.sort_key = body[:sort_key]
+        music.lookup_key = body[:lookup_key]
+        music.limited = false
+        MUSIC_DIFF_PREFIXES.values.each do |prefix|
+          next unless body[prefix.to_sym]
+          item.send("#{prefix}_level=", body[prefix.to_sym][:level])
+          item.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
+        end
+      end
+      return music
+    end
+
+
     def self.last_modified
       music = self.find(:first, :order => 'updated_at desc')
       return (music ? music.updated_at : nil)
@@ -53,7 +73,7 @@ module CxbRank
     end
 
     def exist?(diff)
-      return !level(diff).nil?
+      return level(diff).present?
     end
 
     def monthly?(date=Time.now)

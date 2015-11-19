@@ -45,11 +45,11 @@ GEM
     padrino-mailer (0.9.15)
       mail (>= 2.2.0)
       padrino-core (= 0.9.15)
-    rack (1.6.4)
+    rack (1.5.5)
+    rack-mobile-detect (0.4.0)
+      rack
     rack-protection (1.5.3)
       rack
-    rack-smartphone_detector (0.0.6)
-      rack (~> 1.4)
     rack-test (0.6.3)
       rack (>= 1.0)
     rake (10.4.2)
@@ -96,7 +96,8 @@ DEPENDENCIES
   json
   mime-types (~> 1.0)
   padrino
-  rack-smartphone_detector
+  rack (~> 1.5.0)
+  rack-mobile-detect
   rake
   rinku
   sinatra

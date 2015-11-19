@@ -4,17 +4,17 @@
     - unless skills.present?
       %p 該当するコースのプレイ成績がありません
     - else
-      %table.list
+      %table.skill_list
         - unless mobile?
           %thead
             %tr
-              %th #
+              %th.number #
               %th.title コース名
               %th.level レベル
               %th.mark 完奏
               %th.point RP
               %th.rate RATE
-              %th.mark コンボ
+              %th.combo コンボ
               %th コメント
         %tbody
           - row = 1

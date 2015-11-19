@@ -1,0 +1,21 @@
+- unless mobile?
+  %tr
+    %th= count_title
+    %td.mark= "#{status[:count]}譜面"
+    %th= level_title
+    %td.mark
+      - if status[:max_level] > 0
+        = "Lv.#{sprintf(level_format, status[:max_level])}"
+      - else
+        &ndash;
+- else
+  %tr
+    %th= count_title
+    %td.mark= "#{status[:count]}譜面"
+  %tr
+    %th= level_title
+    %td.mark
+      - if status[:max_level] > 0
+        = "Lv.#{sprintf(level_format, status[:max_level])}"
+      - else
+        &ndash;

@@ -75,8 +75,8 @@ function loginToRpSim(progress, userData) {
 	// REV.ユーザIDの登録確認
 	progress.setMessage1('ユーザー登録を確認中です。');
 	progress.setMessage2('');
-	$.post(RPSIM_LOGIN_URI, 'game_id=' + userData.revUserId, function (response) {
-		if (response.status != 200) {
+	$.post(RPSIM_LOGIN_URI, 'game_id=' + userData.revUserId, function (response, status, xhr) {
+		if (xhr.status != 200) {
 			console.log('REV. RankPoint Simulator ユーザ未登録');
 			deferred.reject('REV. RankPoint SimulatorにREV.ユーザーIDが登録されていません。');
 		} else {
@@ -145,13 +145,13 @@ function updateMasterData(sessionKey, type, item) {
 	var postData = {
 		'key': sessionKey, 'type': type, 'body': item
 	};
-	$.postWithRetries(RPSIM_UPDATE_MASTER_URI, JSON.stringify(postData), function (response) {
+	$.postWithRetries(RPSIM_UPDATE_MASTER_URI, JSON.stringify(postData), function (response, status, xhr) {
 		if (postData.type == 'music') {
 			var logLabel = 'ミュージック [' + item.title + ']';
 		} else {
 			var logLabel = 'チャレンジ [' + item.lookup_key + ']';
 		}
-		switch (response.status) {
+		switch (xhr.status) {
 		case 401: case 500:
 			console.log(logLabel + ': 更新失敗');
 			deferred.reject('マスタデータの更新に失敗しました。最初から操作をやり直してください。');
@@ -168,8 +168,8 @@ function updateMasterData(sessionKey, type, item) {
 // RPシミュレータからログアウトする
 function logoutFromRpSim(progress, userData) {
 	var deferred = $.Deferred();
-	$.postWithRetries(RPSIM_LOGOUT_URI, 'key=' + userData.key, function (response) {
-		if (response.status != 200) {
+	$.postWithRetries(RPSIM_LOGOUT_URI, 'key=' + userData.key, function (response, status, xhr) {
+		if (xhr.status != 200) {
 			console.log('ログアウト異常発生');
 		} else {
 			console.log('ログアウト');

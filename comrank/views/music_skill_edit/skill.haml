@@ -1,11 +1,14 @@
-%table.conf
+%table.skill_conf
   - unless mobile?
     %thead
       %tr
         %th{:colspan => 2} レベル
-        %th.mark
+        %th.locked
           = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
-        %th.mark S/U
+        %th.gauge
+          - if rev_mode?
+            = image_tag '/images/survival.png', :alt => 'S', :height => 12
+          = image_tag '/images/ultimate.png', :alt => 'U', :height => 12
         %th.point RP
         - if defined? prev_skill
           %th.point 差異
@@ -13,9 +16,9 @@
         - if rev_mode?
           %th.u_rate S/U
         - else
-          %th.rate ULT
-        %th ランク
-        %th コンボ
+          %th.u_rate ULT
+        %th.rank ランク
+        %th.combo コンボ
   %tbody
     - music_diffs.keys.sort.each do |diff|
       - next unless skill.music.exist?(diff)
@@ -38,21 +41,21 @@
               %td.point &plusmn;0.00
             - else
               - difference_class = (difference > 0.0 ? 'inc' : 'dec')
-              %td{:class => "rate #{difference_class}"}= sprintf('%+.2f', difference)
+              %td{:class => "point #{difference_class}"}= sprintf('%+.2f', difference)
           - unless skill.cleared?(diff)
-            %td.none{:colspan => 4}= CxbRank::SP_STATUSES[skill.stat(diff)]
+            %td.status{:colspan => 4}= CxbRank::SP_STATUSES[skill.stat(diff)]
           - else
             %td.rate
               = haml :rate, :locals => {:skill => skill, :diff => diff}
-            %td.u_rate= skill.u_rate_to_s(diff)
+            %td.rate= skill.u_rate_to_s(diff)
             %td.mark= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
             %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
       - else
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %th{:rowspan => 2}= music_diffs[diff]
-          %td.point= point_to_s(diff)
+          %td.point= skill.point_to_s(diff)
           - unless skill.cleared?(diff)
-            %td.none{:rowspan => 2, :colspan => 2}= CxbRank::SP_STATUSES[skill.stat(diff)]
+            %td.status{:rowspan => 2, :colspan => 2}= CxbRank::SP_STATUSES[skill.stat(diff)]
           - else
             %td.rate{:colspan => 2}
               = haml :rate, :locals => {:skill => skill, :diff => diff}
@@ -60,12 +63,14 @@
                 = "(#{skill.u_rate_to_s(diff)})"
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %td.mark
-            - if skill.locked?(diff)
+            - if skill.locked(diff)
               = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
             - if skill.survival?(diff)
               = image_tag '/images/survival.png', :alt => '[S]', :height => 12
             - if skill.ultimate?(diff)
               = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+            - unless skill.locked(diff) or skill.survival?(diff) or skill.ultimate?(diff)
+              &nbsp;
           - if skill.cleared?(diff)
             %td.mark= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
             %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]

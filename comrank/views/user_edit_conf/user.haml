@@ -1,7 +1,7 @@
-%div.unit
-  %h2 入力内容
-  %div.subunit
-    - form_tag action, :method => 'put' do
+- form_tag action, :method => 'put' do
+  %div.unit
+    %h2 入力内容
+    %div.subunit
       %table.info
         - if user.id
           %tr
@@ -28,7 +28,7 @@
                 - if mobile?
                   %br
                 （REV.ID非公開）
-        - if user.id
+        - if user.id and rev_mode?
           %tr
             %th 実RP
             %td= sprintf('%.2f', user.point)
@@ -39,7 +39,7 @@
               入力なし
             - else
               = multiline(user.comment, true)
-      %p 以上のユーザー情報を登録します。よろしいですか?
-      %p
-        = submit_tag 'はい', :name => 'y'
-        = submit_tag 'いいえ', :name => 'n'
+  %p 以上のユーザー情報を登録します。よろしいですか?
+  %p
+    = submit_tag 'はい', :name => 'y'
+    = submit_tag 'いいえ', :name => 'n'

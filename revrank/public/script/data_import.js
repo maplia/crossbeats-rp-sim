@@ -1,9 +1,9 @@
-var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revbeta.maplia.jp/';
-var COMMON_SCRIPT_URI = 'https://revrank.maplia.jp/' + 'script/revrank_common.js';
+var MAPLIA_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/';
+var COMMON_SCRIPT_URI = MAPLIA_BASE_URI + 'script/revrank_common.js';
 
 var RPSIM_EDIT_URI = MAPLIA_BASE_URI + 'bml_edit';
 var RPSIM_POINT_URI = MAPLIA_BASE_URI + 'bml_point';
-var RPSIM_VIEW_URI = 'http://revrank.maplia.jp/' + 'view';
+var RPSIM_VIEW_URI = 'http://revtest.maplia.jp/' + 'view';
 
 var MUSIC_DIFFS = ['esy', 'std', 'hrd', 'mas', 'unl'];
 var GRADES = ['S++', 'S+', 'S', 'A+', 'A', 'B+', 'B', 'C', 'D', 'E'];
@@ -27,18 +27,18 @@ function updateRp(progress, postData, item) {
 		return $.Deferred().reject('処理がキャンセルされました').promise();
 	} else {
 		var deferred = $.Deferred();
-		$.postWithRetries(RPSIM_EDIT_URI, JSON.stringify(postData), function (response) {
+		$.postWithRetries(RPSIM_EDIT_URI, JSON.stringify(postData), function (response, status, xhr) {
 			if (postData.type == 'music') {
 				var logLabel = 'ミュージックRP [' + item.title + ']';
 			} else {
 				var logLabel = 'チャレンジRP [' + item.lookup_key + ']';
 			}
-			switch (response.status) {
+			switch (xhr.status) {
 			case 401:
 				console.log(logLabel + ': セッション無効');
 				deferred.reject(MESSAGE_SESSION_IS_DEAD);
 				break;
-			case 400:
+			case 403:
 				console.log(logLabel + ': マスタ未登録');
 				updateMasterData(postData.key, postData.type, item).then(function () {
 					return updateRp(progress, postData, item);
@@ -233,8 +233,8 @@ function updateTotalRp(progress, userData) {
 				progress.setMessage2('');
 				var postData = parseTotalRp(document);
 				postData.key = userData.key;
-				$.postWithRetries(RPSIM_POINT_URI, JSON.stringify(postData), function (response) {
-					switch (response.status) {
+				$.postWithRetries(RPSIM_POINT_URI, JSON.stringify(postData), function (response, status, xhr) {
+					switch (xhr.status) {
 					case 401:
 						console.log('総合RP: セッション無効');
 						deferred.reject(MESSAGE_SESSION_IS_DEAD);

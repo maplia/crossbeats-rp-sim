@@ -16,6 +16,19 @@ module CxbRank
       return self.find(:first, :conditions => {:text_id => param_id})
     end
 
+    def self.create_by_request(body)
+      course = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
+      unless item
+        course = self.new
+        course.text_id = body[:lookup_key]
+        course.name = body[:lookup_key]
+        course.level = 0
+        course.sort_key = body[:lookup_key]
+        course.lookup_key = body[:lookup_key]
+      end
+      return course
+    end
+
     def name
       return title
     end

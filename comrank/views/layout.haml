@@ -11,9 +11,10 @@
     - else
       %meta{:name => 'robots', :content => 'noindex, nofollow'}
     - if mobile?
-      %link{:rel => 'stylesheet', :href => settings.style_sp}
+      = stylesheet_link_tag settings.style_sp
     - else
-      %link{:rel => 'stylesheet', :href => settings.style_pc}
+      = stylesheet_link_tag settings.style_pc
+    = favicon_tag 'favicon.ico'
     - if site_top?
       %title= settings.site_name
     - elsif defined? fixed_title

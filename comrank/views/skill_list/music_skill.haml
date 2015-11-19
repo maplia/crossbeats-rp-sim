@@ -6,8 +6,11 @@
   - css_class = ((ignore_locked or skill.target_diff == skill.best_diff) ? CxbRank::MUSIC_DIFF_CLASSES[target_diff] : 'etc')
 - unless mobile?
   %tr{:class => css_class}
-    %th{:class => "number #{skill.rp_target? ? 'st' : 'sn'}"}= row
-    %td.title.text
+    - if skill.rp_target?
+      %th.number.target= row
+    - else
+      %th.number= row
+    %td.title
       - if edit
         = haml :music_title, :locals => {:music => skill.music, :link_uri => skill.edit_uri}
       - else
@@ -20,7 +23,7 @@
         - elsif skill.ultimate?(target_diff)
           = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
     - if !target_diff or !skill.cleared?(target_diff)
-      %td.none{:colspan => 6} 記録なし
+      %td.status{:colspan => 6} 記録なし
     - else
       %td.level= "[#{music_diffs[target_diff]}] #{skill.music.level_to_s(target_diff)}"
       %td.point
@@ -28,9 +31,45 @@
           = skill.point_bonus_to_s(target_diff)
         - else
           = skill.point_to_s(target_diff)
-      %td.number
+      %td.rate
         = haml :rate, :locals => {:skill => skill, :diff => target_diff}
-      %td.number= skill.u_rate_to_s(target_diff)
+      %td.rate= skill.u_rate_to_s(target_diff)
       %td.mark= CxbRank::SP_RANK_STATUSES[skill.rank(target_diff)]
       %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(target_diff)]
     %td.text= Rinku.auto_link(escape_html skill.comment)
+- else
+  - row_count = (skill.comment.present? ? 3 : 2)
+  %tr{:class => css_class}
+    - if skill.rp_target?
+      %th.number.target{:rowspan => row_count}= row
+    - else
+      %th.number{:rowspan => row_count}= row
+    %td.title{:colspan => 5}
+      - if edit
+        = haml :music_title, :locals => {:music => skill.music, :link_uri => skill.edit_uri}
+      - else
+        = haml :music_title, :locals => {:music => skill.music}
+      - if target_diff and skill.locked(target_diff)
+        = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+      - if target_diff
+        - if skill.survival?(target_diff)
+          = image_tag '/images/survival.png', :alt => '[S]', :height => 12
+        - elsif skill.ultimate?(target_diff)
+          = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+  %tr{:class => css_class}
+    - if !target_diff or !skill.cleared?(target_diff)
+      %td.status{:colspan => 5} 記録なし
+    - else
+      %td.level= music_diffs[target_diff]
+      %td.point
+        - if bonus
+          = skill.point_bonus_to_s(target_diff)
+        - else
+          = skill.point_to_s(target_diff)
+      %td.rate
+        = haml :rate, :locals => {:skill => skill, :diff => target_diff}
+      %td.mark= CxbRank::SP_RANK_STATUSES[skill.rank(target_diff)]
+      %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(target_diff)]
+  - if skill.comment.present?
+    %tr{:class => css_class}
+      %td.comment{:colspan => 5}= Rinku.auto_link(escape_html skill.comment)

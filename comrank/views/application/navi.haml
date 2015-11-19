@@ -1,9 +1,10 @@
-- tree = ((ancestry ||= []) << request.path_info)
-%p.top_navi
-  - tree.each_with_index do |path, i|
-    - if i > 0
-      &gt;
-    - if path != request.path_info
-      = link_to page_title(path), path
-    - else
-      = page_title(path)
+- unless mobile?
+  - tree = ((ancestry ||= []) << request.path_info)
+  %p.top_navi
+    - tree.each_with_index do |path, i|
+      - if i > 0
+        &gt;
+      - if path != request.path_info
+        = link_to page_title(path), path
+      - else
+        = page_title(path)

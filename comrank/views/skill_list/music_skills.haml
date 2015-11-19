@@ -4,11 +4,11 @@
     - unless skills.present?
       %p 該当する曲のプレイ成績がありません
     - else
-      %table.list
+      %table.skill_list
         - unless mobile?
           %thead
             %tr
-              %th #
+              %th.number #
               %th.title タイトル
               %th.level レベル
               %th.point RP
@@ -16,9 +16,9 @@
               - if rev_mode?
                 %th.u_rate S/U
               - else
-                %th.rate ULT
-              %th.mark ランク
-              %th.mark コンボ
+                %th.u_rate ULT
+              %th.rank ランク
+              %th.combo コンボ
               %th コメント
         %tbody
           - row = 1

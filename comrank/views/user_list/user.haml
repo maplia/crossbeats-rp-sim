@@ -15,17 +15,17 @@
     %td= user.point_updated_at.strftime("%Y-%m-%d %H:%M:%S")
 - else
   %tr
-    %td.text
+    %td.name
       %a{:href => user.skill_view_uri}
         &= truncate(user.name, :length => 8)
-    %td.number
+    %td.game_id
       - if user.game_id.present? and user.game_id_display
         = user.game_id
-    %td.number
+    %td.point
       - if user.point
         = sprintf("%.2f", user.point)
   %tr
-    %td.text{:colspan => 3}
+    %td.comment{:colspan => 3}
       - if user.comment.blank?
         &nbsp;
       - else

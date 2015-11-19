@@ -23,6 +23,7 @@ module CxbRank
         :with => /\A\d+(\.\d+)?\z/, :message => SKILL_ERRORS[diff][ERROR_RATE_NOT_NUMERIC]
       validates_numericality_of "#{diff_prefix}_rate".to_sym,
         :allow_nil => true, :allow_blank => true,
+        :if => (lambda do |a| a.rate_before_type_cast(diff) =~ /\A\d+(\.\d+)?\z/ end),
         :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100,
         :message => SKILL_ERRORS[diff][ERROR_RATE_OUT_OF_RANGE]
     end
@@ -34,11 +35,11 @@ module CxbRank
     def validate_unl_point_range; return validate_point_range(MUSIC_DIFF_UNL) end
 
     def validate_point_range(diff)
-      if music.exist?(diff) or point(diff).blank?
+      if !music.exist?(diff) or point(diff).blank? or point_before_type_cast(diff) !~ /\A\d+(\.\d+)?\z/
         return true
       end
       bonus_rate = (ultimate?(diff) ? BONUS_RATE_ULTIMATE : (survival?(diff) ? BONUS_RATE_SURVIVAL : 1.0))
-      unless point(diff) >= 0.0 and point(diff) <= music.level(diff) * bonus_rate
+      if point(diff) < 0.0 or point(diff) > music.level(diff) * bonus_rate
         errors.add("#{MUSIC_DIFF_PREFIXES[diff]}_point".to_sym, SKILL_ERRORS[diff][ERROR_RP_OUT_OF_RANGE])
         return false
       else
@@ -92,6 +93,27 @@ module CxbRank
         skill.user_id = user.id
         skill.music = music
       end
+      return skill
+    end
+
+    def self.create_by_request(user, music, body)
+      raise "user_id: #{user.id}, music_id: #{music.id}"
+      skill = self.find(:first, :conditions => {:user_id => user.id, :music_id => music.id})
+      unless skill
+        skill = Skill.new
+        skill.user_id = user.id
+        skill.music = music
+      end
+      body.keys.each do |prefix|
+        skill.send("#{prefix}_stat=", body[prefix.to_sym][:stat])
+        skill.send("#{prefix}_point=", body[prefix.to_sym][:point])
+        skill.send("#{prefix}_rate=", body[prefix.to_sym][:rate])
+        skill.send("#{prefix}_rate_f=", true)
+        skill.send("#{prefix}_rank=", body[prefix.to_sym][:rank])
+        skill.send("#{prefix}_combo=", body[prefix.to_sym][:combo])
+        skill.send("#{prefix}_gauge=", body[prefix.to_sym][:gauge])
+      end
+      skill.calc!
       return skill
     end
 
@@ -194,7 +216,9 @@ module CxbRank
           temp_point = BigDecimal.new((temp_point * 100).to_s).truncate.to_f / 100.0
           send("#{MUSIC_DIFF_PREFIXES[diff]}_point=", temp_point)
         end
-        if rate_f(diff).blank? and rate_before_type_cast(diff).instance_of?(String)
+        if rate(diff).blank?
+          send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_f=", nil)
+        elsif rate_before_type_cast(diff).instance_of?(String)
           send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_f=", rate_before_type_cast(diff).match(/\A\d+\.\d+\z/).present?)
         end
 
@@ -266,7 +290,7 @@ module CxbRank
     end
 
     def u_rate_to_s(diff, nlv='')
-      unless cleared?(diff)
+      unless cleared?(diff) and (survival?(diff) or ultimate?(diff))
         return nlv
       else
         if @@mode == MODE_REV
@@ -274,7 +298,7 @@ module CxbRank
         else
           mark = ''
         end
-        return (mark.present? ? sprintf('%s %d%%', mark, u_rate(diff)) : '')
+        return (mark.present? ? sprintf('%s %d%%', mark, u_rate(diff)) : sprintf('%d%%', u_rate(diff)))
       end
     end
 
@@ -355,6 +379,19 @@ module CxbRank
         skill.user_id = user.id
         skill.course = course
       end
+      return skill
+    end
+
+    def self.create_by_request(user, course, body)
+      skill = self.find(:first, :conditions => {:user_id => user.id, :course_id => course.id})
+      unless skill
+        skill = self.new
+        skill.user_id = user.id
+        skill.course = course
+      end
+      skill.stat = body[:stat]
+      skill.point = body[:point]
+      skill.calc!
       return skill
     end
 
@@ -448,9 +485,9 @@ module CxbRank
         skill_set[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
         music_skills.each_with_index do |skill, i|
           if skill.music.monthly?
-            skill_set[MUSIC_TYPE_NORMAL][:skills] << skill
-          else
             skill_set[MUSIC_TYPE_SPECIAL][:skills] << skill
+          else
+            skill_set[MUSIC_TYPE_NORMAL][:skills] << skill
           end
         end
       else
@@ -462,7 +499,8 @@ module CxbRank
 
       skill_set.each do |type, hash|
         next if type == MUSIC_TYPE_REV_BONUS
-        hash[:skills][0..(MUSIC_TYPE_ST_COUNTS[type]-1)].each do |skill|
+        target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
+        hash[:skills][0...target_count].each do |skill|
           next if (skill.target_point || 0.0) == 0.0
           hash[:point] += skill.target_point
           skill.rp_target = true
@@ -513,7 +551,12 @@ module CxbRank
     def self.load(mode, user)
       skill_chart = self.new
 
-      skills = Skill.find_by_user(user, :fill_empty => true).sort
+      skills = Skill.find_by_user(user, :fill_empty => true)
+      if mode == MODE_CXB
+        skills.sort! do |a, b| a.music.number <=> b.music.number end
+      else
+        skills.sort!
+      end
       skill_chart[:skills] = skills
       skill_chart.last_modified = Skill.last_modified(user)
 

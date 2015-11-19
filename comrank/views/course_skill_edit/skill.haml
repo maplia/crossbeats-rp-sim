@@ -1,4 +1,4 @@
-%table.conf
+%table.skill_conf
   - unless mobile?
     %thead
       %tr
@@ -13,15 +13,12 @@
     %tr.etc
       - unless mobile?
         %td.level= skill.course.level_to_s
-      - if mobile?
-        %td= CxbRank::SP_COURSE_STATUSES[skill.stat]
+      - if skill.cleared?
+        %td.result ○
+      - elsif skill.played?
+        %td.result ×
       - else
-        - if skill.cleared?
-          %td.mark ○
-        - elsif skill.played?
-          %td.mark ×
-        - else
-          %td.mark －
+        %td.result －
       %td.point= skill.point_to_s
       - if defined? prev_skill
         - difference = (skill.point || 0.0) - (prev_skill.point || 0.0)
@@ -31,10 +28,10 @@
           - difference_class = (difference > 0.0 ? 'inc' : 'dec')
           %td{:class => "rate #{difference_class}"}= sprintf('%+.2f', difference)
       - unless skill.played?
-        %td.none{:colspan => 2}= CxbRank::SP_STATUSES[skill.stat]
+        %td.status{:colspan => 2}= CxbRank::SP_STATUSES[skill.stat]
       - else
         %td.rate= skill.rate_to_s
-        %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
+        %td.combo= CxbRank::SP_COMBO_STATUSES[skill.combo]
 - if skill.comment.present?
   %p
     コメント:

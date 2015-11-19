@@ -2,12 +2,12 @@
   %tr
     - if cxb_mode?
       %th.number= music.number
-    %td.text
+    %td.title
       = haml :music_title, :locals => {:music => music}
       - if rev_mode? and music.hidden
         = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
     - music_diffs.keys.sort.each do |diff|
-      - diff_class = music_diffs[diff].downcase
+      - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
       %td{:class => "#{diff_class} level"}
         = music.level_to_s(diff)
       %td{:class => "#{diff_class} notes"}
@@ -19,19 +19,16 @@
     - music_diffs_blocks = [music_diffs.keys.sort[0..2], music_diffs.keys.sort[3..4]]
   %tr
     %td.text{:colspan => 6}
-      = music.title
-      - if music.subtitle
-        %small= music.subtitle
+      = haml :music_title, :locals => {:music => music}
       - if rev_mode? and music.hidden
         = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
   - music_diffs_blocks.each do |block|
     %tr
       - block.each do |diff|
-    - music_diffs.keys.sort.each do |diff|
-      - diff_class = music_diffs[diff].downcase
+        - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
         %td{:class => "#{diff_class} level"}
           = music.level_to_s(diff)
         %td{:class => "#{diff_class} notes"}
           = music.notes_to_s(diff)
-    - if block.size < 3
-      %td.etc{:colspan => (3 - block.size) * 2}
+      - if block.size < 3
+        %td.etc{:colspan => (3 - block.size) * 2}

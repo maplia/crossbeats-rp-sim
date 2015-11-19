@@ -1,7 +1,8 @@
 site_name: REV. RankPoint Simulator
 site_mode: rev 
-style_pc: /style/pc.css
-style_sp: /stype/sp.css
+description: 「crossbeats REV.」のランクポイント表作成Webツールを公開しているサイトです。
+style_pc: pc.css
+style_sp: sp.css
 session_key: revrank
 secret: 
 

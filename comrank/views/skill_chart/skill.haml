@@ -1,9 +1,9 @@
 - unless mobile?
   %tr
     - if cxb_mode?
-      %th.number{:rowspan => 3, :style => 'width: 3.0em'}
+      %th.number{:rowspan => 3}
         = (skill.music.limited? ? '-' : skill.music.number)
-    %td.title.text{:rowspan => 3}
+    %td.title{:rowspan => 3}
       = skill.music.title
       - if skill.music.subtitle
         %br
@@ -17,20 +17,20 @@
           - elsif skill.failed?(diff)
             F
         - if skill.best_diff == diff and skill.rp_target?
-          %td{:class => "mark target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
+          %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
         - else
-          %td{:class => "mark #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
+          %td{:class => "point #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
       - else
         %td{:class => "mark #{CxbRank::MUSIC_DIFF_CLASSES[diff]}", :colspan => 2, :rowspan => 3} &ndash;
   %tr
     - music_diffs.keys.sort.each do |diff|
       - if skill.music.exist?(diff)
-        %td{:class => "mark #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
+        %td{:class => "rate #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
           = haml :rate, :locals => {:skill => skill, :diff => diff}
   %tr
     - music_diffs.keys.sort.each do |diff|
       - if skill.music.exist?(diff)
-        %td{:class => "mark #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
+        %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
           Lv.#{skill.music.level_to_s(diff)}
           - if skill.locked(diff)
             = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
@@ -42,7 +42,7 @@
           = CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
 - else
   - music_diffs_blocks = []
-  - ((music_diff.size/2.0).ceil).times do |i|
+  - ((music_diffs.size/2.0).ceil).times do |i|
     - music_diffs_blocks << [music_diffs.keys.sort[i*2+0], music_diffs.keys.sort[i*2+1]]
   %tr
     %td.title.text{:colspan => 4}
@@ -61,20 +61,20 @@
             - elsif skill.failed?(diff)
               F
           - if skill.best_diff == diff and skill.rp_target?
-            %td{:class => "mark target #{CxbRank::MUSIC_DIFFS_CLASSES[diff]}"}= point_to_s(diff)
+            %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
           - else
-            %td{:class => "mark #{CxbRank::MUSIC_DIFFS_CLASSES[diff]}"}= point_to_s(diff)
+            %td{:class => "point #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
         - else
           %td{:rowspan => 3, :colspan => 2}
     %tr
       - block.each do |diff|
         - next unless diff
-        %td{:class => "mark #{CxbRank::MUSIC_DIFFS_CLASSES[diff]}"}
+        %td{:class => "rate #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
           = haml :rate, :locals => {:skill => skill, :diff => diff}
     %tr
       - block.each do |diff|
         - next unless diff
-        %td{:class => "mark #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
+        %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
           Lv.#{skill.music.level_to_s(diff)}
           - if skill.locked(diff)
             = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12

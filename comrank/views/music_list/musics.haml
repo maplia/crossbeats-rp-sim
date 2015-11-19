@@ -15,8 +15,8 @@
             %tr
               - music_diffs.keys.sort.each do |diff|
                 - diff_class = music_diffs[diff].downcase
-                %th{:class => diff_class} Lv
-                %th{:class => diff_class} Notes
+                %th{:class => "#{diff_class} level"} Lv
+                %th{:class => "#{diff_class} notes"} Notes
         %tbody
           - musics.each do |music|
             = haml :music, :locals => {:music => music}

@@ -1,4 +1,4 @@
-- form_for user, action do |f|
+- form_for user, action, :method => 'post' do |f|
   %p <em>*印</em>がついている項目は入力必須項目です。ここで入力した項目はユーザー登録後も変更可能です。
   %dl
     - if user.id
@@ -13,7 +13,7 @@
         = f.password_field :password, :size => 20, :maxlength => 50, :value => (user.password_changed? ? user.password : '')
       %dt 確認用パスワード（変更しない場合は空欄にしてください）
       %dd
-        = f.password_field :password_confirmation, :size => 20, :maxlength => 50
+        = f.password_field :password_confirmation, :size => 20, :maxlength => 50, :value => ''
     - else
       %dt パスワード <em>*</em>
       %dd
@@ -38,10 +38,9 @@
           = f.text_field :point, :size => '2000.00'.size, :maxlength => '2000.00'.size, :value => sprintf('%.2f', user.point)
     %dt ユーザーコメント（HTMLタグによる文字装飾はできません。URLには自動的にリンクが設定されます）
     %dd
-      - if mobile?
-        = f.text_area :comment, :rows => 6, :style => 'width: 100%;'
-      - else
-        = f.text_area :comment, :rows => 6, :cols => 70
+      - underscored_id = "#{underscore(CxbRank::User)}_comment"
+      - underscored_name = "#{underscore(CxbRank::User)}[comment]"
+      %textarea.comment{:id => underscored_id, :name => underscored_name, :rows => 6}= user.comment
   %p
     = f.submit '次へ進む'
     = input_tag :reset, :value=> '入力リセット'
