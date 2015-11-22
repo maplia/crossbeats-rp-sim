@@ -1,7 +1,11 @@
 @charset 'utf-8';
 
+body {
+  font-family: sans-serif;
+}
+
 /********
-  table cell common colors
+  table cell common colors, common align
  ********/
 th.esy, tr.esy th {
   color: #000066;
@@ -50,6 +54,25 @@ td.played, tr.played td {
 td.etc, tr.etc td {
   color: inherit;
   background-color: white;
+}
+
+td.level {
+  text-align: center;
+}
+td.notes {
+  text-align: right;
+}
+td.point, td.rate {
+  text-align: right;
+}
+td.mark {
+  text-align: center;
+}
+td.status {
+  text-align: center;
+}
+td.score {
+  text-align: right;
 }
 
 /********

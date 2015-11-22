@@ -170,20 +170,20 @@ table.skill_chart td.point {
   width: 4.0em;
 }
 
-td.level {
-  text-align: center;
+table.calc th.diff {
+  width: 3.0em;
 }
-td.notes {
-  text-align: right;
+table.calc th.level {
+  width: 2.5em;
 }
-td.point, td.rate {
-  text-align: right;
+table.calc th.notes {
+  width: 3.5em;
 }
-td.mark {
-  text-align: center;
+table.calc th.score {
+  width: 4.0em;
 }
-td.status {
-  text-align: center;
+table.calc th.rate {
+  width: 4.5em;
 }
 
 td.inc {

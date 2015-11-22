@@ -1,4 +1,4 @@
-- css_class = (skill.id ? 'played' : 'etc')
+- css_class = (skill.played? ? 'played' : 'etc')
 - unless mobile?
   %tr{:class => css_class}
     - if skill.rp_target?
@@ -21,7 +21,7 @@
         %td.mark ×
       %td.point= skill.point_to_s
       %td.rate= skill.rate_to_s
-      %td.combo= CxbRank::SP_COMBO_STATUSES[skill.combo]
+      %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
     %td.comment= Rinku.auto_link(escape_html skill.comment)
 - else
   - row_count = (skill.comment.present? ? 3 : 2)
@@ -46,7 +46,7 @@
         %td.mark ×
       %td.point= skill.point_to_s
       %td.rate= skill.rate_to_s
-      %td.combo= CxbRank::SP_COMBO_STATUSES[skill.combo]
+      %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
   - if skill.comment.present?
     %tr{:class => css_class}
       %td.comment{:colspan => 4}= Rinku.auto_link(escape_html skill.comment)

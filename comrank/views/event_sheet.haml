@@ -1,0 +1,52 @@
+= javascript_include_tag 'http://maplia.jp/script/jquery.cookie.js'
+= javascript_include_tag 'http://maplia.jp/script/jquery.json2table.js'
+= javascript_include_tag 'http://maplia.jp/script/strftime-min.js'
+= javascript_include_tag '/common/javascripts/common.js'
+= javascript_include_tag '/common/javascripts/event.js'
+:javascript
+  var data = null;
+  var event_id = null;
+  var span = null;
+  var mobile = null;
+  $(document).ready(function () {
+    data = #{event.to_hash.to_json};
+    event_id = '#{event.text_id}';
+    span = {span_s: Date.parse(data.span.span_s), span_e: Date.parse(data.span.span_e)};
+    mobile = #{mobile?.to_s};
+    initialize();
+  });
+%p.top_navi
+  #{link_to settings.site_name, CxbRank::SITE_TOP_URI}
+  - if mobile?
+    %br
+  - else
+    \ /
+  - if cxb_mode?
+    #{link_to 'MapWiki - CROSS&times;BEATS', 'http://wiki.maplia.jp/?CROSS%C3%97BEATS'}
+  - else
+    #{link_to 'MapWiki - crossbeats REV.', 'http://wiki.maplia.jp/?crossbeats%20REV.'}
+%h1
+  = page_title
+  %small= "[#{event.title}]"
+%p ※入力データはサーバに保存していないため、他のブラウザには引き継がれません
+%form
+  %table#table_input
+  %p
+    = button_tag '計算', :onClick => 'submitScores();'
+    %label
+      = check_box_tag :show_history, :id => :show_history, :checked => mobile?
+      日別履歴を非表示にする
+  :javascript
+    $('#show_history').change(function () {
+      if (this.checked) {
+        $('#p_history').hide();
+        $('#table_history').hide();
+      } else {
+        $('#p_history').show();
+        $('#table_history').show();
+      }
+    });
+%p#p_mtime
+%table#table_chart.calc
+%p#p_history 日別履歴
+%table#table_history.calc

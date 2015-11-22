@@ -1,6 +1,6 @@
-AddHandler cgi-script .rb
-Options +ExecCGI
-DirectoryIndex index.rb index.html
+#AddHandler cgi-script .rb
+#Options +ExecCGI
+#DirectoryIndex index.rb index.html
 
 RewriteEngine On
 RewriteBase /

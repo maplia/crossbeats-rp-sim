@@ -1,6 +1,6 @@
 - if bonus
   - target_diff = CxbRank::MUSIC_DIFF_UNL
-  - css_class = ((ignore_locked or !locked(target_diff)) ? CxbRank::MUSIC_DIFF_CLASSES[target_diff] : 'etc')
+  - css_class = ((ignore_locked or !skill.locked(target_diff)) ? CxbRank::MUSIC_DIFF_CLASSES[target_diff] : 'etc')
 - else
   - target_diff = skill.target_diff
   - css_class = ((ignore_locked or skill.target_diff == skill.best_diff) ? CxbRank::MUSIC_DIFF_CLASSES[target_diff] : 'etc')

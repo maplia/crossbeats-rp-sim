@@ -21,6 +21,10 @@ p, ul, ol, li, dl, table {
   margin: 2px 0px;
 }
 
+ul, ol {
+  padding-left: 1.0em;
+}
+
 dt {
   font-weight: bold;
   margin: 0;
@@ -85,7 +89,7 @@ table.skill_summary td {
   font-weight: bold;
 }
 table.skill_list th.number {
-  width: 2.5em;
+  width: 15%;
 }
 table.skill_list th.target {
   color: red !important;
@@ -93,20 +97,17 @@ table.skill_list th.target {
   border-color: inherit !important;
 }
 
-table.skill_list th.title {
-  width: 26.0em;
+table.skill_list td.level {
+  width: 15%;
 }
-table.skill_list th.level {
-  width: 6.0em;
+table.skill_list td.point {
+  width: 20%;
 }
-table.skill_list th.point {
-  width: 4.0em;
-}
-table.skill_list th.rate, table.skill_list th.u_rate {
-  width: 4.0em;
+table.skill_list td.rate {
+  width: 20%;
 }
 table.skill_list th.rank, table.skill_list th.combo {
-  width: 3.5em;
+  width: 15%;
 }
 
 table.skill_edit td.comment input[type="text"] {
@@ -122,17 +123,17 @@ table.skill_conf th.locked {
 table.skill_conf th.gauge {
   width: 2.0em;
 }
-table.skill_conf td.level {
-  width: 2.5em;
+table.skill_conf td.result {
+  width: 15%;
 }
-table.skill_conf th.point {
-  width: 4.0em;
+table.skill_conf td.point {
+  width: 25%;
 }
-table.skill_conf th.rate, table.skill_conf th.u_rate {
-  width: 4.0em;
+table.skill_conf td.rate {
+  width: 20%;
 }
-table.skill_conf th.rank, table.skill_conf th.combo {
-  width: 3.5em;
+table.skill_conf th.rank, table.skill_conf td.combo {
+  width: 20%;
 }
 
 table.skill_status th {
@@ -172,20 +173,14 @@ table.user_list td.point {
   width: 30%;
 }
 
-td.level {
-  text-align: center;
+table.calc th.diff {
+  width: 3.0em;
 }
-td.notes {
-  text-align: right;
+table.calc th.level {
+  width: 2.5em;
 }
-td.point, td.rate {
-  text-align: right;
-}
-td.mark {
-  text-align: center;
-}
-td.status {
-  text-align: center;
+table.calc th.notes {
+  width: 15%;
 }
 
 td.inc {

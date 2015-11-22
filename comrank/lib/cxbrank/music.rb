@@ -35,8 +35,8 @@ module CxbRank
         music.limited = false
         MUSIC_DIFF_PREFIXES.values.each do |prefix|
           next unless body[prefix.to_sym]
-          item.send("#{prefix}_level=", body[prefix.to_sym][:level])
-          item.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
+          music.send("#{prefix}_level=", body[prefix.to_sym][:level])
+          music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
         end
       end
       return music
@@ -105,10 +105,10 @@ module CxbRank
       hash = {
         :text_id => text_id, :number => number,
         :title => title, :subtitle => subtitle, :full_title => full_title,
-        :monthly => monthly?, :limited => limited?,
+        :monthly => monthly?, :limited => limited,
       }
-      $config.music_diffs.each do |diff, diff_name|
-        hash[diff_name.downcase] = {
+      music_diffs.keys.each do |diff|
+        hash[MUSIC_DIFF_PREFIXES[diff]] = {
           :level => level(diff), :notes => notes(diff),
         }
       end

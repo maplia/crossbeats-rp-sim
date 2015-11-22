@@ -513,8 +513,8 @@ module CxbRank
           end
         end
         skill_set[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
-          if a.locked?(MUSIC_DIFF_UNL) != b.locked?(MUSIC_DIFF_UNL)
-            (a.locked?(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked?(MUSIC_DIFF_UNL) ? 1 : 0)
+          if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
+            (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
           else
             -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
           end
@@ -524,7 +524,7 @@ module CxbRank
             user.point - skill_set[MUSIC_TYPE_REV_SINGLE][:point] - skill_set[MUSIC_TYPE_REV_COURSE][:point]
         else
           skill_set[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
-            if Skill.ignore_locked or !skill.locked?(MUSIC_DIFF_UNL)
+            if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
               skill_set[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
             end
           end
@@ -540,6 +540,104 @@ module CxbRank
           skill_set.total_point += hash[:point]
         end
       end
+
+      return skill_set
+    end
+
+    def self.max(mode, options={})
+      skill_set = self.new
+      Skill.ignore_locked = options[:ignore_locked]
+
+      music_skills = []
+      musics = Music.find(:all)
+      musics.each do |music|
+        max_diff = (music.exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS)
+        skill = Skill.new
+        skill.music = music
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_stat=", SP_STATUS_CLEAR)
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate=", 100)
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate_f=", false)
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rank=", SP_RANK_STATUS_SPP)
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_combo=", SP_COMBO_STATUS_EX)
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
+        skill.calc!
+        music_skills << skill
+      end
+      music_skills.sort!
+      if mode == MODE_CXB
+        skill_set[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
+        skill_set[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
+        music_skills.each_with_index do |skill, i|
+          if skill.music.monthly?
+            skill_set[MUSIC_TYPE_SPECIAL][:skills] << skill
+          else
+            skill_set[MUSIC_TYPE_NORMAL][:skills] << skill
+          end
+        end
+      else
+        course_skills = []
+        courses = Course.find(:all)
+        courses.each do |course|
+          skill = CourseSkill.new
+          skill.course = course
+          skill.stat = SP_STATUS_CLEAR
+          skill.rate = 100
+          skill.combo = SP_COMBO_STATUS_EX
+          skill.calc!
+          course_skills << skill
+        end
+        course_skills.sort!
+        skill_set[MUSIC_TYPE_REV_SINGLE] = {:skills => music_skills.dup, :point => 0.0}
+        skill_set[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
+        skill_set[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
+      end
+
+      skill_set.each do |type, hash|
+        next if type == MUSIC_TYPE_REV_BONUS
+        target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
+        hash[:skills][0...target_count].each do |skill|
+          next if (skill.target_point || 0.0) == 0.0
+          hash[:point] += skill.target_point
+          skill.rp_target = true
+        end
+        hash[:skills].delete_if do |skill|
+          !skill.rp_target? and hash[:skills][target_count-1].best_point != skill.best_point
+        end
+      end
+      if mode == MODE_REV
+        music_skills.each do |skill|
+          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL)
+            skill_set[MUSIC_TYPE_REV_BONUS][:skills] << skill
+          end
+        end
+        skill_set[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
+          if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
+            (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
+          else
+            -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
+          end
+        end
+#        if user.point_direct
+#          skill_set[MUSIC_TYPE_REV_BONUS][:point] =
+#            user.point - skill_set[MUSIC_TYPE_REV_SINGLE][:point] - skill_set[MUSIC_TYPE_REV_COURSE][:point]
+#        else
+          skill_set[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
+            if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
+              skill_set[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+            end
+          end
+          skill_set[MUSIC_TYPE_REV_BONUS][:point] = (skill_set[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
+#        end
+      end
+      skill_set.last_modified = [Music.last_modified, Course.last_modified].compact.max
+#      if user.point_direct
+#        skill_set.total_point = user.point
+#      else
+        skill_set.total_point = 0.0
+        skill_set.each_value do |hash|
+          skill_set.total_point += hash[:point]
+        end
+#      end
 
       return skill_set
     end

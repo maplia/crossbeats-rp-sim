@@ -26,17 +26,14 @@ class RevRankApp < CxbRank::AppBase
       begin
         data = JSON.parse(request.body.read, {:symbolize_names => true})
         if data[:key].blank?
-          status 401
-          jsonx :message => 'セッションキーが指定されていません'
+          jsonx :status => 401, :message => 'セッションキーが指定されていません'
         elsif (session = CxbRank::BookmarkletSession.find(:first, :conditions => {:key => data[:key]})).nil?
-          status 401
-          jsonx :message => 'セッションキーが間違っています'
+          jsonx :status => 401, :message => 'セッションキーが間違っています'
         else
           yield session, data
         end
       rescue
-        status 400
-        jsonx :message => $!.message
+        jsonx :status => 400, :message => $!.message
       end
     end
   end
@@ -129,15 +126,14 @@ class RevRankApp < CxbRank::AppBase
   post '/bml_login' do
     error_no = CxbRank::BookmarkAuthenticator.authenticate(params)
     if error_no != CxbRank::NO_ERROR
-      status 401
-      jsonx :message => CxbRank::ERRORS[error_no]
+      jsonx :status => 401, :message => CxbRank::ERRORS[error_no]
     else
       session = CxbRank::BookmarkletSession.new
       session.user_id = CxbRank::User.find_by_param_id(params[:game_id])
       session.key = SecureRandom.hex(32)
       begin
         session.save!
-        jsonx :key => session.key, :user_id => session.user_id
+        jsonx :status => 200, :key => session.key, :user_id => session.user_id
       rescue
         status 500
         jsonx :message => $!.message
@@ -156,8 +152,7 @@ class RevRankApp < CxbRank::AppBase
           item = CxbRank::Course.create_by_request(data[:body])
           item.save!
         else
-          status 400
-          jsonx :message => "TypeError: #{data[:type]}"
+          jsonx :status => 400, :message => "TypeError: #{data[:type]}"
         end
       rescue
         status 500
@@ -172,23 +167,20 @@ class RevRankApp < CxbRank::AppBase
         case data[:type]
         when 'music'
           unless (music = CxbRank::Music.find_by_lookup_key(data[:lookup_key]))
-            status 400
-            jsonx :message => "Lookup_key [#{data[:lookup_key]}] is not found"
+            jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
             skill = CxbRank::Skill.create_by_request(session.user, music, data[:body])
             skill.save!
           end
         when 'course'
           unless (course = CxbRank::Course.find_by_lookup_key(data[:lookup_key]))
-            status 400
-            jsonx :message => "Lookup_key [#{data[:lookup_key]}] is not found"
+            jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
             skill = CxbRank::CourseSkill.create_by_request(session.user, course, data[:body])
             skill.save!
           end
         else
-          status 400
-          jsonx :message => "TypeError: #{data[:type]}"
+          jsonx :status => 400, :message => "TypeError: #{data[:type]}"
         end
       rescue
         status 500

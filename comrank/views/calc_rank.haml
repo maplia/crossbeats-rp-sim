@@ -1,0 +1,28 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+= javascript_include_tag 'http://maplia.jp/script/jquery.json2table.js'
+= javascript_include_tag '/common/javascripts/common.js'
+= javascript_include_tag '/common/javascripts/rankcalc.js'
+:javascript
+  var data = null;
+  var diffs = null;
+  $(document).ready(function () {
+    data = #{data.to_json};
+    diffs = #{diffs.to_json};
+    mobile = #{mobile?.to_s};
+    initialize();
+  });
+%p あるランク/クリアレートを取得するのに許容されるミスの数を譜面ごとに表示します
+%p ※ノート数がデータベース未登録の曲は表示されません
+%div.unit
+  %p
+    曲名:
+    %select#select_music{:onKeyUp => 'changeChart();', :onKeyDown => 'changeChart();', :onChange => 'changeChart();'}
+  %h2 ランク
+  %div.subunit
+    %p 許容されるCool未満の数です
+    %table#table_rank_chart.calc
+  %h2 クリアレート
+  %div.subunit
+    %p すべてCool以上でフルコンボ時の許容Cool数です
+    %table#table_rate_chart.calc

@@ -8,6 +8,7 @@ require 'sinatra/multi_route'
 require 'sinatra/json'
 require 'sinatra/jsonp'
 require 'sinatra/cross_origin'
+require 'sinatra/default_charset'
 require 'tilt/haml'
 require 'rack/mobile-detect'
 require 'padrino-helpers'
@@ -18,25 +19,30 @@ require 'cxbrank/music'
 require 'cxbrank/course'
 require 'cxbrank/user'
 require 'cxbrank/skill'
+require 'cxbrank/event'
 
 module CxbRank
   class AppBase < Sinatra::Base
     register Sinatra::ConfigFile
     register Sinatra::CrossOrigin
+    register Sinatra::DefaultCharset
     register Sinatra::MultiRoute
     register Padrino::Helpers
     register CxbRank::Helpers
 
     config_file File.expand_path(CxbRank::CONFIG_FILE, Dir.pwd)
-  
+
     configure do
       use Rack::Session::Cookie,
         :key => settings.session_key, :secret => settings.secret,
         :expire_after => CxbRank::EXPIRE_MINUTES * 60
       set :public_dir, File.expand_path('public', Dir.pwd)
       set :method_override, true
-      use Rack::MobileDetect
       enable :cross_origin
+      set :default_charset, 'utf-8'
+      use Rack::MobileDetect
+      mime_type :css, 'text/css'
+      mime_type :js, 'text/javascript'
     end
 
     before do
@@ -46,6 +52,8 @@ module CxbRank
       CxbRank::Music.mode = settings.site_mode
       CxbRank::Skill.mode = settings.site_mode
     end
+
+    helpers Sinatra::Jsonp
 
     helpers do
       def jsonx(data, callback=nil)
@@ -97,6 +105,16 @@ module CxbRank
           yield curr_skill
         end
       end
+    end
+
+    get '/common/stylesheets/:file_name' do
+      content_type :css
+      send_file File.expand_path(params[:file_name], '../comrank/stylesheets')
+    end
+
+    get '/common/javascripts/:file_name' do
+      content_type :js
+      send_file File.expand_path(params[:file_name], '../comrank/javascripts')
     end
 
     get CxbRank::SITE_TOP_URI do
@@ -347,6 +365,62 @@ module CxbRank
       else
         redirect CxbRank::USER_EDIT_URI
       end
+    end
+
+    get '/api/music/:param_id' do
+      last_modified CxbRank::Music.last_modified
+      music = CxbRank::Music.find_by_param_id(params[:param_id])
+      jsonx (music ? music.to_hash : {}), params[:callback]
+    end
+
+    get '/api/musics' do
+      last_modified CxbRank::Music.last_modified
+      musics = CxbRank::Music.find(:all, :conditions => {:limited => false})
+      music_hashes = []
+      musics.sort.each do |music|
+        music_hashes << music.to_hash
+      end
+      jsonx music_hashes, params[:callback]
+    end
+
+    get CxbRank::RANK_CALC_URI do
+      last_modified CxbRank::Music.last_modified
+      musics = CxbRank::Music.find(:all, :conditions => {:limited => false})
+      music_hashes = []
+      musics.sort.each do |music|
+        music_hashes << music.to_hash
+      end
+      diffs = []
+      music_diffs.keys.sort.each do |diff|
+        diffs << CxbRank::MUSIC_DIFF_PREFIXES[diff]
+      end
+      haml :calc_rank, :layout => true, :locals => {:data => music_hashes, :diffs => diffs}
+    end
+
+    get CxbRank::RATE_CALC_URI do
+      last_modified CxbRank::Music.last_modified
+      musics = CxbRank::Music.find(:all, :conditions => {:limited => false})
+      music_hashes = []
+      musics.sort.each do |music|
+        music_hashes << music.to_hash
+      end
+      haml :calc_rate, :layout => true, :locals => {:data => music_hashes, :diffs => music_diffs}
+    end
+
+    get CxbRank::MAX_SKILL_VIEW_URI do
+      settings.views << '../comrank/views/skill_list'
+      skill_set = CxbRank::SkillSet.max(settings.site_mode)
+      last_modified skill_set.last_modified
+      haml :skill_list, :layout => true, :locals => {
+        :skill_set => skill_set, :edit => false, :ignore_locked => false}
+    end
+
+    get "#{CxbRank::EVENT_SHEET_URI}/:event_text_id", "#{CxbRank::EVENT_SHEET_URI}/:event_text_id/:section" do
+      request.env['X_MOBILE_DEVICE'] = nil
+      event = CxbRank::Event.find(:first,
+        :conditions => {:text_id => params[:event_text_id], :section => (params[:section] || 0)})
+      last_modified CxbRank::Music.last_modified
+      haml :event_sheet, :layout => true, :locals => {:event => event}
     end
   end
 end

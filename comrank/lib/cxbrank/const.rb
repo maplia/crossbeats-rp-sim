@@ -1,7 +1,7 @@
 module CxbRank
   # エンジン名
   ENGINE_NAME = 'CxB RankPoint Simulator REV.'
-  ENGINE_VERSION = '1.4.0 &beta;'
+  ENGINE_VERSION = '1.3.0 &beta;5'
 
   # URI
   SITE_TOP_URI = '/'                                # サイトトップ
@@ -17,8 +17,13 @@ module CxbRank
   SKILL_ITEM_EDIT_URI = '/edit'                     # スキル情報編集（単曲）
   SKILL_COURSE_ITEM_EDIT_URI = '/edit_course'       # スキル情報編集（コース）
 
+  MAX_SKILL_VIEW_URI = '/max_view'                  # 理論値スキル表
+  MAX_SKILL_VIEW_IGLOCK_URI = '/max_iglock'         # 理論値スキル表（ロック無視版）
+
   MUSIC_LIST_VIEW_URI = '/musics'                   # 登録曲リスト
   RANK_CALC_URI = '/rankcalc'                       # 許容ミス数計算機
+  RATE_CALC_URI = '/scorerate'                      # 得点率計算機
+  EVENT_SHEET_URI = '/sheet'                        # イベントスコアシート
 
   # ページ名
   PAGE_TITLES = {
@@ -30,9 +35,14 @@ module CxbRank
     SKILL_LIST_EDIT_URI =>        'ランクポイント表',
     SKILL_LIST_VIEW_URI =>        'ランクポイント表',
     SKILL_LIST_VIEW_IGLOCK_URI => 'ランクポイント表',
+    MAX_SKILL_VIEW_URI =>         '理論値ランクポイント表',
+    MAX_SKILL_VIEW_IGLOCK_URI =>  '理論値ランクポイント表',
     CLEAR_LIST_VIEW_URI =>        'クリア状況表',
     SKILL_ITEM_EDIT_URI =>        'ランクポイント編集',
     SKILL_COURSE_ITEM_EDIT_URI => 'ランクポイント編集',
+    RANK_CALC_URI =>              'ランク/レート別許容ミス数計算機',
+    RATE_CALC_URI =>              '得点率計算ツール',
+    EVENT_SHEET_URI =>            'イベントスコアシート',
   }
 
   # 画像ファイルを置いておくディレクトリへのパス

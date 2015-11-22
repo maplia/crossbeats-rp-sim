@@ -2,7 +2,8 @@
 %h1= page_title
 - if skill_set.last_modified
   %p.last_modified 最終更新時刻: #{skill_set.last_modified.strftime('%Y-%m-%d %H:%M:%S')}
-= haml :user, :locals => {:user => user, :edit => edit}
+- if defined? user
+  = haml :user, :locals => {:user => user, :edit => edit}
 %div.unit
   %h2 ランクポイント
   %div.subunit
