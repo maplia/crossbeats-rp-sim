@@ -33,20 +33,22 @@
   %table#table_input
   %p
     = button_tag '計算', :onClick => 'submitScores();'
-    %label
-      = check_box_tag :show_history, :id => :show_history, :checked => mobile?
-      日別履歴を非表示にする
-  :javascript
-    $('#show_history').change(function () {
-      if (this.checked) {
-        $('#p_history').hide();
-        $('#table_history').hide();
-      } else {
-        $('#p_history').show();
-        $('#table_history').show();
-      }
-    });
+    - if cxb_mode?
+      %label
+        = check_box_tag :show_history, :id => :show_history, :checked => mobile?
+        日別履歴を非表示にする
+      :javascript
+        $('#show_history').change(function () {
+          if (this.checked) {
+            $('#p_history').hide();
+            $('#table_history').hide();
+          } else {
+            $('#p_history').show();
+            $('#table_history').show();
+          }
+        });
 %p#p_mtime
 %table#table_chart.calc
-%p#p_history 日別履歴
-%table#table_history.calc
+- if cxb_mode?
+  %p#p_history 日別履歴
+  %table#table_history.calc

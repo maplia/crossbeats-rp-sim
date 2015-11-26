@@ -48,8 +48,7 @@
     %td.title.text{:colspan => 4}
       = skill.music.title
       - if skill.music.subtitle
-        %br
-        = skill.music.subtitle
+        %small= skill.music.subtitle
   - music_diffs_blocks.each do |block|
     %tr
       - block.each do |diff|

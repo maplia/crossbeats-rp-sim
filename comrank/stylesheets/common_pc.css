@@ -20,6 +20,10 @@ p, ul, ol, li, dl, table {
   margin: 2px 0px;
 }
 
+ul li ul li {
+  margin: 0 0 0 1.5em;
+}
+
 dt {
   font-weight: bold;
   margin: 0;
@@ -127,6 +131,9 @@ table.skill_conf th.gauge {
 table.skill_conf td.level {
   width: 2.5em;
 }
+table.skill_conf th.course_level {
+  width: 3.5em;
+}
 table.skill_conf th.point {
   width: 4.0em;
 }
@@ -186,6 +193,19 @@ table.calc th.rate {
   width: 4.5em;
 }
 
+table.user_list th.name {
+  width: 12.0em;
+}
+table.user_list th.game_id {
+  width: 5.5em;
+}
+table.user_list th.point {
+  width: 4.5em;
+}
+table.user_list th.comment {
+  width: 15.0em;
+}
+
 td.inc {
   color: red !important;
   font-weight: bold;
@@ -196,8 +216,11 @@ td.dec {
 }
 
 /********
-  textarea
+  input[text], textarea
  ********/
+input.score {
+  width: 3.0em;
+}
 textarea {
   width: 45.0em;
 }

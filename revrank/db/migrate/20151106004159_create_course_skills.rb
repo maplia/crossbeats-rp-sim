@@ -9,7 +9,6 @@ class CreateCourseSkills < ActiveRecord::Migration
       t.integer :stat, :default => CxbRank::SP_STATUS_NO_PLAY
       t.float :point
       t.float :rate
-      t.boolean :rate_f, :default => true
       t.integer :combo
       t.string :comment
       t.timestamps

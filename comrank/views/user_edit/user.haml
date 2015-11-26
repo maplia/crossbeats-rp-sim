@@ -22,20 +22,20 @@
       %dd
         = f.password_field :password_confirmation, :size => 20, :maxlength => 50
     - if cxb_mode?
-      %dt CROSS&times;BEAT ID
+      %dt CROSS&times;BEAT ID（公開しない場合は空欄にしてください）
       %dd
-        = f.text_field :game_id, :size => 8, :maxlength => 8
+        = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id
     - else
       %dt REV.ユーザーID（MY DATAからのデータインポートに使用します）
       %dd
-        = f.text_field :game_id, :size => 8, :maxlength => 8
+        = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id
         %label
           = f.check_box :game_id_display
           REV.ユーザーIDを公開する
       - if user.id
-        %dt 実RP
+        %dt 実RP <em>*</em>
         %dd
-          = f.text_field :point, :size => '2000.00'.size, :maxlength => '2000.00'.size, :value => sprintf('%.2f', user.point)
+          = f.text_field :point, :size => '2000.00'.size, :maxlength => '2000.00'.size, :value => (user.point ? sprintf('%.2f', user.point) : '')
     %dt ユーザーコメント（HTMLタグによる文字装飾はできません。URLには自動的にリンクが設定されます）
     %dd
       - underscored_id = "#{underscore(CxbRank::User)}_comment"

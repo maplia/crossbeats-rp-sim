@@ -12,7 +12,7 @@
     mobile = #{mobile?.to_s};
     initialize();
   });
-%p 選択した譜面とスコアから得点率を計算するツールです（バグ報告は <a href="https://twitter.com/maplia">@maplia</a> までお願いします）
+%p 選択した譜面とスコアから得点率を計算するツールです
 %div.unit
   %h2 入力フォーム
   %div.subunit
@@ -22,15 +22,19 @@
         %select#select_music
       %p
         譜面難度:
+        - if mobile?
+          %br
         - music_diffs.keys.sort.each do |diff|
           %label
-            = radio_button_tag :diff, :value => CxbRank::MUSIC_DIFF_PREFIXES[diff], :checked => (diff == CxbRank::MUSIC_DIFF_UNL)
+            = radio_button_tag :diff, :value => CxbRank::MUSIC_DIFF_PREFIXES[diff], :checked => (diff == music_diffs.keys.max)
             = music_diffs[diff]
+          - if mobile? and diff == CxbRank::MUSIC_DIFF_HRD
+            %br
       %p
         スコア:
-        = text_field_tag :score, :maxlength => 5, :size => 5
+        = text_field_tag :score, :maxlength => 5, :class => :score
         = button_tag '計算', :onClick => 'calcScoreRate()'
 %div.unit
   %h2 計算結果
   %div.subunit
-    %table#table_rate
+    %table#table_rate.calc

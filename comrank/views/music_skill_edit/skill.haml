@@ -23,7 +23,7 @@
     - music_diffs.keys.sort.each do |diff|
       - next unless skill.music.exist?(diff)
       - unless mobile?
-        %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
+        %tr{:class => "#{CxbRank::MUSIC_DIFF_CLASSES[diff]} diff"}
           %th.diff= music_diffs[diff]
           %td.level= skill.music.level_to_s(diff)
           %td.mark
@@ -52,7 +52,7 @@
             %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
       - else
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
-          %th{:rowspan => 2}= music_diffs[diff]
+          %th.diff{:rowspan => 2}= music_diffs[diff]
           %td.point= skill.point_to_s(diff)
           - unless skill.cleared?(diff)
             %td.status{:rowspan => 2, :colspan => 2}= CxbRank::SP_STATUSES[skill.stat(diff)]

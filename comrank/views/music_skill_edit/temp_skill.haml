@@ -5,8 +5,8 @@
         - next unless skill.music.exist?(diff)
         - diff_prefix = CxbRank::MUSIC_DIFF_PREFIXES[diff]
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
-          %th{:rowspan => (mobile? ? 4 : 2)}= music_diffs[diff]
-          %td
+          %th.diff{:rowspan => (mobile? ? 4 : 2)}= music_diffs[diff]
+          %td.input
             %label<
               = f.radio_button "#{diff_prefix}_stat".to_sym,
                 :value => CxbRank::SP_STATUS_CLEAR, :checked => (skill.stat(diff) == CxbRank::SP_STATUS_CLEAR)

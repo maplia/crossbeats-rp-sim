@@ -67,7 +67,7 @@ module CxbRank
     def max_notes
       note_data = []
       music_diffs.keys.each do |diff|
-        note_data << notes(diff)
+        note_data << (notes(diff) || 0)
       end
       return note_data.max
     end

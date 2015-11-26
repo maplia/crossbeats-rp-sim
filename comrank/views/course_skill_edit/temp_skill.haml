@@ -1,52 +1,99 @@
 - form_for skill, CxbRank::SKILL_COURSE_ITEM_EDIT_URI do |f|
   %table.skill_edit
-    %tbody
-      %tr
-        %th{:rowspan => 2} -
-        %td
-          %label<
-            = f.radio_button :stat,
-              :value => CxbRank::SP_STATUS_CLEAR, :checked => (skill.stat == CxbRank::SP_STATUS_CLEAR)
-            = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_CLEAR] + ':'
-          - if mobile?
+    -unless mobile?
+      %tbody
+        %tr
+          %th.diff{:rowspan => 3} -
+          %td
+            %label<
+              = f.radio_button :stat,
+                :value => CxbRank::SP_STATUS_CLEAR, :checked => (skill.stat == CxbRank::SP_STATUS_CLEAR)
+              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_CLEAR]
+          %td{:rowspan => 2}
+            %label
+              RP:
+              = f.text_field :point,
+                :size => CxbRank::POINT_FIGURE, :maxlength => CxbRank::POINT_FIGURE,
+                :value => skill.point_to_input_value
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            %label
+              CLEAR RATE:
+              = f.text_field :rate,
+                :size => CxbRank::RATE_FIGURE, :maxlength => CxbRank::RATE_FIGURE,
+                :value => skill.rate_to_input_value
+              \ %
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            %label
+              フルコンボ:
+              = f.select :combo,
+                :options => CxbRank::SP_COMBO_STATUS_OPTIONS, :selected => skill.combo
+        %tr
+          %td
+            %label<
+              = f.radio_button :stat,
+                :value => CxbRank::SP_STATUS_FAILED, :checked => (skill.stat == CxbRank::SP_STATUS_FAILED)
+              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_FAILED]
+        %tr
+          %td{:colspan => 2}
+            %label<
+              = f.radio_button :stat,
+                :value => CxbRank::SP_STATUS_NO_PLAY, :checked => (skill.stat == CxbRank::SP_STATUS_NO_PLAY)
+              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_NO_PLAY]
+        %tr
+          %th コメント
+          %td.comment{:colspan => 2}
+            = f.text_field :comment, :value => skill.comment, :class => 'comment'
+    -else
+      %tbody
+        %tr
+          %th.diff{:rowspan => 2} -
+          %td
+            %label<
+              = f.radio_button :stat,
+                :value => CxbRank::SP_STATUS_CLEAR, :checked => (skill.stat == CxbRank::SP_STATUS_CLEAR)
+              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_CLEAR]
+            \ /
+            %label<
+              = f.radio_button :stat,
+                :value => CxbRank::SP_STATUS_FAILED, :checked => (skill.stat == CxbRank::SP_STATUS_FAILED)
+              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_FAILED]
             %br
             &nbsp;&nbsp;&nbsp;&nbsp;
-          %label
-            RP:
-            = f.text_field :point,
-              :size => CxbRank::POINT_FIGURE, :maxlength => CxbRank::POINT_FIGURE,
-              :value => skill.point_to_input_value
-          - if mobile?
-            %br
-            &nbsp;&nbsp;&nbsp;&nbsp;
-          %label
-            CLEAR RATE:
-            = f.text_field :rate,
-              :size => CxbRank::RATE_FIGURE, :maxlength => CxbRank::RATE_FIGURE,
-              :value => skill.rate_to_input_value
-            \ %
-          - if mobile?
-            %br
-            &nbsp;&nbsp;&nbsp;&nbsp;
-          %label
-            フルコンボ:
-            = f.select :combo,
-              :options => CxbRank::SP_COMBO_STATUS_OPTIONS, :selected => skill.combo
-      %tr
-        %td
-          %label<
-            = f.radio_button :stat,
-              :value => CxbRank::SP_STATUS_FAILED, :checked => (skill.stat == CxbRank::SP_STATUS_FAILED)
-            = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_FAILED]
-          & /
-          %label<
-            = f.radio_button :stat,
-              :value => CxbRank::SP_STATUS_NO_PLAY, :checked => (skill.stat == CxbRank::SP_STATUS_NO_PLAY)
-            = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_NO_PLAY]
-      %tr
-        %th コメント
-        %td
-          = f.text_field :comment, :value => skill.comment
+            %label
+              RP:
+              = f.text_field :point,
+                :size => CxbRank::POINT_FIGURE, :maxlength => CxbRank::POINT_FIGURE,
+                :value => skill.point_to_input_value
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            %label
+              CLEAR RATE:
+              = f.text_field :rate,
+                :size => CxbRank::RATE_FIGURE, :maxlength => CxbRank::RATE_FIGURE,
+                :value => skill.rate_to_input_value
+              \ %
+            - if mobile?
+              %br
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            %label
+              フルコンボ:
+              = f.select :combo,
+                :options => CxbRank::SP_COMBO_STATUS_OPTIONS, :selected => skill.combo
+        %tr
+          %td
+            %label<
+              = f.radio_button :stat,
+                :value => CxbRank::SP_STATUS_NO_PLAY, :checked => (skill.stat == CxbRank::SP_STATUS_NO_PLAY)
+              = CxbRank::SP_STATUSES[CxbRank::SP_STATUS_NO_PLAY]
+        %tr
+          %th コメント
+          %td.comment
+            = f.text_field :comment, :value => skill.comment, :class => 'comment'
   %p
     = f.submit '登録', :name => 'update'
     = f.submit '削除', :name => 'delete', :disabled => skill.id.blank?

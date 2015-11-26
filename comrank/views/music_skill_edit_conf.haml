@@ -1,6 +1,8 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SKILL_LIST_EDIT_URI]}
 %h1
   = "#{page_title}確認"
+  - if mobile?
+    %br
   %small= "[#{curr_skill.music.full_title}]"
 %div.unit
   %h2 入力情報

@@ -33,7 +33,7 @@ module CxbRank
     config_file File.expand_path(CxbRank::CONFIG_FILE, Dir.pwd)
 
     configure do
-      use Rack::Session::Cookie,
+      set :sessions,
         :key => settings.session_key, :secret => settings.secret,
         :expire_after => CxbRank::EXPIRE_MINUTES * 60
       set :public_dir, File.expand_path('public', Dir.pwd)
@@ -51,6 +51,7 @@ module CxbRank
       ActiveRecord::Base.establish_connection(settings.environment)
       CxbRank::Music.mode = settings.site_mode
       CxbRank::Skill.mode = settings.site_mode
+      CxbRank::User.mode = settings.site_mode
     end
 
     helpers Sinatra::Jsonp
@@ -134,6 +135,7 @@ module CxbRank
     get CxbRank::USER_ADD_URI do
       settings.views << '../comrank/views/user_edit'
       session[:temp_user] ||= CxbRank::User.new
+      session[:user_added] = false
       haml :user_add, :layout => true
     end
 
@@ -150,9 +152,9 @@ module CxbRank
     end
 
     put CxbRank::USER_ADD_URI do
-      if params['y'].present?
+      if params[:y].present?
         settings.views << '../comrank/views/user_edit'
-        if session[:user_id].present?
+        if session[:user_added]
           user = CxbRank::User.find_by_id(session[:user_id])
           haml :user_add_result, :layout => true, :locals => {:user => user}
         else
@@ -163,6 +165,7 @@ module CxbRank
             session[:temp_user].save!
             user = session[:temp_user]
             session[:user_id] = user.id
+            session[:user_added] = true
             session[:temp_user] = nil
             haml :user_add_result, :layout => true, :locals => {:user => user}
           rescue
@@ -277,7 +280,7 @@ module CxbRank
 
     put CxbRank::SKILL_ITEM_EDIT_URI do
       private_page do |user|
-        if params['y'].present?
+        if params[:y].present?
 #          begin
             session[:temp_skill].save!
             user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
@@ -335,6 +338,7 @@ module CxbRank
         if session[:temp_user].password_confirmation.blank?
           session[:temp_user].password_confirmation = user.password
         end
+        session[:temp_user].point_direct = session[:temp_user].point_changed?
         unless session[:temp_user].valid?
           haml :error, :layout => true,
             :locals => {:errors => session[:temp_user].errors, :back_uri => request.path_info}
@@ -413,6 +417,14 @@ module CxbRank
       last_modified skill_set.last_modified
       haml :skill_list, :layout => true, :locals => {
         :skill_set => skill_set, :edit => false, :ignore_locked => false}
+    end
+
+    get CxbRank::EVENT_SHEET_URI, "#{CxbRank::EVENT_SHEET_URI}/" do
+      settings.views << '../comrank/views/event_list'
+      events = CxbRank::Event.find(:all).sort
+      last_modified CxbRank::Event.last_modified
+      fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_URI]}一覧"
+      haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
     end
 
     get "#{CxbRank::EVENT_SHEET_URI}/:event_text_id", "#{CxbRank::EVENT_SHEET_URI}/:event_text_id/:section" do

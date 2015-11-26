@@ -1,4 +1,3 @@
-require 'bigdecimal'
 require 'rubygems'
 require 'active_record'
 require 'cxbrank/const'
@@ -97,7 +96,6 @@ module CxbRank
     end
 
     def self.create_by_request(user, music, body)
-      raise "user_id: #{user.id}, music_id: #{music.id}"
       skill = self.find(:first, :conditions => {:user_id => user.id, :music_id => music.id})
       unless skill
         skill = Skill.new
@@ -189,32 +187,32 @@ module CxbRank
       unless survival?(diff) or ultimate?(diff)
         return nil
       else
-        if survival?(diff)
-          max_point = music.level(diff) * BONUS_RATE_SURVIVAL
-        elsif ultimate?(diff)
-          max_point = music.level(diff) * BONUS_RATE_ULTIMATE
-        end
-        return [((point(diff) || 0.0) / max_point * 100).ceil, rate(diff)].min
+        max_point = music.level(diff) * gauge_bonus_rate(diff)
+        return [((point(diff) || 0.0) / max_point).to_d.ceil(2) * 100, rate(diff)].min
       end
     end
 
     def calc!
-      send("best_diff=", nil)
-      send("best_point=", 0.0)
-      send("iglock_best_diff=", nil)
-      send("iglock_best_point=", 0.0)
+      send('best_diff=', nil)
+      send('best_point=', 0.0)
+      send('iglock_best_diff=', nil)
+      send('iglock_best_point=', 0.0)
+      @point_filled = {}
+      @rate_filled = {}
 
       music_diffs.keys.each do |diff|
         next unless music.exist?(diff)
+        @point_filled[diff] = false
+        @rate_filled[diff] = false
         if point(diff).blank? and rate(diff)
-          temp_point = music.level(diff) * ((rate(diff) ? rate(diff).to_i : 0) / 100.0)
-          if survival?(diff)
-            temp_point = temp_point * BONUS_RATE_SURVIVAL
-          elsif ultimate?(diff)
-            temp_point = temp_point * BONUS_RATE_ULTIMATE
-          end
-          temp_point = BigDecimal.new((temp_point * 100).to_s).truncate.to_f / 100.0
-          send("#{MUSIC_DIFF_PREFIXES[diff]}_point=", temp_point)
+          calc_point = (music.level(diff) * (rate(diff).to_i / 100.0) * gauge_bonus_rate(diff)).to_d.floor(2)
+          send("#{MUSIC_DIFF_PREFIXES[diff]}_point=", calc_point)
+          @point_filled[diff] = true
+        elsif rate(diff).blank? and point(diff)
+          calc_rate = ((point(diff) / gauge_bonus_rate(diff)).to_d.ceil(2) / music.level(diff)).to_d.floor(2) * 100
+          send("#{MUSIC_DIFF_PREFIXES[diff]}_rate=", calc_rate)
+          send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_f=", false)
+          @rate_filled[diff] = true
         end
         if rate(diff).blank?
           send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_f=", nil)
@@ -223,12 +221,12 @@ module CxbRank
         end
 
         if (iglock_best_point || 0.0) < (point(diff) || 0.0)
-          send("iglock_best_diff=", diff)
-          send("iglock_best_point=", point(diff))
+          send('iglock_best_diff=', diff)
+          send('iglock_best_point=', point(diff))
         end
         if (best_point || 0.0) < (point(diff) || 0.0) and !locked(diff)
-          send("best_diff=", diff)
-          send("best_point=", point(diff))
+          send('best_diff=', diff)
+          send('best_point=', point(diff))
         end
       end
     end
@@ -242,7 +240,7 @@ module CxbRank
     end
 
     def target_diff
-      return @@ignore_locked ? iglock_best_diff : (best_diff == iglock_best_diff ? best_diff : iglock_best_diff)
+      return @@ignore_locked ? iglock_best_diff : (music_diffs.keys.include?(best_diff) ? best_diff : iglock_best_diff)
     end
 
     def target_point
@@ -262,10 +260,12 @@ module CxbRank
     end
 
     def point_to_input_value(diff)
-      if point_before_type_cast(diff).instance_of?(String)
+      if @point_filled and @point_filled[diff]
+        return ''
+      elsif point_before_type_cast(diff).instance_of?(String)
         return point_before_type_cast(diff)
       else
-        return (point(diff) ? point_to_s(diff) : '')
+        return (point(diff) ? point_to_s(diff, '') : '')
       end
     end
 
@@ -282,10 +282,12 @@ module CxbRank
     end
 
     def rate_to_input_value(diff)
-      if rate_before_type_cast(diff).instance_of?(String)
+      if @rate_filled and @rate_filled[diff]
+        return ''
+      elsif rate_before_type_cast(diff).instance_of?(String)
         return rate_before_type_cast(diff)
       else
-        return (rate(diff) ? rate_to_s(diff).gsub(/%/, '') : '')
+        return (rate(diff) ? rate_to_s(diff, '').gsub(/%/, '') : '')
       end
     end
 
@@ -302,10 +304,16 @@ module CxbRank
       end
     end
 
+    def gauge_bonus_rate(diff)
+      return (survival?(diff) ? BONUS_RATE_SURVIVAL : (ultimate?(diff) ? BONUS_RATE_ULTIMATE : 1.0))
+    end
+
     def <=>(other)
       if @@ignore_locked
         if (iglock_best_point || 0.0) != (other.iglock_best_point || 0.0)
           return -((iglock_best_point || 0.0) <=> (other.iglock_best_point || 0.0))
+        elsif target_diff != other.target_diff
+          return target_diff <=> other.target_diff
         else
           return music.sort_key <=> other.music.sort_key
         end
@@ -314,6 +322,8 @@ module CxbRank
           return -((best_point || 0.0) <=> (other.best_point || 0.0))
         elsif (iglock_best_point || 0.0) != (other.iglock_best_point || 0.0)
           return -((iglock_best_point || 0.0) <=> (other.iglock_best_point || 0.0))
+        elsif target_diff != other.target_diff
+          return target_diff <=> other.target_diff
         else
           return music.sort_key <=> other.music.sort_key
         end
@@ -344,7 +354,7 @@ module CxbRank
       if point.blank?
         return true
       end
-      unless point >= 0.0 and point <= course.level
+      if course.level > 0 and (point < 0.0 or point > course.level)
         errors.add(:point, ERRORS[ERROR_RP_OUT_OF_RANGE])
         return false
       else
@@ -416,13 +426,17 @@ module CxbRank
     end
 
     def calc!
+      @point_filled = false
+      @rate_filled = false
       if played?
-        if point.nil? and rate
-          temp_point = course.level * ((rate || 0.0) / 100.0)
-          temp_point = BigDecimal.new((temp_point * 100).to_s).truncate.to_f / 100.0
-          send("point=".to_sym, temp_point)
-        elsif point and rate.nil?
-          send("rate=".to_sym, (point / course.level * 1000).truncate.to_f / 10.0)
+        if point.blank? and rate and (course.level > 0)
+          calc_point = (course.level * (rate / 100.0)).to_d.floor(2)
+          send('point=', calc_point)
+          @point_filled = true
+        elsif point and rate.blank? and (course.level > 0)
+          calc_rate = (point / course.level).to_d.floor(3) * 100
+          send('rate=', calc_rate)
+          @rate_filled = true
         end
       end
     end
@@ -444,7 +458,9 @@ module CxbRank
     end
 
     def point_to_input_value
-      if point_before_type_cast.instance_of?(String)
+      if @point_filled
+        return ''
+      elsif point_before_type_cast.instance_of?(String)
         return point_before_type_cast
       else
         return (point ? point_to_s : '')
@@ -452,11 +468,13 @@ module CxbRank
     end
 
     def rate_to_s(nlv='&ndash;')
-      return (played? ? sprintf('%.1f%%', rate) : nlv)
+      return ((played? and rate) ? sprintf('%.1f%%', rate) : nlv)
     end
 
     def rate_to_input_value()
-      if rate_before_type_cast.instance_of?(String)
+      if @rate_filled
+        return ''
+      elsif rate_before_type_cast.instance_of?(String)
         return rate_before_type_cast
       else
         return (rate ? rate_to_s.gsub(/%/, '') : '')
@@ -496,50 +514,7 @@ module CxbRank
         skill_set[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
         skill_set[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
       end
-
-      skill_set.each do |type, hash|
-        next if type == MUSIC_TYPE_REV_BONUS
-        target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
-        hash[:skills][0...target_count].each do |skill|
-          next if (skill.target_point || 0.0) == 0.0
-          hash[:point] += skill.target_point
-          skill.rp_target = true
-        end
-      end
-      if mode == MODE_REV
-        music_skills.each do |skill|
-          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL)
-            skill_set[MUSIC_TYPE_REV_BONUS][:skills] << skill
-          end
-        end
-        skill_set[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
-          if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
-            (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
-          else
-            -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
-          end
-        end
-        if user.point_direct
-          skill_set[MUSIC_TYPE_REV_BONUS][:point] =
-            user.point - skill_set[MUSIC_TYPE_REV_SINGLE][:point] - skill_set[MUSIC_TYPE_REV_COURSE][:point]
-        else
-          skill_set[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
-            if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
-              skill_set[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
-            end
-          end
-          skill_set[MUSIC_TYPE_REV_BONUS][:point] = (skill_set[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
-        end
-      end
-      skill_set.last_modified = [Skill.last_modified(user), CourseSkill.last_modified(user)].compact.max
-      if user.point_direct
-        skill_set.total_point = user.point
-      else
-        skill_set.total_point = 0.0
-        skill_set.each_value do |hash|
-          skill_set.total_point += hash[:point]
-        end
-      end
+      skill_set.calc!(mode, user, music_skills)
 
       return skill_set
     end
@@ -591,8 +566,21 @@ module CxbRank
         skill_set[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
         skill_set[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
       end
+      skill_set.calc!(mode, nil, music_skills)
 
       skill_set.each do |type, hash|
+        next if type == MUSIC_TYPE_REV_BONUS
+        target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
+        hash[:skills].delete_if do |skill|
+          !skill.rp_target? and hash[:skills][target_count-1].best_point != skill.best_point
+        end
+      end
+
+      return skill_set
+    end
+
+    def calc!(mode, user, music_skills)
+      self.each do |type, hash|
         next if type == MUSIC_TYPE_REV_BONUS
         target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
         hash[:skills][0...target_count].each do |skill|
@@ -600,46 +588,42 @@ module CxbRank
           hash[:point] += skill.target_point
           skill.rp_target = true
         end
-        hash[:skills].delete_if do |skill|
-          !skill.rp_target? and hash[:skills][target_count-1].best_point != skill.best_point
-        end
       end
       if mode == MODE_REV
+        min_target = self[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
         music_skills.each do |skill|
-          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL)
-            skill_set[MUSIC_TYPE_REV_BONUS][:skills] << skill
+          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
+            self[MUSIC_TYPE_REV_BONUS][:skills] << skill
           end
         end
-        skill_set[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
+        self[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
           if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
             (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
           else
             -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
           end
         end
-#        if user.point_direct
-#          skill_set[MUSIC_TYPE_REV_BONUS][:point] =
-#            user.point - skill_set[MUSIC_TYPE_REV_SINGLE][:point] - skill_set[MUSIC_TYPE_REV_COURSE][:point]
-#        else
-          skill_set[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
+        if user and user.point_direct
+          self[MUSIC_TYPE_REV_BONUS][:point] =
+            user.point - self[MUSIC_TYPE_REV_SINGLE][:point] - self[MUSIC_TYPE_REV_COURSE][:point]
+        else
+          self[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
             if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
-              skill_set[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+              self[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
             end
           end
-          skill_set[MUSIC_TYPE_REV_BONUS][:point] = (skill_set[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
-#        end
-      end
-      skill_set.last_modified = [Music.last_modified, Course.last_modified].compact.max
-#      if user.point_direct
-#        skill_set.total_point = user.point
-#      else
-        skill_set.total_point = 0.0
-        skill_set.each_value do |hash|
-          skill_set.total_point += hash[:point]
+          self[MUSIC_TYPE_REV_BONUS][:point] = (self[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
         end
-#      end
-
-      return skill_set
+      end
+      @last_modified = [Music.last_modified, Course.last_modified].compact.max
+      if user and user.point_direct
+        @total_point = user.point
+      else
+        @total_point = 0.0
+        self.each_value do |hash|
+          @total_point += hash[:point]
+        end
+      end
     end
   end
 

@@ -9,6 +9,7 @@ require 'sinatra/activerecord/rake'
 require 'cxbrank/const'
 require 'cxbrank/music'
 require 'cxbrank/course'
+require 'cxbrank/event'
 
 env = (ENV['ENV'] ? ENV['ENV'].to_sym : :development)
 ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
@@ -50,7 +51,7 @@ namespace :revrank do
         course.lookup_key = row[0]
       end
       course.text_id = row[1]
-      course.name = row[2]
+      course.title = row[2]
       course.sort_key = row[3]
       course.level = row[4]
       course.limited = row[5]
@@ -70,6 +71,32 @@ namespace :revrank do
       cmusic.music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[2]}).id
       cmusic.diff = row[3]
       cmusic.save!
+    end
+
+    CSV.open('./db/master/events.tsv', 'r', "\t") do |row|
+      event = CxbRank::Event.find(:first, :conditions => {:text_id => row[0], :section => row[1]})
+      unless event
+        event = CxbRank::Event.new
+        event.text_id = row[0]
+        event.section = row[1]
+      end
+      event.title = row[2]
+      event.span_s = row[3]
+      event.span_e = row[4]
+      event.save!
+    end
+
+    CSV.open('./db/master/event_musics.tsv', 'r', "\t") do |row|
+      event_id = CxbRank::Event.find(:first, :conditions => {:text_id => row[0], :section => row[1]}).id
+      event_music = CxbRank::EventMusic.find(:first, :conditions => {:event_id => event_id, :seq => row[2]})
+      unless event_music
+        event_music = CxbRank::EventMusic.new
+        event_music.event_id = event_id
+        event_music.seq = row[2]
+      end
+      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[3]}).id
+      event_music.music_id = music_id
+      event_music.save!
     end
   end
 end

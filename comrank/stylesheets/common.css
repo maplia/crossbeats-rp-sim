@@ -124,3 +124,10 @@ strong {
   font-weight: bold;
   font-size: larger;
 }
+
+/********
+  navigation
+ ********/
+p.top_navi {
+  font-size: smaller;
+}

@@ -1,0 +1,18 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+%div.unit
+  %h2 イベント一覧
+  %div.subunit
+    - unless events.present?
+      %p 表示対象のイベントは存在しません
+    - else
+      %table.event_list
+        - unless mobile?
+          %thead
+            %tr
+              %th.name イベント名
+              %th.span 開始時刻
+              %th.span 終了時刻
+        %tbody
+          - events.each do |event|
+            = haml :event, :locals => {:event => event}

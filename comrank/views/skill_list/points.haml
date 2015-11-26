@@ -14,8 +14,8 @@
     %tbody
       - music_types.keys.sort.each do |type|
         %tr
-          %th= music_types[type].sub(/RP対象曲/, '')
-          %td= sprintf('%.2f', skill_set[type][:point])
+          %th.type= music_types[type].sub(/RP対象曲/, '')
+          %td.point= sprintf('%.2f', skill_set[type][:point])
       %tr
-        %th 合計RP
-        %td= sprintf('%.2f', skill_set.total_point)
+        %th.type 合計RP
+        %td.point= sprintf('%.2f', skill_set.total_point)

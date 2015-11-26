@@ -168,11 +168,19 @@ function updateMasterData(sessionKey, type, item) {
 // RPシミュレータからログアウトする
 function logoutFromRpSim(progress, userData) {
   var deferred = $.Deferred();
-  $.postWithRetries(RPSIM_LOGOUT_URI, 'key=' + userData.key, function (response) {
-    if (response.status != 200) {
+  var postData = {
+    'key': userData.key
+  };
+  progress.setMessage1('終了処理をしています。');
+  progress.setMessage2('');
+  $.postWithRetries(RPSIM_LOGOUT_URI, JSON.stringify(postData), function (response) {
+    switch (response.status) {
+    case 401: case 500:
       console.log('ログアウト異常発生');
-    } else {
+      break;
+    default:
       console.log('ログアウト');
+      break;
     }
     deferred.resolve();
   });

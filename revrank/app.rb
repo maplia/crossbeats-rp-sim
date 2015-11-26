@@ -30,6 +30,8 @@ class RevRankApp < CxbRank::AppBase
         elsif (session = CxbRank::BookmarkletSession.find(:first, :conditions => {:key => data[:key]})).nil?
           jsonx :status => 401, :message => 'セッションキーが間違っています'
         else
+          session.edit_count += 1
+          session.save!
           yield session, data
         end
       rescue
@@ -129,11 +131,11 @@ class RevRankApp < CxbRank::AppBase
       jsonx :status => 401, :message => CxbRank::ERRORS[error_no]
     else
       session = CxbRank::BookmarkletSession.new
-      session.user_id = CxbRank::User.find_by_param_id(params[:game_id])
+      session.user = CxbRank::User.find_by_param_id(params[:game_id])
       session.key = SecureRandom.hex(32)
       begin
         session.save!
-        jsonx :status => 200, :key => session.key, :user_id => session.user_id
+        jsonx :status => 200, :key => session.key, :user_id => session.user.user_id
       rescue
         status 500
         jsonx :message => $!.message
@@ -143,7 +145,7 @@ class RevRankApp < CxbRank::AppBase
 
   post '/bml_update_master' do
     bookmarklet_session do |session, data|
-      begin
+#      begin
         case data[:type]
         when 'music'
           item = CxbRank::Music.create_by_request(data[:body])
@@ -154,16 +156,16 @@ class RevRankApp < CxbRank::AppBase
         else
           jsonx :status => 400, :message => "TypeError: #{data[:type]}"
         end
-      rescue
-        status 500
-        jsonx :message => $!.message
-      end
+#      rescue
+#        status 500
+#        jsonx :message => $!.message
+#      end
     end
   end
 
   post '/bml_edit' do
     bookmarklet_session do |session, data|
-      begin
+#      begin
         case data[:type]
         when 'music'
           unless (music = CxbRank::Music.find_by_lookup_key(data[:lookup_key]))
@@ -182,10 +184,10 @@ class RevRankApp < CxbRank::AppBase
         else
           jsonx :status => 400, :message => "TypeError: #{data[:type]}"
         end
-      rescue
-        status 500
-        jsonx :message => $!.message
-      end
+#      rescue
+#        status 500
+#        jsonx :message => $!.message
+#      end
     end
   end
 
@@ -204,7 +206,7 @@ class RevRankApp < CxbRank::AppBase
   end
 
   post '/bml_logout' do
-    bookmarklet_session do |session|
+    bookmarklet_session do |session, data|
       begin
         session.destroy
       rescue

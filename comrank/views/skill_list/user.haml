@@ -17,7 +17,7 @@
               %th クリア表公開URL
               %td.text
                 #{link_to "http://#{request.host}#{user.skill_chart_uri}", user.skill_chart_uri}
-          - if user.game_id.present? and user.game_id_display
+          - if user.game_id.present? and (cxb_mode? or user.game_id_display)
             %tr
               - if cxb_mode?
                 %th C&times;B ID

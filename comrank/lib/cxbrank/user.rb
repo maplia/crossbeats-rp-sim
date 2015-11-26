@@ -13,6 +13,14 @@ module CxbRank
       :is => GAME_ID_FIGURE, :message => ERRORS[ERROR_GAME_ID_LENGTH_IS_INVALID]
     validates_format_of :point_before_type_cast, :allow_nil => true, :allow_blank => true,
       :with => /\A\d+(\.\d+)?\z/, :message => ERRORS[ERROR_REAL_RP_NOT_NUMERIC]
+    validates_presence_of :point, :if => (lambda do |a| @@mode == MODE_REV and a.id end),
+      :message => ERRORS[ERROR_REAL_RP_IS_UNINPUTED]
+
+    @@mode = nil
+
+    def self.mode=(mode)
+      @@mode = mode
+    end
 
     def self.last_modified
       user = self.find(:first, :order => 'updated_at desc')

@@ -1,6 +1,8 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SKILL_LIST_EDIT_URI]}
 %h1
   = page_title
+  - if mobile?
+    %br
   %small= "[#{curr_skill.music.full_title}]"
 - if curr_skill.id
   %p.last_modified= "最終更新時刻: #{curr_skill.updated_at.strftime('%Y-%m-%d %H:%M:%S')}"

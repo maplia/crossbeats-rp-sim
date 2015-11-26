@@ -18,10 +18,10 @@ module CxbRank
 
     def self.create_by_request(body)
       course = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
-      unless item
+      unless course
         course = self.new
         course.text_id = body[:lookup_key]
-        course.name = body[:lookup_key]
+        course.title = body[:lookup_key]
         course.level = 0
         course.sort_key = body[:lookup_key]
         course.lookup_key = body[:lookup_key]
@@ -42,7 +42,7 @@ module CxbRank
     end
 
     def level_to_s
-      return (level == 0) ? '-' : sprintf(LEVEL_FORMATS[MODE_REV], level)
+      return (level == 0) ? '&ndash;' : sprintf(LEVEL_FORMATS[MODE_REV], level)
     end
 
     def notes_to_s

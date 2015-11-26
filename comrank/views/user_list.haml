@@ -10,15 +10,16 @@
         - unless mobile?
           %thead
             %tr
-              %th ユーザーID
-              %th ユーザー名
-              - if cxb_mode?
-                %th CxB ID
-              - else
-                %th REV.ID
-              %th RP
-              %th コメント
-              %th 最終更新時刻
+              %th.user_id ユーザーID
+              %th.name ユーザー名
+              %th.game_id
+                - if cxb_mode?
+                  CxB ID
+                - else
+                  REV.ID
+              %th.point RP
+              %th.comment コメント
+              %th.update 最終更新時刻
         %tbody
           - users.each do |user|
             = haml :user, :locals => {:user => user}

@@ -6,7 +6,7 @@ function initialize() {
 }
 
 function calcScoreRate() {
-  var selected_music = getSelectedMusic($(selected_music_id), data);
+  var selected_music = getSelectedMusic($(select_music_id), data);
   var selected_diff = $('[name="diff"]:checked').val();
   var inputed_score = parseInt($('[name="score"]')[0].value);
   var table = $(rate_table_id);
@@ -23,10 +23,10 @@ function calcScoreRate() {
   table_data.tbody = [];
   if (mobile) {
     table_data.thead[0] = {
-      values: ['レベル', '理論値', 'スコア', '得点率']
+      values: ['Lv', '理論値', 'スコア', '得点率']
     };
     table_data.thead_column_classes = [
-      'level', 'score', 'score', 'rate',
+      '', 'score', 'score', 'rate',
     ];
     table_data.tbody_column_classes = [
       'level', 'score', 'score', 'rate',
@@ -36,7 +36,7 @@ function calcScoreRate() {
       values: ['タイトル', 'レベル', '理論値', 'スコア', '得点率']
     };
     table_data.thead_column_classes = [
-      '', 'level', 'score', 'score', 'rate',
+      '', '', 'score', 'score', 'rate',
     ];
     table_data.tbody_column_classes = [
       '', 'level', 'score', 'score', 'rate',

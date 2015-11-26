@@ -2,23 +2,23 @@
   - unless mobile?
     %thead
       %tr
-        %th レベル
+        %th.course_level レベル
         %th 完奏
         %th.point RP
         - if defined? prev_skill
           %th.point 差異
-        %th RATE
-        %th コンボ
+        %th.rate RATE
+        %th.combo コンボ
   %tbody
     %tr.etc
       - unless mobile?
         %td.level= skill.course.level_to_s
       - if skill.cleared?
-        %td.result ○
+        %td.mark ○
       - elsif skill.played?
-        %td.result ×
+        %td.mark ×
       - else
-        %td.result －
+        %td.mark －
       %td.point= skill.point_to_s
       - if defined? prev_skill
         - difference = (skill.point || 0.0) - (prev_skill.point || 0.0)

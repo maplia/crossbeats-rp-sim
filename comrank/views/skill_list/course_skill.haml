@@ -12,7 +12,7 @@
       - else
         = skill.course.name
     - unless skill.played?
-      %td.none{:colspan => 5} 記録なし
+      %td.status{:colspan => 5} 記録なし
     - else
       %td.mark= skill.course.level_to_s
       - if skill.cleared?

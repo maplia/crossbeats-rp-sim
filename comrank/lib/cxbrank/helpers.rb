@@ -55,6 +55,16 @@ module CxbRank
             end
           end
 
+          def strftime_over24(time, format, dateline)
+            if time.hour >= dateline
+              return time.strftime(format)
+            else
+              yesterday = time - 60*60*24*1
+              yesterday_format = format.gsub(/%H/, (time.hour+24).to_s)
+              return yesterday.strftime(yesterday_format)
+            end
+          end
+
           def find_template(views, name, engine, &block)
             Array(views).each do |v|
               super(v, name, engine, &block)
