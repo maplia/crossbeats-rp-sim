@@ -1,6 +1,6 @@
 @charset 'utf-8';
 
-body {
+body, select option {
   font-family: sans-serif;
 }
 
@@ -54,6 +54,11 @@ td.played, tr.played td {
 td.etc, tr.etc td {
   color: inherit;
   background-color: white;
+}
+
+table.skill_list th.target, table.skill_course_list th.target {
+  color: red !important;
+  background-color: #ffcccc !important;
 }
 
 td.level {

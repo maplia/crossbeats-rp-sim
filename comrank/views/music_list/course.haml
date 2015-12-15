@@ -1,6 +1,6 @@
 - unless mobile?
   %tr
-    %td.text{:rowspan => course.course_musics.size}= course.name
+    %td.text{:rowspan => course.course_musics.size}= course.title
     %td.level{:rowspan => course.course_musics.size}= course.level_to_s
     %td.notes{:rowspan => course.course_musics.size}= course.notes_to_s
     = haml :course_music, :locals => {:course_music => course.course_musics.sort[0]}
@@ -9,7 +9,7 @@
       = haml :course_music, :locals => {:course_music => course_music}
 - else
   %tr
-    %td.text{:colspan => 2}= course.name
+    %td.text{:colspan => 2}= course.title
   %tr
     %td.level= course.level_to_s
     %td.notes= course.notes_to_s

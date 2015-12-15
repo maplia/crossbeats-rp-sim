@@ -19,9 +19,8 @@ h2 {
 p, ul, ol, li, dl, table {
   margin: 2px 0px;
 }
-
-ul li ul li {
-  margin: 0 0 0 1.5em;
+ul, ol {
+    padding: 0 0 0 1.5em;
 }
 
 dt {
@@ -90,28 +89,25 @@ table.skill_summary td {
   background-color: black;
   font-weight: bold;
 }
-table.skill_list th.number {
+table.skill_list th.number, table.skill_course_list th.number {
   width: 2.5em;
 }
-table.skill_list th.target {
-  color: red !important;
-  background-color: #ffcccc !important;
-  border-color: inherit !important;
-}
 
-table.skill_list th.title {
+table.skill_list th.title, table.skill_course_list th.title {
   width: 26.0em;
 }
 table.skill_list th.level {
   width: 6.0em;
 }
-table.skill_list th.point {
+table.skill_list th.point, table.skill_course_list th.point {
   width: 4.0em;
 }
-table.skill_list th.rate, table.skill_list th.u_rate {
+table.skill_list th.rate, table.skill_list th.u_rate,
+table.skill_course_list th.rate {
   width: 4.0em;
 }
-table.skill_list th.rank, table.skill_list th.combo {
+table.skill_list th.rank,
+table.skill_list th.combo, table.skill_course_list th.combo {
   width: 3.5em;
 }
 
@@ -264,6 +260,9 @@ div.sidebar ul {
 }
 div.sidebar li {
   list-style-type: none;
+}
+div.sidebar ul li ul li {
+    padding: 0 0 0 1.5em;
 }
 
 div.main {

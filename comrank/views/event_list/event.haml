@@ -7,8 +7,11 @@
     %td.span= strftime_over24(event.span_e, '%Y/%m/%d %H:%M', 4)
 - else
   %tr
-    %th
+    %td
       %a{:href => "#{CxbRank::EVENT_SHEET_URI}/#{event.text_id}"}
-        event.title
-    %td.span= strftime_over24(event.span_s, '%Y/%m/%d %H:%M', 4)
-    %td.span= strftime_over24(event.span_e, '%Y/%m/%d %H:%M', 4)
+        = event.title
+  %tr
+    %td.span
+      = strftime_over24(event.span_s, '%Y/%m/%d %H:%M', 4)
+      ～
+      = strftime_over24(event.span_e, '%Y/%m/%d %H:%M', 4)

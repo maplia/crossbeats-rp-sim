@@ -3,7 +3,7 @@
     %th= user.user_id
     %td.text
       %a{:href => user.skill_view_uri}
-        &= truncate(user.name, :length => 15)
+        &= truncate(user.name, :length => 25)
     %td.game_id
       - if user.game_id.present? and (cxb_mode? or user.game_id_display)
         = user.game_id

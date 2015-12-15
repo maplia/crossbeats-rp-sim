@@ -1,0 +1,24 @@
+- musics = CxbRank::Music.find(:all, :conditions => ['created_at >= ?', Time.now-28*60*60*24], :order => 'created_at desc')
+- if musics.blank?
+  %p 最近登録された曲はありません
+- else
+  - unless mobile?
+    %table.music_list
+      %thead
+        %tr
+          %th 追加日
+          %th タイトル
+          - music_diffs.keys.sort.each do |diff|
+            %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music_diffs[diff]
+      %tbody
+        - musics.each do |music|
+          %tr
+            %th= music.created_at.strftime('%m/%d')
+            %td.title
+              = haml :music_title, :locals => {:music => music}
+            - music_diffs.keys.sort.each do |diff|
+              %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music.level_to_s(diff)
+  - else
+    %ul
+      - musics.each do |music|
+        %li= "#{music.full_title} (#{music.created_at.strftime('%m/%d')})"

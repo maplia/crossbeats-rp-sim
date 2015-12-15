@@ -524,7 +524,7 @@ module CxbRank
       Skill.ignore_locked = options[:ignore_locked]
 
       music_skills = []
-      musics = Music.find(:all)
+      musics = Music.find(:all, :conditions => {:display => true}).sort
       musics.each do |music|
         max_diff = (music.exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS)
         skill = Skill.new
@@ -542,7 +542,7 @@ module CxbRank
       if mode == MODE_CXB
         skill_set[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
         skill_set[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
-        music_skills.each_with_index do |skill, i|
+        music_skills.each do |skill|
           if skill.music.monthly?
             skill_set[MUSIC_TYPE_SPECIAL][:skills] << skill
           else

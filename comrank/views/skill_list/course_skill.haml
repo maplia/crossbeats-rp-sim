@@ -8,9 +8,9 @@
     %td.title.text
       - if edit
         %a{:href => skill.edit_uri}
-          = skill.course.name
+          = skill.course.title
       - else
-        = skill.course.name
+        = skill.course.title
     - unless skill.played?
       %td.status{:colspan => 5} 記録なし
     - else
@@ -33,9 +33,9 @@
     %td.title{:colspan => 4}
       - if edit
         %a{:href => skill.edit_uri}
-          = skill.course.name
+          = skill.course.title
       - else
-        = skill.course.name
+        = skill.course.title
   %tr{:class => css_class}
     - unless skill.played?
       %td.status{:colspan => 5} 記録なし

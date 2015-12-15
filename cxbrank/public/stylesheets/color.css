@@ -26,9 +26,10 @@ a:hover {
 table {
   background-color: white;
 }
-th, table.skill_list th.number {
+th, td, table.skill_list th.number, table.skill_summary td {
   color: inherit;
   background-color: #ccffcc;
+  border-color: #005500 !important;
 }
 
 div.sidebar {

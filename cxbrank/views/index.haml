@@ -28,6 +28,10 @@
           %p こういう表が作れるということで#{link_to '作者のもの', '/view/00002'}をさらしてみます。
           %p 登録はご自由にどうぞ。
   %div.unit
+    %h2 最近の登録曲
+    %div.subunit
+      = haml :new_music
+  %div.unit
     %h2 最新の運営情報
     %div.subunit
       = yield

@@ -183,7 +183,7 @@ module CxbRank
     get CxbRank::USER_LIST_URI do
       settings.views << '../comrank/views/user_list'
       last_modified CxbRank::User.last_modified
-      users = CxbRank::User.find(:all, :conditions => 'display = 1 and point_updated_at is not null').sort
+      users = CxbRank::User.find(:all, :conditions => 'display = 1 and point_updated_at is not null').sort.reverse
       haml :user_list, :layout => true, :locals => {:users => users}
     end
 
