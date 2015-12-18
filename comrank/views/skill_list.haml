@@ -12,5 +12,6 @@
   - if type == CxbRank::MUSIC_TYPE_REV_COURSE
     = haml :course_skills, :locals => {:skills => skill_set[type][:skills], :edit => edit, :type_name => music_types[type]}
   - else
+    - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED and skill_set[type][:skills].empty?
     = haml :music_skills, :locals => {:skills => skill_set[type][:skills], :edit => edit,
       :ignore_locked => ignore_locked, :type_name => music_types[type], :bonus => (type == CxbRank::MUSIC_TYPE_REV_BONUS)}

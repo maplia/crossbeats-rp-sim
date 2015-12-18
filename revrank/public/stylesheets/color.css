@@ -31,6 +31,9 @@ th, table.skill_list th.number, table.skill_course_list th.number, table.skill_s
   background-color: #f0dfeb;
   border-color: #1c2c52 !important;
 }
+td {
+  border-color: #1c2c52 !important;
+}
 
 div.sidebar {
   background-color: white;

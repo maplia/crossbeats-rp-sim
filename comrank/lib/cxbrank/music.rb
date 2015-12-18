@@ -107,10 +107,16 @@ module CxbRank
         :title => title, :subtitle => subtitle, :full_title => full_title,
         :monthly => monthly?, :limited => limited,
       }
-      music_diffs.keys.each do |diff|
-        hash[MUSIC_DIFF_PREFIXES[diff]] = {
-          :level => level(diff), :notes => notes(diff),
-        }
+      MUSIC_DIFF_PREFIXES.keys.each do |diff|
+        if exist?(diff)
+          hash[MUSIC_DIFF_PREFIXES[diff]] = {
+            :level => level(diff), :notes => notes(diff),
+          }
+        else
+          hash[MUSIC_DIFF_PREFIXES[diff]] = {
+            :level => nil, :notes => nil,
+          }
+        end
       end
 
       return hash

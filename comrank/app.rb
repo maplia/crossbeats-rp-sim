@@ -286,7 +286,7 @@ module CxbRank
             user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
             user.point_direct = false
             user.point_updated_at = Time.now
-            user.save!
+            user.save false
             session[:music_text_id] = nil
             redirect CxbRank::SKILL_LIST_EDIT_URI
 #          rescue
