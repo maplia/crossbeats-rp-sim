@@ -9,6 +9,8 @@ class CreateCourses < ActiveRecord::Migration
       t.boolean :limited, :default => false
       t.boolean :hidden, :default => false
       t.boolean :display, :default => true
+      t.date :added_at, :default => '2015-07-23'
+      t.string :event
       t.timestamps
     end
     change_table :courses do |t|

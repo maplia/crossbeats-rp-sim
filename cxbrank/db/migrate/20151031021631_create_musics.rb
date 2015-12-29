@@ -6,7 +6,7 @@ class CreateMusics < ActiveRecord::Migration
     music_diffs = CxbRank::MUSIC_DIFFS[CxbRank::MODE_REV]
     create_table :musics do |t|
       t.string :text_id, :null => false
-      t.integer :number, :null => false, :default => 0
+      t.integer :number, :default => 0
       t.string :title, :null => false
       t.string :subtitle
       t.string :lookup_key, :null => false
@@ -15,9 +15,11 @@ class CreateMusics < ActiveRecord::Migration
         t.float "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_level".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_notes".to_sym
       end
-      t.boolean :limited, :null => false, :default => false
-      t.boolean :hidden, :null => false, :default => false
-      t.boolean :display, :null => false, :default => true
+      t.boolean :limited, :default => false
+      t.boolean :hidden, :default => false
+      t.boolean :display, :default => true
+      t.date :added_at, :default => '2013-12-02'
+      t.string :event
       t.timestamps
     end
     change_table :musics do |t|

@@ -134,6 +134,9 @@ module CxbRank
   class Monthly < ActiveRecord::Base
   end
 
+  class LegacyChart < ActiveRecord::Base
+  end
+
   class MusicSet < Hash
     attr_accessor :last_modified
 

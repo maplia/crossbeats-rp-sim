@@ -15,9 +15,11 @@ class CreateMusics < ActiveRecord::Migration
         t.float "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_level".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_notes".to_sym
       end
-      t.boolean :limited, :null => false, :default => false
-      t.boolean :hidden, :null => false, :default => false
-      t.boolean :display, :null => false, :default => true
+      t.boolean :limited, :default => false
+      t.boolean :hidden, :default => false
+      t.boolean :display, :default => true
+      t.date :added_at, :default => '2015-07-23'
+      t.string :event
       t.timestamps
     end
     change_table :musics do |t|

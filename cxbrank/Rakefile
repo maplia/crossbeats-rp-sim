@@ -39,8 +39,10 @@ namespace :cxbrank do
       music.unl_level = row[13]
       music.unl_notes = row[14]
       music.limited = row[15]
-      music.hidden = 0
+      music.hidden = row[16]
       music.display = row[17]
+      music.added_at = row[18]
+      music.event = row[19]
       music.save!
     end
 
@@ -54,6 +56,28 @@ namespace :cxbrank do
       end
       monthly.span_e = row[2]
       monthly.save!
+    end
+
+    CSV.open('./db/master/legacy_charts.tsv', 'r', "\t") do |row|
+      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[0]}).id
+      chart = CxbRank::LegacyChart.find(:first, :conditions => {:music_id => music_id, :span_s => row[1]})
+      unless chart
+        chart = CxbRank::LegacyChart.new
+        chart.music_id = music_id
+        chart.span_s = row[1]
+      end
+      chart.span_e = row[2]
+      chart.esy_level = row[3]
+      chart.esy_notes = row[4]
+      chart.std_level = row[5]
+      chart.std_notes = row[6]
+      chart.hrd_level = row[7]
+      chart.hrd_notes = row[8]
+      chart.mas_level = row[9]
+      chart.mas_notes = row[10]
+      chart.unl_level = row[11]
+      chart.unl_notes = row[12]
+      chart.save!
     end
 
     CSV.open('./db/master/events.tsv', 'r', "\t") do |row|
@@ -81,5 +105,13 @@ namespace :cxbrank do
       event_music.music_id = music_id
       event_music.save!
     end
+  end
+
+  desc 'make insert sql'
+  task :make_insert_sql do
+  end
+
+  desc 'make update sql'
+  task :make_update_sql do
   end
 end
