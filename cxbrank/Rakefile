@@ -10,6 +10,20 @@ require 'cxbrank/const'
 require 'cxbrank/music'
 require 'cxbrank/event'
 
+def quote(value)
+  if value.nil?
+    return 'null'
+  elsif value.is_a?(String)
+    return "'#{value.gsub(/'/, "''")}'"
+  elsif value.is_a?(Date)
+    return "'#{value.strftime('%Y-%m-%d')}'"
+  elsif value.is_a?(Time)
+    return "'#{value.strftime('%Y-%m-%d %H:%M:%S')}'"
+  else
+    return value.to_s
+  end
+end
+
 env = (ENV['ENV'] ? ENV['ENV'].to_sym : :development)
 ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
 ActiveRecord::Base.establish_connection(env)
@@ -38,10 +52,10 @@ namespace :cxbrank do
       music.mas_notes = row[12]
       music.unl_level = row[13]
       music.unl_notes = row[14]
-      music.limited = row[15]
-      music.hidden = row[16]
-      music.display = row[17]
-      music.added_at = row[18]
+      music.limited = row[15] if row[15].present?
+      music.hidden = row[16] if row[16].present?
+      music.display = row[17] if row[17].present?
+      music.added_at = row[18] if row[18].present?
       music.event = row[19]
       music.save!
     end
@@ -107,11 +121,120 @@ namespace :cxbrank do
     end
   end
 
-  desc 'make insert sql'
-  task :make_insert_sql do
-  end
+  desc 'make upsert sql'
+  task :make_upsert_sql do
+    output = File.open('upsert.sql', 'w')
+    output.puts '-- musics'
+    CSV.open('./db/master/musics.tsv', 'r', "\t") do |row|
+      music = CxbRank::Music.new
+      music.lookup_key = row[0]
+      music.text_id = row[0]
+      music.number = row[1]
+      music.title = row[2]
+      music.subtitle = row[3]
+      music.sort_key = row[4]
+      music.esy_level = row[5]
+      music.esy_notes = row[6]
+      music.std_level = row[7]
+      music.std_notes = row[8]
+      music.hrd_level = row[9]
+      music.hrd_notes = row[10]
+      music.mas_level = row[11]
+      music.mas_notes = row[12]
+      music.unl_level = row[13]
+      music.unl_notes = row[14]
+      music.limited = row[15] if row[15].present?
+      music.hidden = row[16] if row[16].present?
+      music.display = row[17] if row[17].present?
+      music.added_at = row[18] if row[18].present?
+      music.event = row[19]
+      sql = <<EOS
+        insert into musics (lookup_key, text_id, number,
+          title, subtitle, sort_key,
+          esy_level, esy_notes, std_level, std_notes, hrd_level, hrd_notes,
+          mas_level, mas_notes, unl_level, unl_notes,
+          limited, hidden, display, added_at, event, created_at, updated_at)
+        values (#{quote(music.lookup_key)}, #{quote(music.text_id)}, #{quote(music.number)},
+          #{quote(music.title)}, #{quote(music.subtitle)}, #{quote(music.sort_key)},
+          #{quote(music.esy_level)}, #{quote(music.esy_notes)},
+          #{quote(music.std_level)}, #{quote(music.std_notes)},
+          #{quote(music.hrd_level)}, #{quote(music.hrd_notes)},
+          #{quote(music.mas_level)}, #{quote(music.mas_notes)},
+          #{quote(music.unl_level)}, #{quote(music.unl_notes)},
+          #{quote(music.limited)}, #{quote(music.hidden)}, #{quote(music.display)},
+          #{quote(music.added_at)}, #{quote(music.event)}, now(), now())
+        on duplicate key update
+          text_id = #{quote(music.text_id)},
+          title = #{quote(music.title)}, subtitle = #{quote(music.subtitle)},
+          sort_key = #{quote(music.sort_key)},
+          esy_level = #{quote(music.esy_level)}, esy_notes = #{quote(music.esy_notes)},
+          std_level = #{quote(music.std_level)}, std_notes = #{quote(music.std_notes)},
+          hrd_level = #{quote(music.hrd_level)}, hrd_notes = #{quote(music.hrd_notes)},
+          mas_level = #{quote(music.mas_level)}, mas_notes = #{quote(music.mas_notes)},
+          unl_level = #{quote(music.unl_level)}, unl_notes = #{quote(music.unl_notes)},
+          limited = #{quote(music.limited)}, hidden = #{quote(music.hidden)}, display = #{quote(music.display)},
+          added_at = #{quote(music.added_at)}, event = #{quote(music.event)}, updated_at = now();
+EOS
+      output.puts sql
+    end
 
-  desc 'make update sql'
-  task :make_update_sql do
+    output.puts '-- monthlies'
+    CSV.open('./db/master/monthlies.tsv', 'r', "\t") do |row|
+      text_id = row[0]
+      monthly = CxbRank::Monthly.new
+      monthly.span_s = row[1]
+      monthly.span_e = row[2]
+      sql = <<EOS
+        insert into monthlies (music_id, span_s, span_e, created_at, updated_at)
+        values (
+          (select id from musics where text_id = #{quote(text_id)}),
+          #{quote(monthly.span_s)}, #{quote(monthly.span_e)}, now(), now())
+        on duplicate key update
+          span_e = #{quote(monthly.span_e)}, updated_at = now();
+EOS
+      output.puts sql
+    end
+
+    output.puts '-- legacy_charts'
+    CSV.open('./db/master/legacy_charts.tsv', 'r', "\t") do |row|
+      text_id = row[0]
+      chart = CxbRank::LegacyChart.new
+      chart.span_s = row[1]
+      chart.span_e = row[2]
+      chart.esy_level = row[3]
+      chart.esy_notes = row[4]
+      chart.std_level = row[5]
+      chart.std_notes = row[6]
+      chart.hrd_level = row[7]
+      chart.hrd_notes = row[8]
+      chart.mas_level = row[9]
+      chart.mas_notes = row[10]
+      chart.unl_level = row[11]
+      chart.unl_notes = row[12]
+      sql = <<EOS
+        insert into legacy_charts (music_id, span_s, span_e,
+          esy_level, esy_notes, std_level, std_notes, hrd_level, hrd_notes,
+          mas_level, mas_notes, unl_level, unl_notes,
+          created_at, updated_at)
+        values (
+          (select id from musics where text_id = #{quote(text_id)}),
+          #{quote(chart.span_s)}, #{quote(chart.span_e)},
+          #{quote(chart.esy_level)}, #{quote(chart.esy_notes)},
+          #{quote(chart.std_level)}, #{quote(chart.std_notes)},
+          #{quote(chart.hrd_level)}, #{quote(chart.hrd_notes)},
+          #{quote(chart.mas_level)}, #{quote(chart.mas_notes)},
+          #{quote(chart.unl_level)}, #{quote(chart.unl_notes)}, now(), now())
+        on duplicate key update
+          span_e = #{quote(chart.span_e)},
+          esy_level = #{quote(chart.esy_level)}, esy_notes = #{quote(chart.esy_notes)},
+          std_level = #{quote(chart.std_level)}, std_notes = #{quote(chart.std_notes)},
+          hrd_level = #{quote(chart.hrd_level)}, hrd_notes = #{quote(chart.hrd_notes)},
+          mas_level = #{quote(chart.mas_level)}, mas_notes = #{quote(chart.mas_notes)},
+          unl_level = #{quote(chart.unl_level)}, unl_notes = #{quote(chart.unl_notes)},
+          updated_at = now();
+EOS
+      output.puts sql
+    end
+    output.close
   end
 end

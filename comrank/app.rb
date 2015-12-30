@@ -3,6 +3,7 @@ ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 
 require 'rubygems'
 require 'sinatra/base'
+require 'sinatra/reloader'
 require 'sinatra/config_file'
 require 'sinatra/multi_route'
 require 'sinatra/json'
@@ -23,6 +24,7 @@ require 'cxbrank/event'
 
 module CxbRank
   class AppBase < Sinatra::Base
+    register Sinatra::Reloader
     register Sinatra::ConfigFile
     register Sinatra::CrossOrigin
     register Sinatra::DefaultCharset
@@ -63,6 +65,28 @@ module CxbRank
           jsonp data, callback
         else
           json data
+        end
+      end
+
+      def past_date_page(&block)
+        begin
+          if params[:date].present?
+            date = Date.strptime(params[:date], '%Y%m%d')
+          else
+            date = nil
+          end
+        rescue ArgumentError
+          date_error = true
+        end
+
+        if date_error
+          haml :error, :layout => true,
+            :locals => {:error_no => CxbRank::ERROR_DATE_IS_INVALID, :back_uri => CxbRank::SITE_TOP_URI}
+        elsif date.present? and date < DATE_LOW_LIMITS[settings.site_mode]
+          haml :error, :layout => true,
+            :locals => {:error_no => CxbRank::ERROR_DATE_OUT_OF_RANGE, :back_uri => CxbRank::SITE_TOP_URI}
+        else
+          yield date
         end
       end
 
@@ -125,11 +149,20 @@ module CxbRank
       end
     end
 
-    get CxbRank::MUSIC_LIST_VIEW_URI do
-      settings.views << '../comrank/views/music_list'
-      music_set = CxbRank::MusicSet.load(settings.site_mode)
-      last_modified music_set.last_modified
-      haml :music_list, :layout => true, :locals => {:music_set => music_set}
+    get "#{CxbRank::MUSIC_LIST_VIEW_URI}/?:date?" do
+      past_date_page do |date|
+        settings.views << '../comrank/views/music_list'
+        CxbRank::Music.date = date
+        CxbRank::Course.date = date
+        music_set = CxbRank::MusicSet.load(settings.site_mode)
+        last_modified music_set.last_modified
+        fixed_title = CxbRank::PAGE_TITLES[CxbRank::MUSIC_LIST_VIEW_URI].dup
+        if date.present?
+          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
+        end
+        haml :music_list, :layout => true,
+          :locals => {:music_set => music_set, :date => date, :fixed_title => fixed_title}
+      end
     end
 
     get CxbRank::USER_ADD_URI do
@@ -210,19 +243,19 @@ module CxbRank
       end
     end
 
-    get CxbRank::SKILL_LIST_VIEW_URI, "#{CxbRank::SKILL_LIST_VIEW_URI}/:user_id" do
+    get "#{CxbRank::SKILL_LIST_VIEW_URI}/?:user_id?" do
       public_user_page do |user|
         skill_list_page user, false
       end
     end
 
-    get CxbRank::SKILL_LIST_VIEW_IGLOCK_URI, "#{CxbRank::SKILL_LIST_VIEW_IGLOCK_URI}/:user_id" do
+    get "#{CxbRank::SKILL_LIST_VIEW_IGLOCK_URI}/?:user_id?" do
       public_user_page do |user|
         skill_list_page user, false, :ignore_locked => true
       end
     end
 
-    get CxbRank::CLEAR_LIST_VIEW_URI, "#{CxbRank::CLEAR_LIST_VIEW_URI}/:user_id" do
+    get "#{CxbRank::CLEAR_LIST_VIEW_URI}/?:user_id?" do
       public_user_page do |user|
         settings.views << '../comrank/views/skill_chart'
         settings.views << '../comrank/views/skill_list'
@@ -411,15 +444,25 @@ module CxbRank
       haml :calc_rate, :layout => true, :locals => {:data => music_hashes, :diffs => music_diffs}
     end
 
-    get CxbRank::MAX_SKILL_VIEW_URI do
-      settings.views << '../comrank/views/skill_list'
-      skill_set = CxbRank::SkillSet.max(settings.site_mode)
-      last_modified skill_set.last_modified
-      haml :skill_list, :layout => true, :locals => {
-        :skill_set => skill_set, :edit => false, :ignore_locked => false}
+    get "#{CxbRank::MAX_SKILL_VIEW_URI}/?:date?" do
+      past_date_page do |date|
+        settings.views << '../comrank/views/skill_list'
+        CxbRank::Music.date = date
+        CxbRank::Course.date = date
+        CxbRank::Skill.date = date
+        skill_set = CxbRank::SkillSet.max(settings.site_mode)
+        last_modified skill_set.last_modified
+        fixed_title = CxbRank::PAGE_TITLES[CxbRank::MAX_SKILL_VIEW_URI].dup
+        if date.present?
+          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
+        end
+        haml :skill_list, :layout => true, :locals => {
+          :skill_set => skill_set, :edit => false,
+          :date => date, :ignore_locked => false, :fixed_title => fixed_title}
+      end
     end
 
-    get CxbRank::EVENT_SHEET_URI, "#{CxbRank::EVENT_SHEET_URI}/" do
+    get "#{CxbRank::EVENT_SHEET_URI}/?" do
       settings.views << '../comrank/views/event_list'
       events = CxbRank::Event.find(:all).sort
       last_modified CxbRank::Event.last_modified

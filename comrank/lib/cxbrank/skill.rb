@@ -47,10 +47,19 @@ module CxbRank
     end
 
     @@mode = nil
+    @@date = nil
     @@ignore_locked = false
 
     def self.mode=(mode)
       @@mode = mode
+    end
+
+    def self.date=(date)
+      @@date = date
+    end
+
+    def self.ultimate_enable?
+      return (@@date || Time.now) >= ULTIMATE_START_DATE[@@mode]
     end
 
     def music_diffs
@@ -555,7 +564,7 @@ module CxbRank
       Skill.ignore_locked = options[:ignore_locked]
 
       music_skills = []
-      musics = Music.find(:all, :conditions => {:display => true}).sort
+      musics = Music.find_actives.sort
       musics.each do |music|
         max_diff = (music.exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS)
         skill = Skill.new
@@ -565,7 +574,9 @@ module CxbRank
         skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate_f=", false)
         skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rank=", SP_RANK_STATUS_SPP)
         skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_combo=", SP_COMBO_STATUS_EX)
-        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
+        if Skill.ultimate_enable?
+          skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
+        end
         skill.calc!
         music_skills << skill
       end

@@ -28,7 +28,7 @@ crossangel	27	Cross+Angel		crossangel			27	178	53	319	67	457			0	0	1	2013/12/20	
 dazzlingseason	28	DAZZLING&#x2661;SEASON		dazzlingseason			43	250	62	412	80	562			0	0	1		
 nextfrontier	29	NEXT FRONTIER		next frontier			48	363	65	513	82	574			0	0	1		
 azitateprologue	30	Azitate	(Prologue Edition)	azitate prologue edition			23	143	52	275	66	377			0	0	1		東京ゲームショウ来場特典
-landingonthemooninstrumental	31	Landing on the moon	(Instrumental Version)	landing on the moon instrumental			20	142	34	217	59	318			0	0	1		東京ゲームショウ試遊特典
+landingonthemooninst	31	Landing on the moon	(Instrumental Version)	landing on the moon instrumental			20	142	34	217	59	318			0	0	1		東京ゲームショウ試遊特典
 dynamitesensation	32	DYNAMITE SENSATION		dynamite sensation			26	176	54	276	68	388			0	0	1		事前登録特典
 diamondskin	33	DIAMOND SKIN		diamond skin			10	74	26	109	33	187			0	0	1		
 everkrack	34	everKrack		everkrack			18	172	29	204	41	357			0	0	1	2013/12/6	GLAYキャンペーン
@@ -42,7 +42,7 @@ remilkyway	41	Re:Milky way		remilky way			13	77	26	192	46	317			0	0	1	2014/1/1	2
 sundrop	42	Sundrop		sundrop			24	126	47	226	75	441			0	0	1	2014/1/1	年越し個人戦
 childrenautomaton	43	チルドレン・オートマトン	～ある歌声の亡霊～	チルドレンオートマトン			24	133	41	181	57	292			0	0	1	2014/1/1	年越し個人戦
 tsukaisutedeadworld	44	ツカイステ・デッドワールド		ツカイステデッドワールド			21	145	44	276	74	504			0	0	1	2014/1/6	年越し個人戦
-dennoshowjohautahimenoyumewomiruka	45	電脳少女は歌姫の夢を見るか?		デンノウショウジョハウタヒメノユメヲミルカ			29	129	57	328	76	488			0	0	1	2014/1/6	年越し個人戦
+dennoshojohautahimenoyumewomiruka	45	電脳少女は歌姫の夢を見るか?		デンノウショウジョハウタヒメノユメヲミルカ			29	129	57	328	76	488			0	0	1	2014/1/6	年越し個人戦
 reseed	46	Reseed		reseed			22	122	47	254	63	450			0	0	1	2014/1/6	年越し個人戦
 romancinggame	47	ロマンシングゲーム		ロマンシングゲーム			28	221	55	379	81	595			0	1	1	2014/1/16	第1回ランダムセレクト祭
 anotherchance	48	Another Chance		another chance			27	132	37	195	73	519			0	1	1	2014/1/16	第1回ランダムセレクト祭
@@ -60,7 +60,7 @@ saishukaistory	59	最終回STORY		サイシュウカイstory			16	125	36	259	56	
 underworld	60	Underworld		underworld			29	145	46	279	69	473			0	0	1	2014/2/17	Next Break Artistコラボ 第1弾
 megitsune	61	メギツネ		メギツネ			15	70	30	157	49	297			0	0	1	2014/2/17	Next Break Artistコラボ 第1弾
 nuera	62	Nu Era		nu era			22	144	43	222	75	447			0	1	1	2014/2/26	第3回ランダムセレクト祭
-somedayinstrumental	63	some day	(instrumental)	some day instrumental			13	107	43	304	77.7	503			0	0	1	2014/2/26	au未来研究所コラボキャンペーン第1弾
+somedayinst	63	some day	(instrumental)	some day instrumental			13	107	43	304	77.7	503			0	0	1	2014/2/26	au未来研究所コラボキャンペーン第1弾
 hagitokonotheme	64	「ハギとこ!」のテーマ		ハギトコノテーマ			12	68	26	141	50	299			0	0	1	2014/3/4	ハギとこ! コラボキャンペーン
 touchofgoldremix	65	Touch Of Gold	(Bongo Mango Remix)	touch of gold remix			17	131	32	202	52	313			0	0	1	2014/3/10	Touch Of Gold フェスティバル
 daisakkaigarakutasympathy	66	大殺界がらくたシンパシー		ダイサッカイガラクタシンパシー			27	157	36	260	66	500			0	0	1	2014/3/19	Whte Day杯
@@ -74,7 +74,7 @@ murasame	73	Murasame		murasame			28	170	41	233	76	478			0	1	1	2014/4/1	第4回�
 sly	74	SLY		sly			11	59	33	230	58	363			0	0	1	2014/4/14	unBORDEレーベル特集 第1弾
 yukifuruyorunikissshite	75	雪降る夜にキスして		ユキフルヨルニキスシテ			13	121	29	198	51	330			0	0	1	2014/4/14	unBORDEレーベル特集 第1弾
 ninjarebangbang	76	にんじゃりばんばん		ニンジャリバンバン			8	62	23	221	41	356			0	0	1	2014/4/14	unBORDEレーベル特集 第1弾
-fasionmonster	77	ファッションモンスター		ファッションモンスター			8	74	24	177	39	290			0	0	1	2014/4/17	なんだこれくしょん特集★
+fashionmonster	77	ファッションモンスター		ファッションモンスター			8	74	24	177	39	290			0	0	1	2014/4/17	なんだこれくしょん特集★
 furisodation	78	ふりそでーしょん		フリソデーション			12	151	24	244	44	360			0	0	1	2014/4/21	なんだこれくしょん特集★
 invaderinvader	79	インベーダーインベーダー		インベーダーインベーダー			10	91	28	226	47	439			0	0	1	2014/4/26	なんだこれくしょん特集★
 mottainightland	80	もったいないとらんど		モッタイナイトランド			10	92	26	151	36	185			0	0	1	2014/5/7	きゃりーぱみゅぱみゅフェスティバル
@@ -161,9 +161,10 @@ startingstation	160	starting station		starting station			17	134	31	232	54	416			
 eschatology	161	エスカトロジィ		エスカトロジィ			36	211	57	299	77	483			0	1	1	2015/10/23	第26回ランダムセレクト祭
 virtualrealitycontroller	162	Virtual Reality Controller		virtual reality controller			15	122	35	286	63	401			0	0	1	2015/11/19	RISING STAR ARTISTS 第1弾
 timelessencode	163	Timeless encode		timeless encode			16	117	33	336	72	616			0	0	1	2015/11/19	RISING STAR ARTISTS 第1弾
-hoshizoratodangan	164	星空と弾丸		ホシゾラトダンガン			28	190	58	359	81	645			0	1	1	2015/11/21	第27回ランダムセレクト祭
+dangantohoshizora	164	弾丸と星空		ダンガントホシゾラ			28	190	58	359	81	645			0	1	1	2015/11/21	第27回ランダムセレクト祭
 sodamachine	165	Soda Machine		soda machine			20	124	40	182	65	344			0	0	1	2015/12/12	ATTACK THE MUSIC特集
 moonrise	166	Moonrise		moonrise			21	185	38	282	58	537			0	0	1	2015/12/12	ATTACK THE MUSIC特集
 ionization	167	IONIZATION		ionization			17	102	34	259	70	467			0	0	1	2015/12/26	クリスマス杯2015
 dreaminofyou	168	DREAMIN' OF YOU	feat. コッテル	dreamin of you			14	93	37	230	65	346			0	0	1	2015/12/26	クリスマス杯2015
 senpaislam	169	Senpai Slam		senpai slam			38	219	54	340	77	564			0	1	1	2015/12/26	第28回ランダムセレクト祭
+kotobuki	170	KOTOBUKI		kotobuki			32	235	71	433	90	686			0	1	1	2015/12/31	第28回ランダムセレクト祭

@@ -7,6 +7,12 @@ module CxbRank
     include Comparable
     has_many :course_musics
 
+    @@date = nil
+
+    def self.date=(date)
+      @@date = date
+    end
+
     def self.last_modified
       course = self.find(:first, :order => 'updated_at desc')
       return (course ? course.updated_at : nil)
@@ -14,6 +20,15 @@ module CxbRank
 
     def self.find_by_param_id(param_id)
       return self.find(:first, :conditions => {:text_id => param_id})
+    end
+
+    def self.find_actives
+      if @@date.present?
+        conditions = ['display = ? and added_at <= ?', true, @@date]
+      else
+        conditions = {:display => true}
+      end
+      return self.find(:all, :conditions => conditions)
     end
 
     def self.create_by_request(body)

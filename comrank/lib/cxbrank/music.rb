@@ -7,12 +7,21 @@ module CxbRank
   class Music < ActiveRecord::Base
     include Comparable
     has_many :monthlies
+    has_many :legacy_charts
 
     @@mode = nil
-    @@ignore_locked = false
+    @@date = nil
+    @@time = nil
 
     def self.mode=(mode)
       @@mode = mode
+    end
+
+    def self.date=(date)
+      if date.present?
+        @@date = date
+        @@time = Time.local(date.year, date.month, date.day, 23, 59, 59)
+      end
     end
 
     def music_diffs
@@ -42,7 +51,6 @@ module CxbRank
       return music
     end
 
-
     def self.last_modified
       music = self.find(:first, :order => 'updated_at desc')
       return (music ? music.updated_at : nil)
@@ -52,15 +60,38 @@ module CxbRank
       return self.find(:first, :conditions => {:text_id => param_id})
     end
 
+    def self.find_actives
+      if @@date.present?
+        conditions = ['display = ? and added_at <= ?', true, @@date]
+      else
+        conditions = {:display => true}
+      end
+      return self.find(:all, :conditions => conditions)
+    end
+
     def full_title
       return subtitle ? "#{title} #{subtitle}" : title
     end
 
     def level(diff)
+      if @@date.present? and legacy_charts.present?
+        legacy_charts.each do |legacy_chart|
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@@date)
+            return legacy_chart.level(diff)
+          end
+        end
+      end
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
     end
 
     def notes(diff)
+      if @@date.present? and legacy_charts.present?
+        legacy_charts.each do |legacy_chart|
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@@date)
+            return legacy_chart.notes(diff)
+          end
+        end
+      end
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
     end
 
@@ -76,9 +107,9 @@ module CxbRank
       return level(diff).present?
     end
 
-    def monthly?(date=Time.now)
+    def monthly?
       monthlies.each do |monthly|
-        if (monthly.span_s..monthly.span_e).include?(date)
+        if (monthly.span_s..monthly.span_e).include?(@@time || Time.now)
           return true
         end
       end
@@ -135,6 +166,13 @@ module CxbRank
   end
 
   class LegacyChart < ActiveRecord::Base
+    def level(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
+    end
+
+    def notes(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
+    end
   end
 
   class MusicSet < Hash
@@ -142,7 +180,7 @@ module CxbRank
 
     def self.load(mode)
       music_set = self.new
-      musics = Music.find(:all, :conditions => {:display => true}).sort
+      musics = Music.find_actives.sort
       if mode == MODE_CXB
         music_set[MUSIC_TYPE_NORMAL] = []
         music_set[MUSIC_TYPE_SPECIAL] = []
@@ -155,7 +193,7 @@ module CxbRank
         end
       else
         music_set[MUSIC_TYPE_REV_SINGLE] = musics
-        courses = Course.find(:all, :conditions => {:display => true}).sort
+        courses = Course.find_actives.sort
         music_set[MUSIC_TYPE_REV_COURSE] = courses
       end
       music_set.last_modified = [Music.last_modified, Course.last_modified].compact.max
