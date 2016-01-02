@@ -6,7 +6,7 @@ class CreateLegacyCharts < ActiveRecord::Migration
       t.date :span_s, :null => false
       t.date :span_e, :null => false
       music_diffs.keys.sort.each do |key|
-        t.float "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_level".to_sym
+        t.decimal "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_level".to_sym, :precision => 3, :scale => 1
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_notes".to_sym
       end
       t.timestamps

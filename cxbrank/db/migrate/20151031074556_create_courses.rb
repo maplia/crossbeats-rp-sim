@@ -5,7 +5,7 @@ class CreateCourses < ActiveRecord::Migration
       t.string :name, :null => false
       t.string :lookup_key, :null => false
       t.string :sort_key, :null => false
-      t.float :level
+      t.decimal :level, :precision => 3, :scale => 1
       t.boolean :limited, :default => false
       t.boolean :hidden, :default => false
       t.boolean :display, :default => true

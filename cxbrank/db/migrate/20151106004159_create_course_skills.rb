@@ -4,8 +4,8 @@ class CreateCourseSkills < ActiveRecord::Migration
       t.references :user, :null => false
       t.references :course, :null => false
       t.integer :stat
-      t.float :point
-      t.float :rate
+      t.decimal :point, :precision => 5, :scale => 2
+      t.decimal :rate, :precision => 5, :scale => 2
       t.boolean :rate_f, :default => true
       t.integer :combo
       t.string :comment

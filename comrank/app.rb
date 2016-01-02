@@ -120,10 +120,13 @@ module CxbRank
       end
 
       def music_skill_edit_page(user, &block)
-        music_text_id = (session[:music_text_id] || params[:music_text_id])
-        if music_text_id.blank?
+        if params[:music_text_id]
+          session[:music_text_id] = params[:music_text_id].dup
+          session[:temp_skill] = nil
+        end
+        if session[:music_text_id].blank?
           haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_MUSIC_IS_UNDECIDED}
-        elsif (music = CxbRank::Music.find_by_param_id(music_text_id)).nil?
+        elsif (music = CxbRank::Music.find_by_param_id(session[:music_text_id])).nil?
           haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_MUSIC_NOT_EXIST}
         else
           curr_skill = CxbRank::Skill.find_by_user_and_music(user, music)
@@ -267,23 +270,13 @@ module CxbRank
       end
     end
 
-    get "#{CxbRank::SKILL_ITEM_EDIT_URI}/:music_text_id" do
+    get "#{CxbRank::SKILL_ITEM_EDIT_URI}/?:music_text_id?" do
       private_page do |user|
         music_skill_edit_page(user) do |curr_skill|
           settings.views << '../comrank/views/music_skill_edit'
-          session[:music_text_id] = params[:music_text_id]
-          session[:temp_skill] = curr_skill.dup
-          fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
-          haml :music_skill_edit, :layout => true, :locals => {
-            :curr_skill => curr_skill, :temp_skill => session[:temp_skill], :fixed_title => fixed_title}
-        end
-      end
-    end
-
-    get CxbRank::SKILL_ITEM_EDIT_URI do
-      private_page do |user|
-        music_skill_edit_page(user) do |curr_skill|
-          settings.views << '../comrank/views/music_skill_edit'
+          unless session[:temp_skill]
+            session[:temp_skill] = curr_skill.dup
+          end
           fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
           haml :music_skill_edit, :layout => true, :locals => {
             :curr_skill => curr_skill, :temp_skill => session[:temp_skill], :fixed_title => fixed_title}
@@ -407,7 +400,7 @@ module CxbRank
     get '/api/music/:param_id' do
       last_modified CxbRank::Music.last_modified
       music = CxbRank::Music.find_by_param_id(params[:param_id])
-      jsonx (music ? music.to_hash : {}), params[:callback]
+      jsonx((music ? music.to_hash : {}), params[:callback])
     end
 
     get '/api/musics' do

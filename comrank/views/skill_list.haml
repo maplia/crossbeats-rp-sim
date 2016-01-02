@@ -1,7 +1,7 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
 %h1
   = page_title
-  - if defined? date
+  - if defined? date and date.present?
     %small= " [#{date.strftime('%Y-%m-%d')}]"
 - if skill_set.last_modified
   %p.last_modified 最終更新時刻: #{skill_set.last_modified.strftime('%Y-%m-%d %H:%M:%S')}

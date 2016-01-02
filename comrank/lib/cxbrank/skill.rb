@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'active_record'
+require 'bigdecimal'
 require 'cxbrank/const'
 require 'cxbrank/user'
 require 'cxbrank/music'
@@ -38,7 +39,7 @@ module CxbRank
         return true
       end
       bonus_rate = (ultimate?(diff) ? BONUS_RATE_ULTIMATE : (survival?(diff) ? BONUS_RATE_SURVIVAL : 1.0))
-      if point(diff) < 0.0 or point(diff) > music.level(diff) * bonus_rate
+      if (point(diff) < 0.0) or (point(diff) > music.level(diff) * bonus_rate)
         errors.add("#{MUSIC_DIFF_PREFIXES[diff]}_point".to_sym, SKILL_ERRORS[diff][ERROR_RP_OUT_OF_RANGE])
         return false
       else
@@ -197,7 +198,7 @@ module CxbRank
         return nil
       else
         max_point = music.level(diff) * gauge_bonus_rate(diff)
-        return [((point(diff) || 0.0) / max_point).to_d.ceil(2) * 100, rate(diff)].min
+        return [((point(diff) || 0.0) / max_point).ceil(2) * 100, rate(diff)].min
       end
     end
 
@@ -210,15 +211,15 @@ module CxbRank
       @rate_filled = {}
 
       music_diffs.keys.each do |diff|
-        next unless music.exist?(diff)
+        next unless music.exist?(diff) and cleared?(diff)
         @point_filled[diff] = false
         @rate_filled[diff] = false
         if point(diff).blank? and rate(diff)
-          calc_point = (music.level(diff) * (rate(diff).to_i / 100.0) * gauge_bonus_rate(diff)).to_d.floor(2)
+          calc_point = (music.level(diff) * BigDecimal.new((rate(diff).to_i / 100.0).to_s) * gauge_bonus_rate(diff)).floor(2)
           send("#{MUSIC_DIFF_PREFIXES[diff]}_point=", calc_point)
           @point_filled[diff] = true
         elsif rate(diff).blank? and point(diff)
-          calc_rate = ((point(diff) / gauge_bonus_rate(diff)).to_d.ceil(2) / music.level(diff)).to_d.floor(2) * 100
+          calc_rate = ((point(diff) / gauge_bonus_rate(diff)).ceil(2) / music.level(diff)).floor(2) * 100.0
           send("#{MUSIC_DIFF_PREFIXES[diff]}_rate=", calc_rate)
           send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_f=", false)
           @rate_filled[diff] = true
@@ -314,7 +315,7 @@ module CxbRank
     end
 
     def gauge_bonus_rate(diff)
-      return (survival?(diff) ? BONUS_RATE_SURVIVAL : (ultimate?(diff) ? BONUS_RATE_ULTIMATE : 1.0))
+      return (survival?(diff) ? BONUS_RATE_SURVIVAL : (ultimate?(diff) ? BONUS_RATE_ULTIMATE : BONUS_RATE_NONE))
     end
 
     def to_hash
@@ -462,11 +463,11 @@ module CxbRank
       @rate_filled = false
       if played?
         if point.blank? and rate and (course.level > 0)
-          calc_point = (course.level * (rate / 100.0)).to_d.floor(2)
+          calc_point = (course.level * (rate / 100.0)).floor(2)
           send('point=', calc_point)
           @point_filled = true
         elsif point and rate.blank? and (course.level > 0)
-          calc_rate = (point / course.level).to_d.floor(3) * 100
+          calc_rate = (point / course.level).floor(3) * 100
           send('rate=', calc_rate)
           @rate_filled = true
         end

@@ -21,8 +21,6 @@ gem 'activerecord-mysql2-adapter'
 gem 'json'
 gem 'rinku'
 
-gem 'rake'
-gem 'sinatra-activerecord'
-gem 'sqlite3'
-
 gem 'haml'
+gem 'chronic'
+

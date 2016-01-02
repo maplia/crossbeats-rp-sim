@@ -1,3 +1,5 @@
+require 'bigdecimal'
+
 module CxbRank
   # エンジン名
   ENGINE_NAME = 'CxB RankPoint Simulator REV.'
@@ -273,9 +275,10 @@ module CxbRank
   ]
 
   # ゲージ・難易度によるボーナスレート
-  BONUS_RATE_SURVIVAL = 1.1
-  BONUS_RATE_ULTIMATE = 1.2
-  BONUS_RATE_UNLIMITED = 0.01
+  BONUS_RATE_SURVIVAL = BigDecimal.new('1.1')
+  BONUS_RATE_ULTIMATE = BigDecimal.new('1.2')
+  BONUS_RATE_NONE = BigDecimal.new('1.0')
+  BONUS_RATE_UNLIMITED = BigDecimal.new('0.01')
 
   # ID桁数
   USER_ID_FIGURE = 5          # ユーザID

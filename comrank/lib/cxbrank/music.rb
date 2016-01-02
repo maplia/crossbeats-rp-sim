@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'active_record'
+require 'chronic'
 require 'cxbrank/const'
 require 'cxbrank/course'
 
@@ -20,7 +21,7 @@ module CxbRank
     def self.date=(date)
       if date.present?
         @@date = date
-        @@time = Time.local(date.year, date.month, date.day, 23, 59, 59)
+        @@time = Chronic.parse("#{date.strftime('%Y-%m-%d 27:59:59')}")
       end
     end
 
