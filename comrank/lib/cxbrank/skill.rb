@@ -35,11 +35,12 @@ module CxbRank
     def validate_unl_point_range; return validate_point_range(MUSIC_DIFF_UNL) end
 
     def validate_point_range(diff)
-      if !music.exist?(diff) or point(diff).blank? or point_before_type_cast(diff) !~ /\A\d+(\.\d+)?\z/
+      level = (legacy(diff) ? music.legacy_level(diff) : music.level(diff))
+      if level.blank? or point(diff).blank? or point_before_type_cast(diff) !~ /\A\d+(\.\d+)?\z/
         return true
       end
-      bonus_rate = (ultimate?(diff) ? BONUS_RATE_ULTIMATE : (survival?(diff) ? BONUS_RATE_SURVIVAL : 1.0))
-      if (point(diff) < 0.0) or (point(diff) > music.level(diff) * bonus_rate)
+      bonus_rate = gauge_bonus_rate(diff)
+      if (point(diff) < 0.0) or (point(diff) > level * bonus_rate)
         errors.add("#{MUSIC_DIFF_PREFIXES[diff]}_point".to_sym, SKILL_ERRORS[diff][ERROR_RP_OUT_OF_RANGE])
         return false
       else
@@ -157,6 +158,10 @@ module CxbRank
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_locked")
     end
 
+    def legacy(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_legacy")
+    end
+
     def point_before_type_cast(diff)
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_point_before_type_cast")
     end
@@ -197,7 +202,8 @@ module CxbRank
       unless survival?(diff) or ultimate?(diff)
         return nil
       else
-        max_point = music.level(diff) * gauge_bonus_rate(diff)
+        level = (legacy(diff) ? music.legacy_level(diff) : music.level(diff))
+        max_point = level * gauge_bonus_rate(diff)
         return [((point(diff) || 0.0) / max_point).ceil(2) * 100, rate(diff)].min
       end
     end
@@ -212,14 +218,15 @@ module CxbRank
 
       music_diffs.keys.each do |diff|
         next unless music.exist?(diff) and cleared?(diff)
+        level = (legacy(diff) ? music.legacy_level(diff) : music.level(diff))
         @point_filled[diff] = false
         @rate_filled[diff] = false
         if point(diff).blank? and rate(diff)
-          calc_point = (music.level(diff) * BigDecimal.new((rate(diff).to_i / 100.0).to_s) * gauge_bonus_rate(diff)).floor(2)
+          calc_point = (level * BigDecimal.new((rate(diff).to_i / 100.0).to_s) * gauge_bonus_rate(diff)).floor(2)
           send("#{MUSIC_DIFF_PREFIXES[diff]}_point=", calc_point)
           @point_filled[diff] = true
         elsif rate(diff).blank? and point(diff)
-          calc_rate = ((point(diff) / gauge_bonus_rate(diff)).ceil(2) / music.level(diff)).floor(2) * 100.0
+          calc_rate = ((point(diff) / gauge_bonus_rate(diff)).ceil(2) / level).floor(2) * 100.0
           send("#{MUSIC_DIFF_PREFIXES[diff]}_rate=", calc_rate)
           send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_f=", false)
           @rate_filled[diff] = true
@@ -707,30 +714,25 @@ module CxbRank
       skills.each do |skill|
         MUSIC_DIFFS[mode].keys.each do |diff|
           next unless skill.music.exist?(diff)
+          level = (skill.legacy(diff) ? skill.music.legacy_level(diff) : skill.music.level(diff))
           if skill.cleared?(diff)
-            update_status(status[:clear], skill.music.level(diff))
+            update_status(status[:clear], level)
             if [MUSIC_DIFF_MAS, MUSIC_DIFF_UNL].include?(diff)
-              update_status(status[:clear_mas], skill.music.level(diff))
+              update_status(status[:clear_mas], level)
             end
             if [SP_RANK_STATUS_SPP, SP_RANK_STATUS_SP, SP_RANK_STATUS_S].include?(skill.rank(diff))
-              update_status(status[:s_rank], skill.music.level(diff))
+              update_status(status[:s_rank], level)
             end
             if skill.fullcombo?(diff)
-              update_status(status[:fullcombo], skill.music.level(diff))
+              update_status(status[:fullcombo], level)
             end
             if skill.rate(diff) == 100
-              update_status(status[:rate_100], skill.music.level(diff))
+              update_status(status[:rate_100], level)
             end
             if skill.ultimate?(diff)
-              update_status(status[:ultimate], skill.music.level(diff))
+              update_status(status[:ultimate], level)
               if [MUSIC_DIFF_MAS, MUSIC_DIFF_UNL].include?(diff)
-                update_status(status[:ult_mas], skill.music.level(diff))
-              end
-            end
-            if skill.ultimate?(diff)
-              update_status(status[:ultimate], skill.music.level(diff))
-              if [MUSIC_DIFF_MAS, MUSIC_DIFF_UNL].include?(diff)
-                update_status(status[:ult_mas], skill.music.level(diff))
+                update_status(status[:ult_mas], level)
               end
             end
           end

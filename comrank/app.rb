@@ -3,7 +3,6 @@ ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 
 require 'rubygems'
 require 'sinatra/base'
-require 'sinatra/reloader'
 require 'sinatra/config_file'
 require 'sinatra/multi_route'
 require 'sinatra/json'
@@ -24,7 +23,6 @@ require 'cxbrank/event'
 
 module CxbRank
   class AppBase < Sinatra::Base
-    register Sinatra::Reloader
     register Sinatra::ConfigFile
     register Sinatra::CrossOrigin
     register Sinatra::DefaultCharset

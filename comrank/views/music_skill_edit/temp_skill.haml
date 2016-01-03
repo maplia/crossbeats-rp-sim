@@ -69,6 +69,15 @@
               %label<
                 = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
                 = '未取得/ロック譜面'
+              - if skill.music.exist_legacy?(diff)
+                %label<
+                  = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
+                  = '旧譜面'
+              - else
+                %label<
+                  = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
+                  %del<>
+                    = '旧譜面'
         - else
           %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
             %td
@@ -87,6 +96,12 @@
               %label<
                 = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
                 = '未取得/ロック譜面'
+              %label<
+                = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => !skill.music.exist_legacy?(diff)
+                - if skill.music.exist_legacy?(diff)
+                  = '旧譜面'
+                - else
+                  %del= '旧譜面'
       %tr
         %th コメント
         %td.comment

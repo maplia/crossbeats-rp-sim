@@ -7,6 +7,7 @@ GEM
       mysql2
     activesupport (2.3.18)
     backports (3.6.6)
+    chronic (0.10.2)
     git (1.2.9.1)
     haml (4.0.7)
       tilt
@@ -91,6 +92,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 2.3.18)
   activerecord-mysql2-adapter
+  chronic
   haml
   i18n (~> 0.6.0)
   json
@@ -110,4 +112,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

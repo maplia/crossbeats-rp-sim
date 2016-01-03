@@ -85,6 +85,14 @@ module CxbRank
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
     end
 
+    def legacy_level(diff)
+      if legacy_charts.blank?
+        return nil
+      else
+        return legacy_charts[0].level(diff)
+      end
+    end
+
     def notes(diff)
       if @@date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
@@ -94,6 +102,14 @@ module CxbRank
         end
       end
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
+    end
+
+    def legacy_notes(diff)
+      if legacy_charts.blank?
+        return nil
+      else
+        return legacy_charts[0].notes(diff)
+      end
     end
 
     def max_notes
@@ -106,6 +122,10 @@ module CxbRank
 
     def exist?(diff)
       return level(diff).present?
+    end
+
+    def exist_legacy?(diff)
+      return legacy_level(diff).present?
     end
 
     def monthly?
@@ -125,11 +145,27 @@ module CxbRank
       end
     end
 
+    def legacy_level_to_s(diff)
+      unless exist_legacy?(diff)
+        return '-'
+      else
+        return (legacy_level(diff) == 0) ? '-' : sprintf(level_format, legacy_level(diff))
+      end
+    end
+
     def notes_to_s(diff)
       unless exist?(diff)
         return '-'
       else
         return (notes(diff) == 0) ? '???' : sprintf('%d', notes(diff))
+      end
+    end
+
+    def legacy_notes_to_s(diff)
+      unless exist_legacy?(diff)
+        return '-'
+      else
+        return (legacy_notes(diff) == 0) ? '???' : sprintf('%d', legacy_notes(diff))
       end
     end
 

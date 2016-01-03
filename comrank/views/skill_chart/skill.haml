@@ -31,7 +31,10 @@
     - music_diffs.keys.sort.each do |diff|
       - if skill.music.exist?(diff)
         %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
-          Lv.#{skill.music.level_to_s(diff)}
+          - if skill.legacy(diff)
+            旧Lv.#{skill.music.legacy_level_to_s(diff)}
+          - else
+            Lv.#{skill.music.level_to_s(diff)}
           - if skill.locked(diff)
             = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
           - if skill.survival?(diff)

@@ -3,7 +3,7 @@ require 'bigdecimal'
 module CxbRank
   # エンジン名
   ENGINE_NAME = 'CxB RankPoint Simulator REV.'
-  ENGINE_VERSION = '1.3.0'
+  ENGINE_VERSION = '1.3.1'
 
   # URI
   SITE_TOP_URI = '/'                                # サイトトップ
