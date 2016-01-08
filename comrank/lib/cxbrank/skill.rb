@@ -327,20 +327,20 @@ module CxbRank
 
     def to_hash
       hash = {
-        :text_id => music.text_id, :number => music.number, :comment => comment,
+        :music => music.to_hash, :comment => comment,
       }
       MUSIC_DIFF_PREFIXES.keys.each do |diff|
         if music.exist?(diff)
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
-            :stat => stat(diff), :locked => locked(diff),
-            :point => point(diff), :rate => rate(diff).to_i,
-            :rank => rank(diff), :fcs => combo(diff), :ultimate => gauge(diff)
+            :stat => stat(diff), :locked => locked(diff), :legacy => legacy(diff),
+            :point => point(diff), :rate => rate(diff),
+            :rank => rank(diff), :combo => combo(diff), :gauge => gauge(diff)
           }
         else
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
             :stat => nil, :locked => nil,
             :point => nil, :rate => nil,
-            :rank => nil, :fcs => nil, :ultimate => nil
+            :rank => nil, :combo => nil, :gauge => nil
           }
         end
       end

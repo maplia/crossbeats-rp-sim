@@ -119,8 +119,7 @@ module CxbRank
 
       def music_skill_edit_page(user, &block)
         if params[:music_text_id]
-          session[:music_text_id] = params[:music_text_id].dup
-          session[:temp_skill] = nil
+          session[:music_text_id] = params[:music_text_id]
         end
         if session[:music_text_id].blank?
           haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_MUSIC_IS_UNDECIDED}
@@ -128,7 +127,11 @@ module CxbRank
           haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_MUSIC_NOT_EXIST}
         else
           curr_skill = CxbRank::Skill.find_by_user_and_music(user, music)
-          yield curr_skill
+          temp_skill = CxbRank::Skill.find_by_user_and_music(user, music)
+          if params[underscore(CxbRank::Skill)]
+            temp_skill.attributes = params[underscore(CxbRank::Skill)]
+          end
+          yield curr_skill, temp_skill
         end
       end
     end
@@ -270,33 +273,28 @@ module CxbRank
 
     get "#{CxbRank::SKILL_ITEM_EDIT_URI}/?:music_text_id?" do
       private_page do |user|
-        music_skill_edit_page(user) do |curr_skill|
+        music_skill_edit_page(user) do |curr_skill, temp_skill|
           settings.views << '../comrank/views/music_skill_edit'
-          unless session[:temp_skill]
-            session[:temp_skill] = curr_skill.dup
-          end
           fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
           haml :music_skill_edit, :layout => true, :locals => {
-            :curr_skill => curr_skill, :temp_skill => session[:temp_skill], :fixed_title => fixed_title}
+            :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title}
         end
       end
     end
 
     post CxbRank::SKILL_ITEM_EDIT_URI do
       private_page do |user|
-        music_skill_edit_page(user) do |curr_skill|
+        music_skill_edit_page(user) do |curr_skill, temp_skill|
           settings.views << '../comrank/views/music_skill_edit'
-          session[:temp_skill].attributes = params[underscore(CxbRank::Skill)]
-          unless session[:temp_skill].valid?
+          unless temp_skill.valid?
             haml :error, :layout => true,
-              :locals => {:errors => session[:temp_skill].errors, :back_uri => request.path_info}
+              :locals => {:errors => temp_skill.errors, :back_uri => request.path_info}
           else
-            session[:temp_skill].calc!
+            temp_skill.calc!
             method = (params[:update].present? ? 'put' : 'delete')
             fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
             haml :music_skill_edit_conf, :layout => true, :locals => {
-              :curr_skill => curr_skill, :temp_skill => session[:temp_skill],
-              :fixed_title => fixed_title, :method => method}
+              :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title, :method => method}
           end
         end
       end
@@ -305,18 +303,21 @@ module CxbRank
     put CxbRank::SKILL_ITEM_EDIT_URI do
       private_page do |user|
         if params[:y].present?
-#          begin
-            session[:temp_skill].save!
-            user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
-            user.point_direct = false
-            user.point_updated_at = Time.now
-            user.save false
-            session[:music_text_id] = nil
-            redirect CxbRank::SKILL_LIST_EDIT_URI
-#          rescue
-#            haml :error, :layout => true,
-#              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
-#          end
+          music_skill_edit_page(user) do |curr_skill, temp_skill|
+            begin
+              temp_skill.calc!
+              temp_skill.save!
+              user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
+              user.point_direct = false
+              user.point_updated_at = Time.now
+              user.save false
+              session[:music_text_id] = nil
+              redirect CxbRank::SKILL_LIST_EDIT_URI
+            rescue
+               haml :error, :layout => true,
+                 :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+            end
+          end
         else
           redirect CxbRank::SKILL_ITEM_EDIT_URI
         end
@@ -326,18 +327,20 @@ module CxbRank
     delete CxbRank::SKILL_ITEM_EDIT_URI do
       private_page do |user|
         if params['y'].present?
-#          begin
-            session[:temp_skill].destroy
-            user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
-            user.point_direct = false
-            user.point_updated_at = Time.now
-            user.save!
-            session[:music_text_id] = nil
-            redirect CxbRank::SKILL_LIST_EDIT_URI
-#          rescue
-#            haml :error, :layout => true,
-#              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
-#          end
+          music_skill_edit_page(user) do |curr_skill, temp_skill|
+  #          begin
+              temp_skill.destroy
+              user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
+              user.point_direct = false
+              user.point_updated_at = Time.now
+              user.save!
+              session[:music_text_id] = nil
+              redirect CxbRank::SKILL_LIST_EDIT_URI
+  #          rescue
+  #            haml :error, :layout => true,
+  #              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+  #          end
+          end
         else
           redirect CxbRank::SKILL_ITEM_EDIT_URI
         end
@@ -466,7 +469,8 @@ module CxbRank
       event = CxbRank::Event.find(:first,
         :conditions => {:text_id => params[:event_text_id], :section => (params[:section] || 0)})
       last_modified CxbRank::Music.last_modified
-      haml :event_sheet, :layout => true, :locals => {:event => event}
+      fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_URI]} [#{event.title}]"
+      haml :event_sheet, :layout => true, :locals => {:event => event, :fixed_title => fixed_title}
     end
   end
 end

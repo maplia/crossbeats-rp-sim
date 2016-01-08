@@ -11,11 +11,12 @@ class CreateSkills < ActiveRecord::Migration
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_stat".to_sym, :default => CxbRank::SP_STATUS_NO_PLAY
         t.boolean "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_locked".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_gauge".to_sym
-        t.float "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_point".to_sym
-        t.float "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_rate".to_sym
+        t.decimal "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_point".to_sym, :precision => 5, :scale => 2
+        t.decimal "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_rate".to_sym, :precision => 5, :scale => 2
         t.boolean "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_rate_f".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_rank".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_combo".to_sym
+        t.boolean "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_legacy".to_sym, :default => false
       end
       t.string :comment
       t.integer :best_diff

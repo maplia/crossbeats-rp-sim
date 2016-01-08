@@ -64,6 +64,11 @@
             - if skill.legacy(diff)
               [旧]
           %td.point= skill.point_to_s(diff)
+          %td.level
+            - if skill.legacy(diff)
+              = skill.music.legacy_level_to_s(diff)
+            - else
+              = skill.music.level_to_s(diff)
           - unless skill.cleared?(diff)
             %td.status{:rowspan => 2, :colspan => 2}= CxbRank::SP_STATUSES[skill.stat(diff)]
           - else

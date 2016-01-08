@@ -9,6 +9,8 @@
   %div.subunit
     = haml :skill, :locals => {:prev_skill => curr_skill, :skill => temp_skill}
 - form_tag CxbRank::SKILL_ITEM_EDIT_URI, :method => method do
+  - params[underscore(CxbRank::Skill)].each do |key, value|
+    = hidden_field_tag "#{underscore(CxbRank::Skill)}[#{key}]".to_sym, :value => value
   - if method == 'put'
     %p 以上のプレイ情報を登録します。よろしいですか?
   - else

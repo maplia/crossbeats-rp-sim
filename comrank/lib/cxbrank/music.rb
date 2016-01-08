@@ -179,6 +179,7 @@ module CxbRank
         if exist?(diff)
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
             :level => level(diff), :notes => notes(diff),
+            :has_legacy => exist_legacy?(diff),
           }
         else
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
