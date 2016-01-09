@@ -310,7 +310,7 @@ module CxbRank
               user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
               user.point_direct = false
               user.point_updated_at = Time.now
-              user.save false
+              user.save!
               session[:music_text_id] = nil
               redirect CxbRank::SKILL_LIST_EDIT_URI
             rescue
@@ -328,7 +328,7 @@ module CxbRank
       private_page do |user|
         if params['y'].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
-  #          begin
+            begin
               temp_skill.destroy
               user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
               user.point_direct = false
@@ -336,10 +336,10 @@ module CxbRank
               user.save!
               session[:music_text_id] = nil
               redirect CxbRank::SKILL_LIST_EDIT_URI
-  #          rescue
-  #            haml :error, :layout => true,
-  #              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
-  #          end
+            rescue
+              haml :error, :layout => true,
+                :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+            end
           end
         else
           redirect CxbRank::SKILL_ITEM_EDIT_URI

@@ -25,27 +25,31 @@ class CxbRankApp < CxbRank::AppBase
     if error_no != CxbRank::NO_ERROR
       jsonx false
     else
-      user = CxbRank::User.find_by_param_id(data[:user_id])
-      music = CxbRank::Music.find(:first, :conditions => {:text_id => data[:text_id]})
-      skill = CxbRank::Skill.find_by_user_and_music(user, music)
-      skill.user_id = user.id
-      skill.music = music
-      skill.comment = data[:body][:comment]
-      CxbRank::MUSIC_DIFF_PREFIXES.keys.each do |diff|
-        next unless data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym]
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_stat=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:stat])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_point=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:point])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_rate=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:rate])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_rate_f=", false)
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_rank=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:rank])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_combo=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:combo])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_gauge=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:gauge])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_locked=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:locked])
-        skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_legacy=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:legacy])
+      begin
+        user = CxbRank::User.find_by_param_id(data[:user_id])
+        music = CxbRank::Music.find(:first, :conditions => {:text_id => data[:text_id]})
+        skill = CxbRank::Skill.find_by_user_and_music(user, music)
+        skill.user_id = user.id
+        skill.music = music
+        skill.comment = data[:body][:comment]
+        CxbRank::MUSIC_DIFF_PREFIXES.keys.each do |diff|
+          next unless data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym]
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_stat=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:stat])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_point=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:point])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_rate=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:rate])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_rate_f=", false)
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_rank=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:rank])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_combo=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:combo])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_gauge=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:gauge])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_locked=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:locked])
+          skill.send("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_legacy=", data[:body][CxbRank::MUSIC_DIFF_PREFIXES[diff].to_sym][:legacy])
+        end
+        skill.calc!
+        skill.save!
+        jsonx true
+      rescue
+        jsonx false
       end
-      skill.calc!
-      skill.save!
-      jsonx true
     end
   end
 
@@ -55,12 +59,16 @@ class CxbRankApp < CxbRank::AppBase
     if error_no != CxbRank::NO_ERROR
       jsonx false
     else
-      user = CxbRank::User.find_by_param_id(data[:user_id])
-      user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
-      user.point_direct = false
-      user.point_updated_at = Time.now
-      user.save false
-      jsonx true
+      begin
+        user = CxbRank::User.find_by_param_id(data[:user_id])
+        user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
+        user.point_direct = false
+        user.point_updated_at = Time.now
+        user.save!
+        jsonx true
+      rescue
+        jsonx false
+      end
     end
   end
 end

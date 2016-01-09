@@ -72,12 +72,12 @@
               - if skill.music.exist_legacy?(diff)
                 %label<
                   = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
-                  = '旧譜面'
+                  = (cxb_mode? ? '旧譜面' : '旧レベル') 
               - else
                 %label<
                   = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
                   %del<>
-                    = '旧譜面'
+                    = (cxb_mode? ? '旧譜面' : '旧レベル') 
         - else
           %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
             %td
@@ -99,9 +99,9 @@
               %label<
                 = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => !skill.music.exist_legacy?(diff)
                 - if skill.music.exist_legacy?(diff)
-                  = '旧譜面'
+                  = (cxb_mode? ? '旧譜面' : '旧レベル') 
                 - else
-                  %del= '旧譜面'
+                  %del= (cxb_mode? ? '旧譜面' : '旧レベル') 
       %tr
         %th コメント
         %td.comment

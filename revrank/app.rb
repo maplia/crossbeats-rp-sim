@@ -86,7 +86,7 @@ class RevRankApp < CxbRank::AppBase
   put CxbRank::SKILL_COURSE_ITEM_EDIT_URI do
     private_page do |user|
       if params['y'].present?
-#          begin
+          begin
           session[:temp_skill].save!
           user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
           user.point_direct = false
@@ -94,10 +94,10 @@ class RevRankApp < CxbRank::AppBase
           user.save!
           session[:course_text_id] = nil
           redirect CxbRank::SKILL_LIST_EDIT_URI
-#          rescue
-#            haml :error, :layout => true,
-#              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
-#          end
+          rescue
+            haml :error, :layout => true,
+              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+          end
       else
         redirect CxbRank::SKILL_COURSE_ITEM_EDIT_URI
       end
@@ -107,7 +107,7 @@ class RevRankApp < CxbRank::AppBase
   delete CxbRank::SKILL_COURSE_ITEM_EDIT_URI do
     private_page do |user|
       if params['y'].present?
-#          begin
+          begin
           session[:temp_skill].destroy
           user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
           user.point_direct = false
@@ -115,10 +115,10 @@ class RevRankApp < CxbRank::AppBase
           user.save!
           session[:course_text_id] = nil
           redirect CxbRank::SKILL_LIST_EDIT_URI
-#          rescue
-#            haml :error, :layout => true,
-#              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
-#          end
+          rescue
+            haml :error, :layout => true,
+              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+          end
       else
         redirect CxbRank::SKILL_COURSE_ITEM_EDIT_URI
       end
@@ -145,7 +145,7 @@ class RevRankApp < CxbRank::AppBase
 
   post '/bml_update_master' do
     bookmarklet_session do |session, data|
-#      begin
+      begin
         case data[:type]
         when 'music'
           item = CxbRank::Music.create_by_request(data[:body])
@@ -156,16 +156,16 @@ class RevRankApp < CxbRank::AppBase
         else
           jsonx :status => 400, :message => "TypeError: #{data[:type]}"
         end
-#      rescue
-#        status 500
-#        jsonx :message => $!.message
-#      end
+      rescue
+        status 500
+        jsonx :message => $!.message
+      end
     end
   end
 
   post '/bml_edit' do
     bookmarklet_session do |session, data|
-#      begin
+      begin
         case data[:type]
         when 'music'
           unless (music = CxbRank::Music.find_by_lookup_key(data[:lookup_key]))
@@ -184,10 +184,10 @@ class RevRankApp < CxbRank::AppBase
         else
           jsonx :status => 400, :message => "TypeError: #{data[:type]}"
         end
-#      rescue
-#        status 500
-#        jsonx :message => $!.message
-#      end
+      rescue
+        status 500
+        jsonx :message => $!.message
+      end
     end
   end
 

@@ -2,10 +2,10 @@ class CreateCourses < ActiveRecord::Migration
   def self.up
     create_table :courses do |t|
       t.string :text_id, :null => false
-      t.string :name, :null => false
+      t.string :title, :null => false
       t.string :lookup_key, :null => false
       t.string :sort_key, :null => false
-      t.decimal :level, :precision => 2, :scale => 0
+      t.decimal :level, :precision => 3, :scale => 1
       t.boolean :limited, :default => false
       t.boolean :hidden, :default => false
       t.boolean :display, :default => true

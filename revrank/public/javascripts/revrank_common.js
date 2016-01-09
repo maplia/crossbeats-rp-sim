@@ -3,16 +3,35 @@ if (!DEBUG) {
   console['log'] = function () {};
 }
 
+var RPSIM_HTTP_BASE_URI = 'http://revtest.maplia.jp/';
+var RPSIM_HTTPS_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/';
+
+var RPSIM_VIEW_URI = RPSIM_HTTP_BASE_URI + 'view';
+
+var RPSIM_LOGIN_URI = RPSIM_HTTPS_BASE_URI + 'bml_login';
+var RPSIM_LOGOUT_URI = RPSIM_HTTPS_BASE_URI + 'bml_logout';
+var RPSIM_EDIT_URI = RPSIM_HTTPS_BASE_URI + 'bml_edit';
+var RPSIM_POINT_URI = RPSIM_HTTPS_BASE_URI + 'bml_point';
+var RPSIM_UPDATE_MASTER_URI = RPSIM_HTTPS_BASE_URI + 'bml_update_master';
+
 var JQUERY_UI_SCRIPT_URI = 'https://code.jquery.com/ui/1.11.4/jquery-ui.min.js';
 var JQUERY_DIALOG_SCRIPT_URI = 'https://marines.sakura.ne.jp/script/jquery.dialog.js';
 var JQUERY_RETRYAJAX_SCRIPT_URI = 'https://marines.sakura.ne.jp/script/jquery.retryAjax.js';
 var JQUERY_UI_STYLE_URI = 'https://code.jquery.com/ui/1.11.4/themes/eggplant/jquery-ui.css';
 
-var RPSIM_LOGIN_URI = MAPLIA_BASE_URI + 'bml_login';
-var RPSIM_UPDATE_MASTER_URI = MAPLIA_BASE_URI + 'bml_update_master';
-var RPSIM_LOGOUT_URI = MAPLIA_BASE_URI + 'bml_logout';
+var MESSAGE_SESSION_IS_DEAD = '処理の途中でセッションが終了しました。最初からやり直してください';
 
-var MESSAGE_SESSION_IS_DEAD = '処理の途中でセッションが終了しました。最初からやり直してください。';
+var MUSIC_DIFFS = ['esy', 'std', 'hrd', 'mas', 'unl'];
+var GRADES = ['S++', 'S+', 'S', 'A+', 'A', 'B+', 'B', 'C', 'D', 'E'];
+var WAIT_MSEC = 1000;
+var DIALOG_TITLE = 'REV. RankPoint Simulator';
+var DIALOG_FONT_SIZE = '1.7em';
+var PROGRESS_OPTIONS = {
+  title: DIALOG_TITLE, cancelable: false, width: 300, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
+};
+var ALERT_OPTIONS = {
+  title: DIALOG_TITLE, width: 300, height: 210, font_size: DIALOG_FONT_SIZE
+};
 
 // MY DATAページのセッションが継続しているか確認
 function isMyDataSessionAlive(document) {
@@ -69,52 +88,22 @@ function loadJQueryLibrary(callback) {
 // RPシミュレータにログインする
 function loginToRpSim(progress, userData) {
   var deferred = $.Deferred();
+/*
   // REV.ユーザIDの取得
   userData.revUserId = $('.u-profList li dl dd')[0].textContent;
   console.log('REV.ユーザID: ' + userData.revUserId);
+*/
   // REV.ユーザIDの登録確認
-  progress.setMessage1('ユーザー登録を確認中です。');
+  progress.setMessage1('ユーザー登録を確認中です');
   progress.setMessage2('');
   $.post(RPSIM_LOGIN_URI, 'game_id=' + userData.revUserId, function (response) {
     if (response.status != 200) {
       console.log('REV. RankPoint Simulator ユーザ未登録');
-      deferred.reject('REV. RankPoint SimulatorにREV.ユーザーIDが登録されていません。');
+      deferred.reject('REV. RankPoint SimulatorにREV.ユーザーIDが登録されていません');
     } else {
       console.log('REV. RankPoint Simulator ユーザ登録確認');
       userData.key = response.key;
       userData.user_id = response.user_id;
-      deferred.resolve();
-    }
-  });
-  return deferred.promise();
-}
-
-// 取得できる楽曲の情報を取得する
-function getMusicList(progress, musicList, isForRpUpdate) {
-  var deferred = $.Deferred();
-  // ミュージックデータのリンクリストから情報を取得する
-  $.getWithRetries('playdatamusic', function (document) {
-    if (!isMyDataSessionAlive(document)) {
-      deferred.reject(MESSAGE_SESSION_IS_DEAD);
-    } else {
-      $.each($(document).find('.pdMusicData'), function (i, element) {
-        if ($(element).find('a').length > 0) {
-          href = $(element).find('a')[0].href;
-          if ((href.split('/').length > 3) && (href.split('/')[2] != location.hostname)) {
-            return false;
-          }
-          var musicItem = {};
-          musicItem.title = $(element).find('.pdMtitle').first().text();
-          musicItem.uri = href;
-          musicList.push(musicItem);
-        }
-      });
-      console.log('楽曲件数: ' + musicList.length);
-      if (isForRpUpdate) {
-        progress.setProgressbarMax(musicList.length + 2);
-      } else {
-        progress.setProgressbarMax(musicList.length);
-      }
       deferred.resolve();
     }
   });
@@ -154,7 +143,7 @@ function updateMasterData(sessionKey, type, item) {
     switch (response.status) {
     case 401: case 500:
       console.log(logLabel + ': 更新失敗');
-      deferred.reject('マスタデータの更新に失敗しました。最初から操作をやり直してください。');
+      deferred.reject('マスタデータの更新に失敗しました。最初から操作をやり直してください');
       break;
     default:
       console.log(logLabel + ': 更新成功');
@@ -165,13 +154,183 @@ function updateMasterData(sessionKey, type, item) {
   return deferred.promise();
 }
 
+// RPの更新
+function updateRp(progress, postData, item) {
+  if (progress.isCanceled()) {
+    return $.Deferred().reject('処理がキャンセルされました').promise();
+  } else {
+    var deferred = $.Deferred();
+    $.postWithRetries(RPSIM_EDIT_URI, JSON.stringify(postData), function (response) {
+      if (postData.type == 'music') {
+        var logLabel = 'ミュージックRP [' + item.title + ']';
+      } else {
+        var logLabel = 'チャレンジRP [' + item.lookup_key + ']';
+      }
+      switch (response.status) {
+      case 401:
+        console.log(logLabel + ': セッション無効');
+        deferred.reject(MESSAGE_SESSION_IS_DEAD);
+        break;
+      case 400:
+        console.log(logLabel + ': マスタ未登録');
+        updateMasterData(postData.key, postData.type, item).then(function () {
+          return updateRp(progress, postData, item);
+        }).done(function () {
+          deferred.resolve();
+        }).fail(function (e) {
+          deferred.reject(e);
+        });
+        break;
+      case 500:
+        console.log(logLabel + ': 更新失敗');
+        alert('データベースの処理エラーが発生したため、チャレンジRPの更新をスキップします');
+        deferred.resolve();
+        break;
+      default:
+        console.log(logLabel + ': 更新成功');
+        deferred.resolve();
+        break;
+      }
+    });
+    return deferred.promise();
+  }
+}
+
+// ミュージックRPの更新（単曲）
+function updateMusicRp(progress, userData, musicItem) {
+  var deferred = $.Deferred();
+  progress.setMessage2(musicItem.title);
+  $.getWithRetries(musicItem.uri, function (document) {
+    if (!isMyDataSessionAlive(document)) {
+      console.log('ミュージックRP: セッション無効');
+      deferred.reject(MESSAGE_SESSION_IS_DEAD);
+    } else {
+      var postData = parseMusicRp(document);
+      postData.key = userData.key;
+      postData.lookup_key = /playdatamusic\/(.+)/.exec(musicItem.uri)[1];
+      musicItem = parseMusicItem(document);
+      musicItem.lookup_key = postData.lookup_key; 
+      updateRp(progress, postData, musicItem).done(function () {
+        deferred.resolve();
+      }).fail(function (e) {
+        deferred.reject(e);
+      });
+    }
+  });
+  return deferred.promise();
+}
+
+// ミュージックRPの取得
+function parseMusicRp(document, lookupKey) {
+  var body = {};
+  // ミュージックRPの取得
+  $.each($(document).find('.pdm-result'), function (i, element) {
+    var bodyDiff = {};
+    // クリアランク + クリア状況
+    var grade = parseInt(/grade_(\d+).png/.exec($(element).find('.grade img')[0].src)[1]) + 1;
+    if (grade == GRADES.length + 2) {
+      bodyDiff.stat = 0;      // プレイなし
+    } else if (grade == GRADES.length + 1) {
+      bodyDiff.stat = 2;      // クリア失敗
+    } else {
+      bodyDiff.stat = 1;      // クリア
+      bodyDiff.rank = grade;
+    }
+    // 以下はクリアしている譜面のみ取得
+    if (bodyDiff.stat == 1) {
+      // RP
+      var point = parseFloat($(element).find('.pdResultList dd')[2].textContent);
+      bodyDiff.point = point;
+      // クリアレート
+      var rate = parseFloat($(element).find('.pdResultList dd')[1].textContent);
+      bodyDiff.rate = rate;
+      // ゲージタイプ
+      var gaugeSrc = ($(element).find('.clear p').length == 1 ? $(element).find('.clear p img')[0].src : 'bnr_dummy_CLEAR.png'); 
+      var gauge = /bnr_(\w+)_CLEAR.png/.exec(gaugeSrc)[1];
+      if (gauge == 'SURVIVAL') {
+        bodyDiff.gauge = 1;   // SURVIVAL
+      } else if (gauge == 'ULTIMATE') {
+        bodyDiff.gauge = 2;   // ULTIMATE
+      } else {
+        bodyDiff.gauge = 0;   // ゲージオプションなし
+      }
+      // フルコンボ
+      if ($(element).find('.fullcombo').length == 1) {
+        var notes = parseInt(/Note:(\d+)/.exec($(element).find('.note')[0].textContent)[1]);
+        var score = parseInt($(element).find('.pdResultList dd')[0].textContent);
+        if (notes * 100 == score) {
+          bodyDiff.combo = 2; // フルコンボ（All Flawless）
+        } else {
+          bodyDiff.combo = 1; // フルコンボ
+        }
+      } else {
+        bodyDiff.combo = 0;   // フルコンボなし
+      }
+    }
+    body[MUSIC_DIFFS[i]] = bodyDiff;
+  });
+  return {
+    'type': 'music',
+    'body': body
+  };
+}
+
+// 総合RPの更新
+function updateTotalRp(progress, userData) {
+  if (progress.isCanceled()) {
+    return $.Deferred().reject('処理がキャンセルされました').promise();
+  } else {
+    var deferred = $.Deferred();
+    $.getWithRetries('/profile', function (document) {
+      if (!isMyDataSessionAlive(document)) {
+        console.log('総合RP: セッション無効');
+        deferred.reject(MESSAGE_SESSION_IS_DEAD);
+      } else {
+        progress.setMessage1('総合RPを更新中です');
+        progress.setMessage2('');
+        var postData = parseTotalRp(document);
+        postData.key = userData.key;
+        $.postWithRetries(RPSIM_POINT_URI, JSON.stringify(postData), function (response) {
+          switch (response.status) {
+          case 401:
+            console.log('総合RP: セッション無効');
+            deferred.reject(MESSAGE_SESSION_IS_DEAD);
+            break;
+          case 500:
+            console.log('総合RP: 更新失敗');
+            alert('データベースの処理エラーが発生したため、総合RPの更新をスキップします');
+            progress.incProgressbarValue();
+            deferred.resolve();
+            break;
+          default:
+            console.log('総合RP: 更新成功');
+            progress.incProgressbarValue();
+            deferred.resolve();
+            break;
+          }
+        });
+      }
+    });
+    return deferred.promise();
+  }
+}
+
+// 総合RPの取得
+function parseTotalRp(document) {
+  body = {};
+  body.point = parseFloat($(document).find('.f220')[0].textContent + $(document).find('.f200')[0].textContent);
+  return {
+    'body': body
+  };
+}
+
 // RPシミュレータからログアウトする
 function logoutFromRpSim(progress, userData) {
   var deferred = $.Deferred();
   var postData = {
     'key': userData.key
   };
-  progress.setMessage1('終了処理をしています。');
+  progress.setMessage1('終了処理をしています');
   progress.setMessage2('');
   $.postWithRetries(RPSIM_LOGOUT_URI, JSON.stringify(postData), function (response) {
     switch (response.status) {

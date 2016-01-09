@@ -3,7 +3,7 @@ class CreateCourseSkills < ActiveRecord::Migration
     create_table :course_skills do |t|
       t.references :user, :null => false
       t.references :course, :null => false
-      t.integer :stat
+      t.integer :stat, :default => CxbRank::SP_STATUS_NO_PLAY
       t.decimal :point, :precision => 5, :scale => 2
       t.decimal :rate, :precision => 5, :scale => 2
       t.boolean :rate_f, :default => true

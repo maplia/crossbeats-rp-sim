@@ -20,9 +20,9 @@ class CreateSkills < ActiveRecord::Migration
       end
       t.string :comment
       t.integer :best_diff
-      t.float :best_point, :default => 0.0
+      t.decimal :best_point, :precision => 5, :scale => 2, :default => 0.0
       t.integer :iglock_best_diff
-      t.float :iglock_best_point, :default => 0.0
+      t.decimal :iglock_best_point, :precision => 5, :scale => 2, :default => 0.0
       t.timestamps
     end
     change_table :skills do |t|

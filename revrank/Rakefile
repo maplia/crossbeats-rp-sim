@@ -38,10 +38,34 @@ namespace :revrank do
       music.mas_notes = row[12]
       music.unl_level = row[13]
       music.unl_notes = row[14]
-      music.limited = row[15]
-      music.hidden = row[16]
-      music.display = row[17]
+      music.limited = row[15] if row[15].present? 
+      music.hidden = row[16] if row[16].present?
+      music.display = row[17] if row[17].present?
+      music.added_at = row[18] if row[18].present?
+      music.event = row[19]
       music.save!
+    end
+
+    CSV.open('./db/master/legacy_charts.tsv', 'r', "\t") do |row|
+      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[0]}).id
+      chart = CxbRank::LegacyChart.find(:first, :conditions => {:music_id => music_id, :span_s => row[1]})
+      unless chart
+        chart = CxbRank::LegacyChart.new
+        chart.music_id = music_id
+        chart.span_s = row[1]
+      end
+      chart.span_e = row[2]
+      chart.esy_level = row[3]
+      chart.esy_notes = row[4]
+      chart.std_level = row[5]
+      chart.std_notes = row[6]
+      chart.hrd_level = row[7]
+      chart.hrd_notes = row[8]
+      chart.mas_level = row[9]
+      chart.mas_notes = row[10]
+      chart.unl_level = row[11]
+      chart.unl_notes = row[12]
+      chart.save!
     end
 
     CSV.open('./db/master/courses.tsv', 'r', "\t") do |row|
@@ -57,6 +81,8 @@ namespace :revrank do
       course.limited = row[5]
       course.hidden = row[6]
       course.display = row[7]
+      course.added_at = row[8] if row[8].present?
+      course.event = row[9]
       course.save!
     end
 

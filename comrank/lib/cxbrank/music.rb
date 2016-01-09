@@ -230,7 +230,15 @@ module CxbRank
           end
         end
       else
-        music_set[MUSIC_TYPE_REV_SINGLE] = musics
+        music_set[MUSIC_TYPE_REV_SINGLE] = []
+        music_set[MUSIC_TYPE_REV_LIMITED] = []
+        musics.each do |music|
+          if music.limited?
+            music_set[MUSIC_TYPE_REV_LIMITED] << music
+          else
+            music_set[MUSIC_TYPE_REV_SINGLE] << music
+          end
+        end
         courses = Course.find_actives.sort
         music_set[MUSIC_TYPE_REV_COURSE] = courses
       end

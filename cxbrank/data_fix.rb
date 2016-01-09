@@ -21,7 +21,7 @@ CxbRank::User.record_timestamps = false
 users = CxbRank::User.find(:all)
 users.each do |user|
   user.password = Digest::MD5.hexdigest(user.password)
-  user.save false
+  user.save!
   puts "user_id: #{user.id}"
 end
 

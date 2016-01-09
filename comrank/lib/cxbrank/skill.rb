@@ -470,7 +470,7 @@ module CxbRank
       @rate_filled = false
       if played?
         if point.blank? and rate and (course.level > 0)
-          calc_point = (course.level * (rate / 100.0)).floor(2)
+          calc_point = (course.level * BigDecimal.new((rate / 100.0).to_s)).floor(2)
           send('point=', calc_point)
           @point_filled = true
         elsif point and rate.blank? and (course.level > 0)
