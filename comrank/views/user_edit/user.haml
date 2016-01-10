@@ -41,6 +41,11 @@
       - underscored_id = "#{underscore(CxbRank::User)}_comment"
       - underscored_name = "#{underscore(CxbRank::User)}[comment]"
       %textarea.comment{:id => underscored_id, :name => underscored_name, :rows => 6}= user.comment
+    %dt RP表の公開設定（チェックをはずすと他人からRP表が見えなくなり、ユーザー一覧にも載らなくなります）
+    %dd
+      %label
+        = f.check_box :display
+        RP表を公開する
   %p
     = f.submit '次へ進む'
     = input_tag :reset, :value=> '入力リセット'

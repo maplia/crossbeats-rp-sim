@@ -31,7 +31,7 @@
         %td.status{:colspan => 2}= CxbRank::SP_STATUSES[skill.stat]
       - else
         %td.rate= skill.rate_to_s
-        %td.combo= CxbRank::SP_COMBO_STATUSES[skill.combo]
+        %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
 - if skill.comment.present?
   %p
     コメント:

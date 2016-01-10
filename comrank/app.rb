@@ -33,6 +33,7 @@ module CxbRank
     config_file File.expand_path(CxbRank::CONFIG_FILE, Dir.pwd)
 
     configure do
+      set :environment, YAML.load_file(CxbRank::CONFIG_FILE)['environment'].to_sym
       set :sessions,
         :key => settings.session_key, :secret => settings.secret,
         :expire_after => CxbRank::EXPIRE_MINUTES * 60
@@ -102,6 +103,8 @@ module CxbRank
           haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_USERID_IS_UNINPUTED}
         elsif (user = CxbRank::User.find_by_param_id(params[:user_id])).nil?
           haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_USERID_IS_UNREGISTERED}
+        elsif !user.display
+          haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_USERID_IS_HIDDEN}
         else
           yield user
         end

@@ -39,6 +39,13 @@
               入力なし
             - else
               = multiline(user.comment, true)
+        %tr
+          %th RP表公開
+          %td
+            - if user.display
+              公開する
+            - else
+              公開しない
   %p 以上のユーザー情報を登録します。よろしいですか?
   %p
     = submit_tag 'はい', :name => 'y'

@@ -3,7 +3,7 @@
     %th= user.user_id
     %td.text
       %a{:href => user.skill_view_uri}
-        &= truncate(user.name, :length => 25)
+        = NKF.nkf('-wW', user.name[0, 20]) + (user.name.size > 20 ? '...' : '')
     %td.game_id
       - if user.game_id.present? and (cxb_mode? or user.game_id_display)
         = user.game_id
@@ -11,13 +11,13 @@
       - if user.point
         = sprintf("%.2f", user.point)
     %td.text{:style => 'width: 17em'}
-      &= truncate(user.comment, :length => 100)
+      = NKF.nkf('-wW', (user.comment || '')[0, 100]) + ((user.comment || '').size > 100 ? '...' : '')
     %td= user.point_updated_at.strftime("%Y-%m-%d %H:%M:%S")
 - else
   %tr
     %td.name
       %a{:href => user.skill_view_uri}
-        &= truncate(user.name, :length => 8)
+        = NKF.nkf('-wW', user.name[0, 8]) + (user.name.size > 8 ? '...' : '')
     %td.game_id
       - if user.game_id.present? and (cxb_mode? or user.game_id_display)
         = user.game_id
@@ -29,4 +29,4 @@
       - if user.comment.blank?
         &nbsp;
       - else
-        &= truncate(user.comment, :length => 30)
+        = NKF.nkf('-wW', (user.comment || '')[0, 30]) + ((user.comment || '').size > 30 ? '...' : '')
