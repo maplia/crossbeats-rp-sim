@@ -7,6 +7,7 @@ module CxbRank
 
   # URI
   SITE_TOP_URI = '/'                                # サイトトップ
+  USAGE_URI = '/usage'                              # 使い方案内
   USER_ADD_URI = '/user_add'                        # ユーザ新規登録
   USER_EDIT_URI = '/user_edit'                      # ユーザ情報編集
   USER_LOGIN_URI = '/login'                         # ユーザログイン
@@ -30,6 +31,7 @@ module CxbRank
   # ページ名
   PAGE_TITLES = {
     SITE_TOP_URI =>               'トップ',
+    USAGE_URI =>                  '使い方案内',
     MUSIC_LIST_VIEW_URI =>        '登録曲リスト',
     USER_ADD_URI =>               '新規ユーザー登録',
     USER_EDIT_URI =>              'ユーザー情報編集',

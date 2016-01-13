@@ -64,18 +64,13 @@
             - if skill.legacy(diff)
               [旧]
           %td.point= skill.point_to_s(diff)
-          %td.level
-            - if skill.legacy(diff)
-              = skill.music.legacy_level_to_s(diff)
-            - else
-              = skill.music.level_to_s(diff)
           - unless skill.cleared?(diff)
             %td.status{:rowspan => 2, :colspan => 2}= CxbRank::SP_STATUSES[skill.stat(diff)]
           - else
             %td.rate{:colspan => 2}
               = haml :rate, :locals => {:skill => skill, :diff => diff}
               - if (skill.u_rate(diff) || 0.0) > 0.0
-                = "(#{skill.u_rate_to_s(diff)})"
+                = "(U: #{skill.u_rate_to_s(diff)})"
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %td.mark
             - if skill.locked(diff)
@@ -87,8 +82,8 @@
             - unless skill.locked(diff) or skill.survival?(diff) or skill.ultimate?(diff)
               &nbsp;
           - if skill.cleared?(diff)
-            %td.mark= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
-            %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
+            %td.rank= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
+            %td.combo= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
 - if skill.comment.present?
   %p
     コメント:

@@ -150,10 +150,18 @@ module CxbRank
     end
 
     get CxbRank::SITE_TOP_URI do
-      last_modified [File.mtime('views/index.haml'), File.mtime('views/index_news.haml')].max
+      mtimes = []
+      mtimes << File.mtime('views/index.haml') << File.mtime('views/index_news.haml')
+      mtimes << Music.last_modified << Event.last_modified
+      last_modified mtimes.max
       haml :index, :layout => true do
         haml :index_news
       end
+    end
+
+    get CxbRank::USAGE_URI do
+      last_modified File.mtime('views/usage.haml')
+      haml :usage, :layout => true
     end
 
     get "#{CxbRank::MUSIC_LIST_VIEW_URI}/?:date?" do

@@ -76,6 +76,9 @@ td.mark {
 td.status {
   text-align: center;
 }
+td.rank, td.combo {
+  text-align: center;
+}
 td.score {
   text-align: right;
 }

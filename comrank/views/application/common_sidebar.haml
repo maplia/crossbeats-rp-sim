@@ -17,6 +17,17 @@
         %ul
           %li #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_ADD_URI], CxbRank::USER_ADD_URI}
 %div.unit
+  %h2 使い方案内
+  %div.subunit
+    %ul
+      %li
+        #{link_to CxbRank::PAGE_TITLES[CxbRank::USAGE_URI], CxbRank::USAGE_URI}
+        %ul
+          - if rev_mode?
+            %li #{link_to 'データ更新ブックマークレット', "#{CxbRank::USAGE_URI}#bookmarklet"}
+          - else
+            %li #{link_to '一括登録 @ Googleスプレッド', "#{CxbRank::USAGE_URI}#spread"}
+%div.unit
   %h2 登録ユーザーリスト
   %div.subunit
     %ul

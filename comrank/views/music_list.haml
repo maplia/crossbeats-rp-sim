@@ -9,7 +9,7 @@
 - if rev_mode?
   %p<
     = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
-    マークのついている曲は隠し曲です
+    マークのついている曲は初期状態でプレイできない曲です
 - music_types.keys.sort.each do |type|
   - if type == CxbRank::MUSIC_TYPE_REV_COURSE
     = haml :courses, :locals => {:courses => music_set[type], :type_name => music_types[type]}
