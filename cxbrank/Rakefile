@@ -24,9 +24,8 @@ def quote(value)
   end
 end
 
-env = (ENV['ENV'] ? ENV['ENV'].to_sym : :development)
 ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
-ActiveRecord::Base.establish_connection(env)
+ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['environment'])
 
 namespace :cxbrank do
   desc 'initialize music master'

@@ -6,7 +6,7 @@
           %tr
             %th ユーザー名
             %td.text&= user.name
-          - if edit
+          - if edit and user.display
             %tr
               %th RP表公開URL
               %td.text

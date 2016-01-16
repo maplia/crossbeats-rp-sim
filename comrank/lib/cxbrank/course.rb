@@ -40,6 +40,7 @@ module CxbRank
         course.level = 0
         course.sort_key = body[:lookup_key]
         course.lookup_key = body[:lookup_key]
+        course.added_at = Date.today
       end
       return course
     end

@@ -12,8 +12,9 @@
     %h2#bookmarklet データ更新ブックマークレット
     %div.subunit
       - hostname = 'secure508.sakura.ne.jp/revtest.maplia.jp'
-      - bookmarklet_whole = %Q[javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://#{hostname}/javascripts/data_import_whole.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()]
-      - bookmarklet_single = %Q[javascript:(function(){if(location.href.indexOf('https://rev-www.ac.capcom.jp/playdatamusic/')==0){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://#{hostname}/javascripts/data_import_single.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのミュージックデータ詳細ページから実行してください');}})()]
+      -# hostname = 'revrank.maplia.jp'
+      - bookmarklet_all = %Q[javascript:(function(){if(location.href=='https://rev-www.ac.capcom.jp/profile'){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://#{hostname}/javascripts/data_import_all.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのトップページから実行してください');}})()]
+      - bookmarklet_one = %Q[javascript:(function(){if(location.href.indexOf('https://rev-www.ac.capcom.jp/playdatamusic/')==0){if(confirm('REV. RankPoint Simulatorを更新します')){var elem=document.createElement('script');elem.src='https://#{hostname}/javascripts/data_import_one.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('crossbeats REV. MY DATAのミュージックデータ詳細ページから実行してください');}})()]
       %p 「REV.」では#{link_to 'Web上のMY DATAページ', 'https://rev-www.ac.capcom.jp/weblogin'}でプレイデータの閲覧を行うことができるため、このデータを取り込むことができるようにするためにブックマークレットによる更新方法を用意しています
       %p なお、この機能を使用する際はユーザー情報としてREV.ユーザーIDを登録する必要があります（REV.ユーザーIDはMY DATAで確認できます）
       %p= image_tag 'rev_user_id.png'
@@ -22,19 +23,19 @@
         %dd
           %p MY DATAに存在するすべての曲のデータを更新します
           %p #{link_to 'MY DATAにログインした直後に表示されるページ', 'https://rev-www.ac.capcom.jp/profile'}にいる状態で登録したブックマークを開きます
-          %pre= bookmarklet_whole
+          %pre= bookmarklet_all
         %dt 単曲更新版
         %dd
           %p 1曲単位で任意の曲のデータを更新します
           %p ミュージックデータ詳細ページにいる状態で登録したブックマークを開きます
-          %pre= bookmarklet_single
+          %pre= bookmarklet_one
         %dt ブックマーク登録 (PC)
         %dd
-          %p PCの場合は、右記リンクをブックマークとして登録します → #{link_to '全曲更新版', bookmarklet_whole} / #{link_to '単曲更新版', bookmarklet_single}
+          %p PCの場合は、右記リンクをブックマークとして登録します → #{link_to '全曲更新版', bookmarklet_all} / #{link_to '単曲更新版', bookmarklet_one}
           %p ※ChromeおよびFirefox（ともに最新版 @ Windows 10）での動作を確認しています
         %dt ブックマーク登録 (スマートフォン)
         %dd
-          %p スマートフォンの場合は、右記リンクをブックマークとして登録します → #{link_to '全曲更新版', "##{bookmarklet_whole}"} / #{link_to '単曲更新版', "##{bookmarklet_single}"}
+          %p スマートフォンの場合は、右記リンクをブックマークとして登録します → #{link_to '全曲更新版', "##{bookmarklet_all}"} / #{link_to '単曲更新版', "##{bookmarklet_one}"}
           %p ブックマークとして登録した後、ブックマークの編集でURLから「javascript:」よりも前の部分を削除してください
           %p ※iPhone 5S（iOS 8.4搭載）の、Safariでの動作を確認しています
   %div.unit

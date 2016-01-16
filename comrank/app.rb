@@ -152,7 +152,8 @@ module CxbRank
     get CxbRank::SITE_TOP_URI do
       mtimes = []
       mtimes << File.mtime('views/index.haml') << File.mtime('views/index_news.haml')
-      mtimes << Music.last_modified << Event.last_modified
+      mtimes << Music.last_modified if Music.last_modified
+      mtimes << Event.last_modified if Event.last_modified
       last_modified mtimes.max
       haml :index, :layout => true do
         haml :index_news

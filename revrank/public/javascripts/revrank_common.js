@@ -3,11 +3,7 @@ if (!DEBUG) {
   console['log'] = function () {};
 }
 
-var RPSIM_HTTP_BASE_URI = 'http://revtest.maplia.jp/';
-var RPSIM_HTTPS_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/';
-
 var RPSIM_VIEW_URI = RPSIM_HTTP_BASE_URI + 'view';
-
 var RPSIM_LOGIN_URI = RPSIM_HTTPS_BASE_URI + 'bml_login';
 var RPSIM_LOGOUT_URI = RPSIM_HTTPS_BASE_URI + 'bml_logout';
 var RPSIM_EDIT_URI = RPSIM_HTTPS_BASE_URI + 'bml_edit';
@@ -88,11 +84,6 @@ function loadJQueryLibrary(callback) {
 // RPシミュレータにログインする
 function loginToRpSim(progress, userData) {
   var deferred = $.Deferred();
-/*
-  // REV.ユーザIDの取得
-  userData.revUserId = $('.u-profList li dl dd')[0].textContent;
-  console.log('REV.ユーザID: ' + userData.revUserId);
-*/
   // REV.ユーザIDの登録確認
   progress.setMessage1('ユーザー登録を確認中です');
   progress.setMessage2('');
@@ -119,6 +110,8 @@ function parseMusicItem(document) {
   item.text_id = item.text_id.replace(/[\_\-\(\)]/g, '');
   item.title = $(document).find('.title')[0].textContent;
   item.sort_key = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
+  item.sort_key = item.sort_key.toLowerCase();
+  item.sort_key = item.sort_key.replace(/[\_\-\(\)]/g, ' ');
   $.each($(document).find('.pdm-result'), function (i, element) {
     var itemDiff = {};
     itemDiff.level = parseInt(/Lv.(\d+)/.exec($(element).find('.lv')[0].textContent)[1]);
