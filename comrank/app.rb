@@ -468,7 +468,7 @@ module CxbRank
       end
     end
 
-    get "#{CxbRank::EVENT_SHEET_URI}/?" do
+    get "#{CxbRank::EVENT_SHEET_URI}" do
       settings.views << '../comrank/views/event_list'
       events = CxbRank::Event.find(:all).sort
       last_modified CxbRank::Event.last_modified
@@ -476,13 +476,20 @@ module CxbRank
       haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
     end
 
-    get "#{CxbRank::EVENT_SHEET_URI}/:event_text_id", "#{CxbRank::EVENT_SHEET_URI}/:event_text_id/:section" do
-      request.env['X_MOBILE_DEVICE'] = nil
-      event = CxbRank::Event.find(:first,
-        :conditions => {:text_id => params[:event_text_id], :section => (params[:section] || 0)})
-      last_modified CxbRank::Music.last_modified
-      fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_URI]} [#{event.title}]"
-      haml :event_sheet, :layout => true, :locals => {:event => event, :fixed_title => fixed_title}
+    get "#{CxbRank::EVENT_SHEET_URI}/:event_text_id?/?:section?" do
+      if params[:event_text_id].blank?
+        haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_EVENT_ID_IS_UNDECIDED}
+      elsif !CxbRank::Event.where(:text_id => params[:event_text_id]).exists?
+        haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_EVENT_ID_NOT_EXIST}
+      elsif (event = CxbRank::Event.where(
+        :text_id => params[:event_text_id], :section => (params[:section] || 0)).first).nil?
+        haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_EVENT_SECTION_NOT_EXIST}
+      else
+        last_modified CxbRank::Event.last_modified(params[:event_text_id], (params[:section] || 0))
+        request.env['X_MOBILE_DEVICE'] = nil
+        fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_URI]} [#{event.title}]"
+        haml :event_sheet, :layout => true, :locals => {:event => event, :fixed_title => fixed_title}
+      end
     end
   end
 end
