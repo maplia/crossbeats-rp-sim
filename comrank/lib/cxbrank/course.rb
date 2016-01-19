@@ -14,21 +14,21 @@ module CxbRank
     end
 
     def self.last_modified
-      course = self.find(:first, :order => 'updated_at desc')
-      return (course ? course.updated_at : nil)
+      return [
+        self.maximum(:updated_at), CourseMusic.last_modified
+      ].compact.max
     end
 
     def self.find_by_param_id(param_id)
-      return self.find(:first, :conditions => {:text_id => param_id})
+      return self.where(:text_id => param_id).first
     end
 
-    def self.find_actives
-      if @@date.present?
-        conditions = ['display = ? and added_at <= ?', true, @@date]
-      else
-        conditions = {:display => true}
+    def self.find_actives(date=nil)
+      actives = self.where(:display => true)
+      if date.present?
+        actives = actives.where('added_at <= ?', date)
       end
-      return self.find(:all, :conditions => conditions)
+      return actives
     end
 
     def self.create_by_request(body)
@@ -69,6 +69,10 @@ module CxbRank
   class CourseMusic < ActiveRecord::Base
     include Comparable
     belongs_to :music
+
+    def self.last_modified
+      return self.maximum(:updated_at)
+    end
 
     def title
       return music.title

@@ -54,21 +54,22 @@ module CxbRank
     end
 
     def self.last_modified
-      music = self.find(:first, :order => 'updated_at desc')
-      return (music ? music.updated_at : nil)
+      return [
+        self.where(:display => true).maximum(:updated_at),
+        Monthly.last_modified, LegacyChart.last_modified
+      ].compact.max
     end
 
     def self.find_by_param_id(param_id)
       return self.find(:first, :conditions => {:text_id => param_id})
     end
 
-    def self.find_actives
-      if @@date.present?
-        conditions = ['display = ? and added_at <= ?', true, @@date]
-      else
-        conditions = {:display => true}
+    def self.find_actives(date=nil)
+      actives = self.where(:display => true)
+      if date.present?
+        actives = actives.where('added_at <= ?', date)
       end
-      return self.find(:all, :conditions => conditions)
+      return actives
     end
 
     def full_title
@@ -202,9 +203,16 @@ module CxbRank
   end
 
   class Monthly < ActiveRecord::Base
+    def self.last_modified
+      return self.maximum(:updated_at)
+    end
   end
 
   class LegacyChart < ActiveRecord::Base
+    def self.last_modified
+      return self.maximum(:updated_at)
+    end
+
     def level(diff)
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
     end
@@ -214,37 +222,52 @@ module CxbRank
     end
   end
 
-  class MusicSet < Hash
-    attr_accessor :last_modified
+  class MusicSet
+    attr_reader :last_modified
 
-    def self.load(mode)
-      music_set = self.new
-      musics = Music.find_actives.sort
-      if mode == MODE_CXB
-        music_set[MUSIC_TYPE_NORMAL] = []
-        music_set[MUSIC_TYPE_SPECIAL] = []
+    def initialize(mode, date=nil)
+      @mode = mode
+      @date = date
+      case @mode
+      when MODE_CXB
+        @hash = {
+          MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
+        }
+      when MODE_REV
+        @hash = {
+          MUSIC_TYPE_REV_SINGLE => [], MUSIC_TYPE_REV_LIMITED => [],
+          MUSIC_TYPE_REV_COURSE => [],
+        }
+      end
+      @last_modified = [Music.last_modified, Course.last_modified].compact.max
+    end
+
+    def load!
+      musics = Music.find_actives(@date).sort
+      case @mode
+      when MODE_CXB
         musics.each do |music|
           if music.monthly?
-            music_set[MUSIC_TYPE_SPECIAL] << music
+            @hash[MUSIC_TYPE_SPECIAL] << music
           else
-            music_set[MUSIC_TYPE_NORMAL] << music
+            @hash[MUSIC_TYPE_NORMAL] << music
           end
         end
-      else
-        music_set[MUSIC_TYPE_REV_SINGLE] = []
-        music_set[MUSIC_TYPE_REV_LIMITED] = []
+      when MODE_REV
         musics.each do |music|
           if music.limited?
-            music_set[MUSIC_TYPE_REV_LIMITED] << music
+            @hash[MUSIC_TYPE_REV_LIMITED] << music
           else
-            music_set[MUSIC_TYPE_REV_SINGLE] << music
+            @hash[MUSIC_TYPE_REV_SINGLE] << music
           end
         end
-        courses = Course.find_actives.sort
-        music_set[MUSIC_TYPE_REV_COURSE] = courses
+        courses = Course.find_actives(@date).sort
+        @hash[MUSIC_TYPE_REV_COURSE] = courses
       end
-      music_set.last_modified = [Music.last_modified, Course.last_modified].compact.max
-      return music_set
+    end
+
+    def [](key)
+      return @hash[key]
     end
   end
 end
