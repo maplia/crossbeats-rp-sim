@@ -53,23 +53,36 @@ module CxbRank
       return music
     end
 
-    def self.last_modified
-      return [
-        self.where(:display => true).maximum(:updated_at),
-        Monthly.last_modified, LegacyChart.last_modified
-      ].compact.max
+    def self.last_modified(text_id=nil)
+      if text_id.present? and (music = self.find_by_param_id(text_id))
+        return [
+          music.updated_at,
+          Monthly.last_modified(music.id), LegacyChart.last_modified(music.id)
+        ].compact.max
+      else
+        return [
+          self.maximum(:updated_at),
+          Monthly.last_modified, LegacyChart.last_modified
+        ].compact.max
+      end
     end
 
-    def self.find_by_param_id(param_id)
-      return self.find(:first, :conditions => {:text_id => param_id})
+    def self.find_by_param_id(text_id)
+      return self.where(:text_id => text_id).first
     end
 
     def self.find_actives(date=nil)
       actives = self.where(:display => true)
       if date.present?
         actives = actives.where('added_at <= ?', date)
+        actives.each do |music| music.date = date end
       end
       return actives
+    end
+
+    def date=(date)
+      @pivot_date = date
+      @pivot_time = Chronic.parse("#{date.strftime('%Y-%m-%d 27:59:59')}")
     end
 
     def full_title
@@ -77,9 +90,9 @@ module CxbRank
     end
 
     def level(diff)
-      if @@date.present? and legacy_charts.present?
+      if @pivot_date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
-          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@@date)
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@pivot_date)
             return legacy_chart.level(diff)
           end
         end
@@ -96,9 +109,9 @@ module CxbRank
     end
 
     def notes(diff)
-      if @@date.present? and legacy_charts.present?
+      if @pivot_date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
-          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@@date)
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@pivot_date)
             return legacy_chart.notes(diff)
           end
         end
@@ -132,7 +145,7 @@ module CxbRank
 
     def monthly?
       monthlies.each do |monthly|
-        if (monthly.span_s..monthly.span_e).include?(@@time || Time.now)
+        if (monthly.span_s..monthly.span_e).include?(@pivot_time || Time.now)
           return true
         end
       end
@@ -203,14 +216,24 @@ module CxbRank
   end
 
   class Monthly < ActiveRecord::Base
-    def self.last_modified
-      return self.maximum(:updated_at)
+    def self.last_modified(music_id=nil)
+      if music_id.present?
+        monthlies = self.where(:music_id => music_id)
+      else
+        monthlies = self
+      end
+      return monthlies.maximum(:updated_at)
     end
   end
 
   class LegacyChart < ActiveRecord::Base
-    def self.last_modified
-      return self.maximum(:updated_at)
+    def self.last_modified(music_id=nil)
+      if music_id.present?
+        legacy_charts = self.where(:music_id => music_id)
+      else
+        legacy_charts = self
+      end
+      return legacy_charts.maximum(:updated_at)
     end
 
     def level(diff)

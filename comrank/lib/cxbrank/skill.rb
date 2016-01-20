@@ -106,6 +106,22 @@ module CxbRank
       return skill
     end
 
+    def self.max(mode, music, date=nil)
+      max_diff = (music.exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS)
+      skill = self.new
+      skill.music = music
+      skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_stat=", SP_STATUS_CLEAR)
+      skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate=", 100)
+      skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate_f=", false)
+      skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rank=", SP_RANK_STATUS_SPP)
+      skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_combo=", SP_COMBO_STATUS_EX)
+      if date.nil? or (date.present? and date >= ULTIMATE_START_DATE[mode])
+        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
+      end
+      skill.calc!
+      return skill
+    end
+
     def self.create_by_request(user, music, body)
       skill = self.find(:first, :conditions => {:user_id => user.id, :music_id => music.id})
       unless skill
@@ -445,6 +461,16 @@ module CxbRank
       return skill
     end
 
+    def self.max(mode, course, date=nil)
+      skill = self.new
+      skill.course = course
+      skill.stat = SP_STATUS_CLEAR
+      skill.rate = 100
+      skill.combo = SP_COMBO_STATUS_EX
+      skill.calc!
+      return skill
+    end
+
     def best_point
       return point
     end
@@ -567,74 +593,6 @@ module CxbRank
       return skill_set
     end
 
-    def self.max(mode, options={})
-      skill_set = self.new
-      Skill.ignore_locked = options[:ignore_locked]
-
-      music_skills = []
-      musics = Music.find_actives.sort
-      musics.each do |music|
-        max_diff = (music.exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS)
-        skill = Skill.new
-        skill.music = music
-        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_stat=", SP_STATUS_CLEAR)
-        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate=", 100)
-        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rate_f=", false)
-        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rank=", SP_RANK_STATUS_SPP)
-        skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_combo=", SP_COMBO_STATUS_EX)
-        if Skill.ultimate_enable?
-          skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
-        end
-        skill.calc!
-        music_skills << skill
-      end
-      music_skills.sort!
-      if mode == MODE_CXB
-        skill_set[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
-        music_skills.each do |skill|
-          if skill.music.monthly?
-            skill_set[MUSIC_TYPE_SPECIAL][:skills] << skill
-          else
-            skill_set[MUSIC_TYPE_NORMAL][:skills] << skill
-          end
-        end
-      else
-        course_skills = []
-        courses = Course.find(:all)
-        courses.each do |course|
-          skill = CourseSkill.new
-          skill.course = course
-          skill.stat = SP_STATUS_CLEAR
-          skill.rate = 100
-          skill.combo = SP_COMBO_STATUS_EX
-          skill.calc!
-          course_skills << skill
-        end
-        course_skills.sort!
-        skill_set[MUSIC_TYPE_REV_SINGLE] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_REV_LIMITED] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
-        music_skills.dup.each do |skill|
-          if !skill.music.limited
-            skill_set[MUSIC_TYPE_REV_SINGLE][:skills] << skill
-          end
-        end
-      end
-      skill_set.calc!(mode, nil, music_skills)
-
-      skill_set.each do |type, hash|
-        next if type == MUSIC_TYPE_REV_BONUS
-        target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
-        hash[:skills].delete_if do |skill|
-          !skill.rp_target? and hash[:skills][target_count-1].best_point != skill.best_point
-        end
-      end
-
-      return skill_set
-    end
-
     def calc!(mode, user, music_skills)
       self.each do |type, hash|
         next if type == MUSIC_TYPE_REV_BONUS
@@ -684,6 +642,105 @@ module CxbRank
           @total_point += hash[:point]
         end
       end
+    end
+  end
+
+  class SkillMaxSet
+    attr_reader :last_modified, :total_point
+
+    def initialize(mode, date=nil)
+      @mode = mode
+      @date = date
+      case @mode
+      when MODE_CXB
+        @hash = {
+          MUSIC_TYPE_NORMAL => {:skills => [], :point => 0.0},
+          MUSIC_TYPE_SPECIAL => {:skills => [], :point => 0.0},
+        }
+      when MODE_REV
+        @hash = {
+          MUSIC_TYPE_REV_SINGLE => {:skills => [], :point => 0.0},
+          MUSIC_TYPE_REV_COURSE => {:skills => [], :point => 0.0},
+          MUSIC_TYPE_REV_LIMITED => {:skills => [], :point => 0.0},
+        }
+      end
+      @music_set = MusicSet.new(mode, date)
+      @last_modified = @music_set.last_modified
+    end
+
+    def load!
+      @music_set.load!
+      case @mode
+      when MODE_CXB
+        [MUSIC_TYPE_NORMAL, MUSIC_TYPE_SPECIAL].each do |type|
+          @music_set[type].each do |music|
+            @hash[type][:skills] << Skill.max(@mode, music, @date)
+          end
+        end
+      when MODE_REV
+        @music_set[MUSIC_TYPE_REV_SINGLE].each do |music|
+          @hash[MUSIC_TYPE_REV_SINGLE][:skills] << Skill.max(@mode, music, @date)
+        end
+        @music_set[MUSIC_TYPE_REV_COURSE].each do |course|
+          @hash[MUSIC_TYPE_REV_COURSE][:skills] << CourseSkill.max(@mode, course, @date)
+        end
+      end
+      @hash.each do |type, type_set|
+        type_set[:skills].sort!
+      end
+      calc!
+      @hash.each do |type, type_set|
+        next if type == MUSIC_TYPE_REV_BONUS
+        target_count = (MUSIC_TYPE_ST_COUNTS[type] || type_set[:skills].size)
+        type_set[:skills].delete_if do |skill|
+          !skill.rp_target? and type_set[:skills][target_count-1].best_point != skill.best_point
+        end
+      end
+    end
+
+    def calc!
+      @total_point = 0.0
+      @hash.each do |type, type_set|
+        target_count = (MUSIC_TYPE_ST_COUNTS[type] || type_set[:skills].size)
+        type_set[:skills][0...target_count].each do |skill|
+          next if (skill.target_point || 0.0) == 0.0
+          type_set[:point] += skill.target_point
+          skill.rp_target = true
+        end
+        @total_point += type_set[:point]
+      end
+      if @mode == MODE_REV
+        @hash[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
+        min_target = @hash[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
+        @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
+          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
+            @hash[MUSIC_TYPE_REV_BONUS][:skills] << skill
+          end
+        end
+        @hash[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
+          if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
+            (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
+          else
+            -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
+          end
+        end
+        if @user and @user.point_direct
+          @hash[MUSIC_TYPE_REV_BONUS][:point] =
+            @user.point - @hash[MUSIC_TYPE_REV_SINGLE][:point] - @hash[MUSIC_TYPE_REV_COURSE][:point]
+        else
+          @hash[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
+            if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
+              @hash[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+            end
+          end
+          @hash[MUSIC_TYPE_REV_BONUS][:point] = (@hash[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
+        end
+        @total_point += @hash[MUSIC_TYPE_REV_BONUS][:point]
+      end
+    end
+
+    def [](key)
+      return @hash[key]
     end
   end
 

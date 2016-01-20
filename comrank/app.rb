@@ -148,47 +148,59 @@ module CxbRank
       send_file File.expand_path(params[:file_name], '../comrank/javascripts')
     end
 
-    get CxbRank::SITE_TOP_URI do
+    get SITE_TOP_URI do
       last_modified [
         File.mtime('views/index.haml'), File.mtime('views/index_news.haml'),
-        Music.last_modified,  Event.last_modified
+        Music.last_modified, Event.last_modified
       ].compact.max
       haml :index, :layout => true do
         haml :index_news
       end
     end
 
-    get CxbRank::USAGE_URI do
+    get USAGE_URI do
       last_modified File.mtime('views/usage.haml')
       haml :usage, :layout => true
     end
 
-    get "#{CxbRank::MUSIC_LIST_VIEW_URI}/?:date_string?" do
+    get "#{MUSIC_LIST_VIEW_URI}/?:date_string?" do
+      settings.views << '../comrank/views/music_list'
       past_date_page(params[:date_string]) do |date|
         music_set = MusicSet.new(settings.site_mode, date)
         last_modified music_set.last_modified
-        settings.views << '../comrank/views/music_list'
         music_set.load!
-        fixed_title = CxbRank::PAGE_TITLES[CxbRank::MUSIC_LIST_VIEW_URI].dup
         if date.present?
-          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
+          fixed_title = "#{PAGE_TITLES[MUSIC_LIST_VIEW_URI]} [#{date.strftime('%Y-%m-%d')}]"
+        else
+          fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
         end
         haml :music_list, :layout => true,
           :locals => {:music_set => music_set, :date => date, :fixed_title => fixed_title}
       end
     end
 
-    get "#{CxbRank::MAX_SKILL_VIEW_URI}/?:date_string?" do
+    get '/api/music/:music_text_id' do
+      last_modified Music.last_modified(params[:music_text_id])
+      music = Music.find_by_param_id(params[:music_text_id])
+      jsonx((music ? music.to_hash : {}), params[:callback])
+    end
+
+    get '/api/musics' do
+      last_modified Music.last_modified
+      music_hashes = Music.find_actives.map! do |music| music.to_hash end
+      jsonx music_hashes, params[:callback]
+    end
+
+    get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
+      settings.views << '../comrank/views/skill_list'
       past_date_page(params[:date_string]) do |date|
-        skill_set = CxbRank::SkillSet.max(settings.site_mode)
+        skill_set = SkillMaxSet.new(settings.site_mode, date)
         last_modified skill_set.last_modified
-        settings.views << '../comrank/views/skill_list'
-        CxbRank::Music.date = date
-        CxbRank::Course.date = date
-        CxbRank::Skill.date = date
-        fixed_title = CxbRank::PAGE_TITLES[CxbRank::MAX_SKILL_VIEW_URI].dup
+        skill_set.load!
         if date.present?
-          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
+          fixed_title = "#{PAGE_TITLES[MAX_SKILL_VIEW_URI]} [#{date.strftime('%Y-%m-%d')}]"
+        else
+          fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
         end
         haml :skill_list, :layout => true, :locals => {
           :skill_set => skill_set, :edit => false,
@@ -423,22 +435,6 @@ module CxbRank
       else
         redirect CxbRank::USER_EDIT_URI
       end
-    end
-
-    get '/api/music/:param_id' do
-      last_modified CxbRank::Music.last_modified
-      music = CxbRank::Music.find_by_param_id(params[:param_id])
-      jsonx((music ? music.to_hash : {}), params[:callback])
-    end
-
-    get '/api/musics' do
-      last_modified CxbRank::Music.last_modified
-      musics = CxbRank::Music.find(:all, :conditions => {:limited => false})
-      music_hashes = []
-      musics.sort.each do |music|
-        music_hashes << music.to_hash
-      end
-      jsonx music_hashes, params[:callback]
     end
 
     get CxbRank::RANK_CALC_URI do
