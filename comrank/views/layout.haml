@@ -38,6 +38,10 @@
         ga('create', '#{settings.tracker_id}', '#{settings.domain}');
         ga('send', 'pageview');
   %body
+    -# if !mobile? and session[:user_id].present?
+    - if false
+      %p.logout
+        = link_to 'ログアウト', CxbRank::USER_LOGOUT_URI 
     = yield
     - unless defined? error_no or defined? errors
       %address

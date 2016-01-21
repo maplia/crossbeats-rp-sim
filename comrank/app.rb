@@ -208,76 +208,113 @@ module CxbRank
       end
     end
 
-    get CxbRank::USER_ADD_URI do
+    get USER_ADD_URI do
       settings.views << '../comrank/views/user_edit'
-      session[:temp_user] ||= CxbRank::User.new
+      user = User.new
+      user = User.create_by_params(session[underscore(CxbRank::User)])
       session[:user_added] = false
-      haml :user_add, :layout => true
+      haml :user_add, :layout => true, :locals => {:user => user}
     end
 
-    post CxbRank::USER_ADD_URI do
+    post USER_ADD_URI do
       settings.views << '../comrank/views/user_edit_conf'
-      session[:temp_user].attributes = params[underscore(CxbRank::User)]
-      session[:temp_user].comment.gsub!(/\r\n/, "\n")
-      unless session[:temp_user].valid?
+      user = User.create_by_params(params[underscore(CxbRank::User)])
+      session[underscore(CxbRank::User)] = Hash[params[underscore(CxbRank::User)]]
+      unless user.valid?
         haml :error, :layout => true,
-          :locals => {:errors => session[:temp_user].errors, :back_uri => request.path_info}
+          :locals => {:errors => user.errors, :back_uri => request.path_info}
       else
-        haml :user_add_conf, :layout => true
+        haml :user_add_conf, :layout => true, :locals => {:user => user}
       end
     end
 
-    put CxbRank::USER_ADD_URI do
+    put USER_ADD_URI do
       if params[:y].present?
         settings.views << '../comrank/views/user_edit'
         if session[:user_added]
           user = CxbRank::User.find_by_id(session[:user_id])
           haml :user_add_result, :layout => true, :locals => {:user => user}
         else
-          password_backup = session[:temp_user].password
           begin
-            session[:temp_user].password = Digest::MD5.hexdigest(password_backup)
-            session[:temp_user].password_confirmation = Digest::MD5.hexdigest(password_backup)
-            session[:temp_user].save!
-            user = session[:temp_user]
+            user = User.create_by_params(session[underscore(CxbRank::User)])
+            user.save!
             session[:user_id] = user.id
             session[:user_added] = true
-            session[:temp_user] = nil
+            session[underscore(CxbRank::User)] = nil
             haml :user_add_result, :layout => true, :locals => {:user => user}
           rescue
-            session[:temp_user].password = password_backup
-            session[:temp_user].password_confirmation = password_backup
             haml :error, :layout => true,
               :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
           end
         end
       else
-        redirect CxbRank::USER_ADD_URI
+        redirect USER_ADD_URI
       end
     end
 
-    get CxbRank::USER_LIST_URI do
+    get USER_LIST_URI do
       settings.views << '../comrank/views/user_list'
-      last_modified CxbRank::User.last_modified
-      users = CxbRank::User.find(:all, :conditions => 'display = 1 and point_updated_at is not null').sort.reverse
+      last_modified User.last_modified
+      users = User.find_actives
       haml :user_list, :layout => true, :locals => {:users => users}
     end
 
-    post CxbRank::USER_LOGIN_URI do
-      session[:temp_user] = nil
-      error_no = CxbRank::Authenticator.authenticate(params)
-      if error_no != CxbRank::NO_ERROR
+    post USER_LOGIN_URI do
+      session[:user_id] = nil
+      error_no = Authenticator.authenticate(params)
+      if error_no != NO_ERROR
         haml :error, :layout => true,
-          :locals => {:error_no => error_no, :back_uri => CxbRank::SITE_TOP_URI}
+          :locals => {:error_no => error_no, :back_uri => SITE_TOP_URI}
       else
-        session[:user_id] = CxbRank::User.find_by_param_id(params[:user_id]).id
-        redirect CxbRank::SKILL_LIST_EDIT_URI
+        session[:user_id] = User.find_by_param_id(params[:user_id]).id
+        redirect SKILL_LIST_EDIT_URI
       end
     end
 
-    get CxbRank::USER_LOGOUT_URI do
+    get USER_LOGOUT_URI do
       session[:user_id] = nil
-      redirect CxbRank::SITE_TOP_URI
+      redirect SITE_TOP_URI
+    end
+
+    get USER_EDIT_URI do
+      private_page do |user|
+        settings.views << '../comrank/views/user_edit'
+        user.update_by_params!(session[underscore(CxbRank::User)])
+        haml :user_edit, :layout => true, :locals => {:user => user}
+      end
+    end
+
+    post USER_EDIT_URI do
+      private_page do |user|
+        settings.views << '../comrank/views/user_edit_conf'
+        user.update_by_params!(params[underscore(CxbRank::User)])
+        session[underscore(CxbRank::User)] = Hash[params[underscore(CxbRank::User)]]
+        unless user.valid?
+          haml :error, :layout => true,
+            :locals => {:errors => user.errors, :back_uri => request.path_info}
+        else
+          haml :user_edit_conf, :layout => true, :locals => {:user => user}
+        end
+      end
+    end
+
+    put USER_EDIT_URI do
+      if params[:y].present?
+        private_page do |user|
+          settings.views << '../comrank/views/user_edit'
+          begin
+            user.update_by_params!(session[underscore(CxbRank::User)])
+            user.save!
+            session[underscore(CxbRank::User)] = nil
+            redirect SKILL_LIST_EDIT_URI
+          rescue
+            haml :error, :layout => true,
+              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+          end
+        end
+      else
+        redirect USER_EDIT_URI
+      end
     end
 
     get CxbRank::SKILL_LIST_EDIT_URI do
@@ -383,57 +420,6 @@ module CxbRank
         else
           redirect CxbRank::SKILL_ITEM_EDIT_URI
         end
-      end
-    end
-
-    get CxbRank::USER_EDIT_URI do
-      private_page do |user|
-        settings.views << '../comrank/views/user_edit'
-        session[:temp_user] ||= user
-        haml :user_edit, :layout => true
-      end
-    end
-
-    post CxbRank::USER_EDIT_URI do
-      private_page do |user|
-        settings.views << '../comrank/views/user_edit_conf'
-        session[:temp_user].attributes = params[underscore(CxbRank::User)]
-        if session[:temp_user].password.blank?
-          session[:temp_user].password = user.password
-        end
-        if session[:temp_user].password_confirmation.blank?
-          session[:temp_user].password_confirmation = user.password
-        end
-        session[:temp_user].point_direct = session[:temp_user].point_changed?
-        unless session[:temp_user].valid?
-          haml :error, :layout => true,
-            :locals => {:errors => session[:temp_user].errors, :back_uri => request.path_info}
-        else
-          haml :user_edit_conf, :layout => true
-        end
-      end
-    end
-
-    put CxbRank::USER_EDIT_URI do
-      if params['y'].present?
-        settings.views << '../comrank/views/user_edit'
-        password_backup = session[:temp_user].password
-        begin
-          if session[:temp_user].password_changed?
-            session[:temp_user].password = Digest::MD5.hexdigest(password_backup)
-            session[:temp_user].password_confirmation = Digest::MD5.hexdigest(password_backup)
-          end
-          session[:temp_user].save!
-          session[:temp_user] = nil
-          redirect CxbRank::SKILL_LIST_EDIT_URI
-        rescue
-          session[:temp_user].password = password_backup
-          session[:temp_user].password_confirmation = password_backup
-          haml :error, :layout => true,
-            :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
-        end
-      else
-        redirect CxbRank::USER_EDIT_URI
       end
     end
 
