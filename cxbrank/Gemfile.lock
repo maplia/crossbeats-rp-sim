@@ -16,6 +16,7 @@ GEM
     backports (3.6.6)
     builder (3.0.4)
     chronic (0.10.2)
+    fastercsv (1.5.5)
     git (1.2.9.1)
     haml (4.0.7)
       tilt
@@ -101,6 +102,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 3.0)
   chronic
+  fastercsv
   haml
   i18n (~> 0.6.0)
   json

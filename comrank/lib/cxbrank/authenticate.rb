@@ -22,7 +22,7 @@ module CxbRank
     end
   end
 
-  class BookmarkAuthenticator
+  class BookmarkletAuthenticator
     def self.authenticate(params)
       unless params[:game_id].present?
         return ERROR_USERID_IS_UNINPUTED

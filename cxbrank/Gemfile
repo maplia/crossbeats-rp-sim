@@ -24,6 +24,7 @@ gem 'rinku'
 gem 'rake'
 gem 'sinatra-activerecord'
 gem 'sqlite3'
+gem 'fastercsv'
 
 gem 'haml'
 gem 'chronic'

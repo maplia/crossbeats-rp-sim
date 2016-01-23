@@ -30,13 +30,13 @@ module CxbRank
     register Padrino::Helpers
     register CxbRank::Helpers
 
-    config_file File.expand_path(CxbRank::CONFIG_FILE, Dir.pwd)
+    config_file File.expand_path(CONFIG_FILE, Dir.pwd)
 
     configure do
       set :environment, settings.environment.to_sym
       set :sessions,
         :key => settings.session_key, :secret => settings.secret,
-        :expire_after => CxbRank::EXPIRE_MINUTES * 60
+        :expire_after => EXPIRE_MINUTES * 60
       set :public_dir, File.expand_path('public', Dir.pwd)
       set :method_override, true
       enable :cross_origin
@@ -48,7 +48,7 @@ module CxbRank
 
     before do
       settings.views = ['views', '../comrank/views', '../comrank/views/application']
-      ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
+      ActiveRecord::Base.configurations = YAML.load_file(DATABASE_FILE)
       ActiveRecord::Base.establish_connection(settings.environment)
       CxbRank::Music.mode = settings.site_mode
       CxbRank::Skill.mode = settings.site_mode
@@ -79,19 +79,19 @@ module CxbRank
         end
         if date_error
           haml :error, :layout => true,
-            :locals => {:error_no => CxbRank::ERROR_DATE_IS_INVALID, :back_uri => CxbRank::SITE_TOP_URI}
+            :locals => {:error_no => ERROR_DATE_IS_INVALID, :back_uri => SITE_TOP_URI}
         elsif date.present? and date < DATE_LOW_LIMITS[settings.site_mode]
           haml :error, :layout => true,
-            :locals => {:error_no => CxbRank::ERROR_DATE_OUT_OF_RANGE, :back_uri => CxbRank::SITE_TOP_URI}
+            :locals => {:error_no => ERROR_DATE_OUT_OF_RANGE, :back_uri => SITE_TOP_URI}
         else
           yield date
         end
       end
 
       def private_page(&block)
-        if session[:user_id].blank? or (user = CxbRank::User.find_by_id(session[:user_id])).nil?
+        if session[:user_id].blank? or (user = User.find_by_id(session[:user_id])).nil?
           haml :error, :layout => true,
-            :locals => {:error_no => CxbRank::ERROR_SESSION_IS_DEAD, :back_uri => CxbRank::SITE_TOP_URI}
+            :locals => {:error_no => ERROR_SESSION_IS_DEAD, :back_uri => SITE_TOP_URI}
         else
           yield user
         end
@@ -99,11 +99,11 @@ module CxbRank
 
       def public_user_page(&block)
         if params[:user_id].blank?
-          haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_USERID_IS_UNINPUTED}
-        elsif (user = CxbRank::User.find_by_param_id(params[:user_id])).nil?
-          haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_USERID_IS_UNREGISTERED}
+          haml :error, :layout => true, :locals => {:error_no => ERROR_USERID_IS_UNINPUTED}
+        elsif (user = User.find_by_param_id(params[:user_id])).nil?
+          haml :error, :layout => true, :locals => {:error_no => ERROR_USERID_IS_UNREGISTERED}
         elsif !user.display
-          haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_USERID_IS_HIDDEN}
+          haml :error, :layout => true, :locals => {:error_no => ERROR_USERID_IS_HIDDEN}
         else
           yield user
         end
@@ -309,7 +309,7 @@ module CxbRank
             redirect SKILL_LIST_EDIT_URI
           rescue
             haml :error, :layout => true,
-              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+              :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
           end
         end
       else
@@ -447,26 +447,25 @@ module CxbRank
       haml :calc_rate, :layout => true, :locals => {:data => music_hashes, :diffs => music_diffs}
     end
 
-    get "#{CxbRank::EVENT_SHEET_URI}" do
+    get EVENT_SHEET_URI do
       settings.views << '../comrank/views/event_list'
-      events = CxbRank::Event.find(:all).sort
-      last_modified CxbRank::Event.last_modified
-      fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_URI]}一覧"
+      last_modified Event.last_modified
+      events = Event.where(true).sort
+      fixed_title = "#{PAGE_TITLES[EVENT_SHEET_URI]}一覧"
       haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
     end
 
-    get "#{CxbRank::EVENT_SHEET_URI}/:event_text_id?/?:section?" do
+    get "#{EVENT_SHEET_URI}/:event_text_id?/?:section?" do
       if params[:event_text_id].blank?
-        haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_EVENT_ID_IS_UNDECIDED}
-      elsif !CxbRank::Event.where(:text_id => params[:event_text_id]).exists?
-        haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_EVENT_ID_NOT_EXIST}
-      elsif (event = CxbRank::Event.where(
-        :text_id => params[:event_text_id], :section => (params[:section] || 0)).first).nil?
-        haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_EVENT_SECTION_NOT_EXIST}
+        haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_IS_UNDECIDED}
+      elsif !(events = Event.where(:text_id => params[:event_text_id])).exists?
+        haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_NOT_EXIST}
+      elsif (event = events.where(:section => (params[:section] || 0)).first).nil?
+        haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_SECTION_NOT_EXIST}
       else
-        last_modified CxbRank::Event.last_modified(params[:event_text_id], (params[:section] || 0))
+        last_modified event.updated_at
         request.env['X_MOBILE_DEVICE'] = nil
-        fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_URI]} [#{event.title}]"
+        fixed_title = "#{PAGE_TITLES[EVENT_SHEET_URI]} [#{event.title}]"
         haml :event_sheet, :layout => true, :locals => {:event => event, :fixed_title => fixed_title}
       end
     end

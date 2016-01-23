@@ -123,7 +123,7 @@ class RevRankApp < CxbRank::AppBase
   end
 
   post '/bml_login' do
-    error_no = CxbRank::BookmarkAuthenticator.authenticate(params)
+    error_no = CxbRank::BookmarkletAuthenticator.authenticate(params)
     if error_no != CxbRank::NO_ERROR
       jsonx :status => 401, :message => CxbRank::ERRORS[error_no]
     else

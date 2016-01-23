@@ -41,7 +41,7 @@ module CxbRank
     end
 
     def self.find_actives
-      return self.where(:display => true).where('point_updated_at is not null').sort.reverse
+      return self.where(:display => true).where('point_updated_at is not null').order('point_updated_at desc')
     end
 
     def self.create_by_params(params)
