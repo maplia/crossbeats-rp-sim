@@ -5,6 +5,6 @@ style_pc: pc.css
 style_sp: sp.css
 session_key: cxbrank
 secret: 
-
+environment: development 
 tracker_id:
 domain: 

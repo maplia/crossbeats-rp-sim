@@ -111,9 +111,12 @@ module CxbRank
 
       def skill_list_page(user, edit, skill_options={})
         settings.views << '../comrank/views/skill_list'
-        skill_set = CxbRank::SkillSet.load(settings.site_mode, user, skill_options)
-        last_modified skill_set.last_modified unless edit
-        fixed_title = "#{user.name}さんの#{CxbRank::PAGE_TITLES[CxbRank::SKILL_LIST_VIEW_URI]}"
+        skill_set = SkillSet.new(settings.site_mode, user, skill_options)
+        unless edit
+          last_modified skill_set.last_modified
+        end
+        skill_set.load!
+        fixed_title = "#{user.name}さんの#{PAGE_TITLES[SKILL_LIST_VIEW_URI]}"
         haml :skill_list, :layout => true, :locals => {
           :user => user, :skill_set => skill_set,
           :edit => edit, :ignore_locked => skill_options[:ignore_locked], :fixed_title => fixed_title}
@@ -149,13 +152,14 @@ module CxbRank
     end
 
     get SITE_TOP_URI do
-      last_modified [
-        File.mtime('views/index.haml'), File.mtime('views/index_news.haml'),
-        Music.last_modified, Event.last_modified
-      ].compact.max
-      haml :index, :layout => true do
-        haml :index_news
+      user = User.find_by_id(session[:user_id])
+      if user.blank?
+        last_modified [
+          File.mtime('views/index.haml'), File.mtime('views/index_news.haml'),
+          Music.last_modified, Event.last_modified
+        ].compact.max
       end
+      haml :index, :layout => true, :locals => {:user => user}
     end
 
     get USAGE_URI do
@@ -317,7 +321,7 @@ module CxbRank
       end
     end
 
-    get CxbRank::SKILL_LIST_EDIT_URI do
+    get SKILL_LIST_EDIT_URI do
       private_page do |user|
         skill_list_page user, true, :fill_empty => true
       end

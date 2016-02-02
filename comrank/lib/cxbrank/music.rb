@@ -11,18 +11,9 @@ module CxbRank
     has_many :legacy_charts
 
     @@mode = nil
-    @@date = nil
-    @@time = nil
 
     def self.mode=(mode)
       @@mode = mode
-    end
-
-    def self.date=(date)
-      if date.present?
-        @@date = date
-        @@time = Chronic.parse("#{date.strftime('%Y-%m-%d 27:59:59')}")
-      end
     end
 
     def music_diffs

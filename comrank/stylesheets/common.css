@@ -136,6 +136,6 @@ strong {
 /********
   navigation
  ********/
-p.top_navi, p.logout {
+p.top_navi, p.current_user {
   font-size: smaller;
 }
