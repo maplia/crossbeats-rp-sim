@@ -105,13 +105,15 @@ function loginToRpSim(progress, userData) {
 function parseMusicItem(document) {
   var item = {};
   // ミュージックRPページから取得する
-  item.text_id = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
-  item.text_id = item.text_id.toLowerCase();
-  item.text_id = item.text_id.replace(/[\_\-\(\)]/g, '');
+  if ($(document).find('.pdm-jkt')[0] != undefined) {
+    item.text_id = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
+    item.text_id = item.text_id.toLowerCase();
+    item.text_id = item.text_id.replace(/[\_\-\(\)]/g, '');
+    item.sort_key = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
+    item.sort_key = item.sort_key.toLowerCase();
+    item.sort_key = item.sort_key.replace(/[\_\-\(\)]/g, ' ');
+  }
   item.title = $(document).find('.title')[0].textContent;
-  item.sort_key = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
-  item.sort_key = item.sort_key.toLowerCase();
-  item.sort_key = item.sort_key.replace(/[\_\-\(\)]/g, ' ');
   $.each($(document).find('.pdm-result'), function (i, element) {
     var itemDiff = {};
     itemDiff.level = parseInt(/Lv.(\d+)/.exec($(element).find('.lv')[0].textContent)[1]);
