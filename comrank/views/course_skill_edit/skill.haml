@@ -18,7 +18,7 @@
       - elsif skill.played?
         %td.mark ×
       - else
-        %td.mark －
+        %td.mark −
       %td.point= skill.point_to_s
       - if defined? prev_skill
         - difference = (skill.point || 0.0) - (prev_skill.point || 0.0)
