@@ -38,7 +38,7 @@
         ga('create', '#{settings.tracker_id}', '#{settings.domain}');
         ga('send', 'pageview');
   %body
-    - if !mobile? and (defined? user and user.present?)
+    - if !mobile? and (defined? user and !user.new_record?)
       %p.current_user
         ユーザーID: 
         = link_to user.user_id, CxbRank::SKILL_LIST_EDIT_URI

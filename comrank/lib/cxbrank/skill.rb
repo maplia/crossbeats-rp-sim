@@ -555,97 +555,6 @@ module CxbRank
     end
   end
 
-=begin
-  class SkillSet < Hash
-    attr_accessor :last_modified, :total_point
-
-    def self.load(mode, user, options={})
-      skill_set = self.new
-      Skill.ignore_locked = options[:ignore_locked]
-
-      music_skills = Skill.find_by_user(user, options).sort
-      if mode == MODE_CXB
-        skill_set[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
-        music_skills.each do |skill|
-          if skill.music.monthly?
-            skill_set[MUSIC_TYPE_SPECIAL][:skills] << skill
-          else
-            skill_set[MUSIC_TYPE_NORMAL][:skills] << skill
-          end
-        end
-      else
-        course_skills = CourseSkill.find_by_user(user, options).sort
-        skill_set[MUSIC_TYPE_REV_SINGLE] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_REV_LIMITED] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
-        skill_set[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
-        music_skills.dup.each do |skill|
-          if skill.music.limited
-            skill_set[MUSIC_TYPE_REV_LIMITED][:skills] << skill
-          else
-            skill_set[MUSIC_TYPE_REV_SINGLE][:skills] << skill
-          end
-        end
-      end
-      skill_set.calc!(mode, user, music_skills)
-
-      return skill_set
-    end
-
-    def calc!(mode, user, music_skills)
-      self.each do |type, hash|
-        next if type == MUSIC_TYPE_REV_BONUS
-        target_count = (MUSIC_TYPE_ST_COUNTS[type] || hash[:skills].size)
-        hash[:skills][0...target_count].each do |skill|
-          next if (skill.target_point || 0.0) == 0.0
-          hash[:point] += skill.target_point
-          skill.rp_target = true
-        end
-      end
-      if mode == MODE_REV
-        min_target = self[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
-        self[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
-          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
-            self[MUSIC_TYPE_REV_BONUS][:skills] << skill
-          end
-        end
-        self[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
-          if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
-            (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
-          else
-            -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
-          end
-        end
-        if user and user.point_direct
-          self[MUSIC_TYPE_REV_BONUS][:point] =
-            user.point - self[MUSIC_TYPE_REV_SINGLE][:point] - self[MUSIC_TYPE_REV_COURSE][:point]
-        else
-          self[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
-            if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
-              self[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
-            end
-          end
-          self[MUSIC_TYPE_REV_BONUS][:point] = (self[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
-        end
-      end
-      if user
-        @last_modified = [Skill.last_modified(user), CourseSkill.last_modified(user)].compact.max
-      else
-        @last_modified = [Music.last_modified, Course.last_modified].compact.max
-      end
-      if user and (user.point_direct and !Skill.ignore_locked)
-        @total_point = user.point
-      else
-        @total_point = 0.0
-        self.each_value do |hash|
-          @total_point += hash[:point]
-        end
-      end
-    end
-  end
-=end
-
   class SkillSet
     attr_accessor :last_modified, :total_point
 
@@ -758,7 +667,7 @@ module CxbRank
 
   class SkillMaxSet < SkillSet
     def initialize(mode, date=nil)
-      super(mode, null, :date => date)
+      super(mode, nil, :date => date)
     end
 
     def load!
