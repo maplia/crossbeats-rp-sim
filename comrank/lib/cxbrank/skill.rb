@@ -2,6 +2,7 @@ require 'rubygems'
 require 'active_record'
 require 'bigdecimal'
 require 'cxbrank/const'
+require 'cxbrank/site_settings'
 require 'cxbrank/user'
 require 'cxbrank/music'
 
@@ -48,13 +49,8 @@ module CxbRank
       end
     end
 
-    @@mode = nil
     @@date = nil
     @@ignore_locked = false
-
-    def self.mode=(mode)
-      @@mode = mode
-    end
 
     def self.date=(date)
       @@date = date
@@ -62,10 +58,6 @@ module CxbRank
 
     def self.ultimate_enable?
       return (@@date || Time.now) >= ULTIMATE_START_DATE[@@mode]
-    end
-
-    def music_diffs
-      return MUSIC_DIFFS[@@mode]
     end
 
     def self.ignore_locked=(ignore_locked)
@@ -198,7 +190,7 @@ module CxbRank
     end
 
     def survival?(diff)
-      if @@mode == MODE_CXB
+      if SiteSettings.cxb_mode?
         return false
       else
         return send("#{MUSIC_DIFF_PREFIXES[diff]}_gauge") == SP_GAUGE_SURVIVAL_REV
@@ -206,7 +198,7 @@ module CxbRank
     end
 
     def ultimate?(diff)
-      if @@mode == MODE_CXB
+      if SiteSettings.cxb_mode?
         return send("#{MUSIC_DIFF_PREFIXES[diff]}_gauge") == SP_GAUGE_ULTIMATE_CXB
       else
         return send("#{MUSIC_DIFF_PREFIXES[diff]}_gauge") == SP_GAUGE_ULTIMATE_REV
@@ -231,7 +223,7 @@ module CxbRank
       @point_filled = {}
       @rate_filled = {}
 
-      music_diffs.keys.each do |diff|
+      SiteSettings.music_diffs.keys.each do |diff|
         next unless music.exist?(diff) and cleared?(diff)
         level = (legacy(diff) ? music.legacy_level(diff) : music.level(diff))
         @point_filled[diff] = false
@@ -272,7 +264,7 @@ module CxbRank
     end
 
     def target_diff
-      return @@ignore_locked ? iglock_best_diff : (music_diffs.keys.include?(best_diff) ? best_diff : iglock_best_diff)
+      return @@ignore_locked ? iglock_best_diff : (SiteSettings.music_diffs.keys.include?(best_diff) ? best_diff : iglock_best_diff)
     end
 
     def target_point
@@ -280,7 +272,7 @@ module CxbRank
     end
 
     def edit_uri
-      return "#{SKILL_ITEM_EDIT_URI}/#{music.text_id}"
+      return SiteSettings.join_site_base(File.join(SKILL_ITEM_EDIT_URI, music.text_id))
     end
 
     def point_to_s(diff, nlv='&ndash;')
@@ -327,7 +319,7 @@ module CxbRank
       unless cleared?(diff) and (survival?(diff) or ultimate?(diff))
         return nlv
       else
-        if @@mode == MODE_REV
+        if SiteSettings.rev_mode?
           mark = (survival?(diff) ? 'S' : (ultimate?(diff) ? 'U' : ''))
         else
           mark = ''
@@ -515,7 +507,7 @@ module CxbRank
     end
 
     def edit_uri
-      return "#{SKILL_COURSE_ITEM_EDIT_URI}/#{course.text_id}"
+      return SiteSettings.join_site_base(File.join(SKILL_COURSE_ITEM_EDIT_URI, course.text_id))
     end
 
     def point_to_s(nlv='&ndash;')
@@ -563,13 +555,12 @@ module CxbRank
       @user = user
       @date = skill_options[:date]
       @skill_options = skill_options
-      case @mode
-      when MODE_CXB
+      if SiteSettings.cxb_mode?
         @hash = {
           MUSIC_TYPE_NORMAL => {:skills => [], :point => 0.0},
           MUSIC_TYPE_SPECIAL => {:skills => [], :point => 0.0},
         }
-      when MODE_REV
+      else
         @hash = {
           MUSIC_TYPE_REV_SINGLE => {:skills => [], :point => 0.0},
           MUSIC_TYPE_REV_COURSE => {:skills => [], :point => 0.0},
@@ -586,14 +577,14 @@ module CxbRank
         @music_set = MusicSet.new(@mode, @date)
         @last_modified = @music_set.last_modified
       end
+      calc!
     end
 
     def load!
       Skill.ignore_locked = @skill_options[:ignore_locked]
 
       music_skills = Skill.find_by_user(@user, @skill_options).sort
-      case @mode
-      when MODE_CXB
+      if SiteSettings.cxb_mode?
         @hash[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
         music_skills.each do |skill|
@@ -603,7 +594,7 @@ module CxbRank
             @hash[MUSIC_TYPE_NORMAL][:skills] << skill
           end
         end
-      when MODE_REV
+      else
         course_skills = CourseSkill.find_by_user(@user, @skill_options).sort
         @hash[MUSIC_TYPE_REV_SINGLE] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_LIMITED] = {:skills => [], :point => 0.0}
@@ -631,7 +622,7 @@ module CxbRank
         end
         @total_point += type_set[:point]
       end
-      if @mode == MODE_REV
+      if SiteSettings.rev_mode?
         min_target = @hash[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
         @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
           if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
@@ -672,14 +663,13 @@ module CxbRank
 
     def load!
       @music_set.load!
-      case @mode
-      when MODE_CXB
+      if SiteSettings.cxb_mode?
         [MUSIC_TYPE_NORMAL, MUSIC_TYPE_SPECIAL].each do |type|
           @music_set[type].each do |music|
             @hash[type][:skills] << Skill.max(@mode, music, @date)
           end
         end
-      when MODE_REV
+      else
         @music_set[MUSIC_TYPE_REV_SINGLE].each do |music|
           @hash[MUSIC_TYPE_REV_SINGLE][:skills] << Skill.max(@mode, music, @date)
         end

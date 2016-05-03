@@ -21,7 +21,7 @@
       %dt 確認用パスワード <em>*</em>
       %dd
         = f.password_field :password_confirmation, :size => 20, :maxlength => 50
-    - if cxb_mode?
+    - if CxbRank::SiteSettings.cxb_mode?
       %dt CROSS&times;BEAT ID（公開しない場合は空欄にしてください）
       %dd
         = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id

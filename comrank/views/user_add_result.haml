@@ -2,4 +2,4 @@
 %h1= "#{page_title}完了"
 %p ユーザーID「<strong>#{user.user_id}</strong>」で登録されました。
 %p 今後ログインする際にはこのユーザーIDが必要になります。忘れないようにしてください。
-%p #{link_to 'ランクポイント表へ進む', CxbRank::SKILL_LIST_EDIT_URI}
+%p #{link_to 'ランクポイント表へ進む', CxbRank::SiteSettings.join_site_base(CxbRank::SKILL_LIST_EDIT_URI)}

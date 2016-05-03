@@ -1,0 +1,126 @@
+$LOAD_PATH << '../../comrank/lib'
+require 'yaml'
+require 'csv'
+require 'rubygems'
+require 'active_record'
+require 'sinatra/activerecord'
+require 'sinatra/activerecord/rake'
+require 'cxbrank/const'
+require 'cxbrank/music'
+require 'cxbrank/course'
+require 'cxbrank/event'
+
+ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
+ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['environment'])
+
+namespace :revrank do
+  desc 'initialize music master'
+  task :init_master do
+    CSV.open('./db/master/musics.tsv', 'r', "\t") do |row|
+      music = CxbRank::Music.find(:first, :conditions => {:lookup_key => row[0]})
+      unless music
+        music = CxbRank::Music.new
+        music.lookup_key = row[0]
+      end
+      music.text_id = row[1]
+      music.title = row[2]
+      music.subtitle = row[3]
+      music.sort_key = row[4]
+      music.esy_level = row[5]
+      music.esy_notes = row[6]
+      music.std_level = row[7]
+      music.std_notes = row[8]
+      music.hrd_level = row[9]
+      music.hrd_notes = row[10]
+      music.mas_level = row[11]
+      music.mas_notes = row[12]
+      music.unl_level = row[13]
+      music.unl_notes = row[14]
+      music.limited = row[15] if row[15].present? 
+      music.hidden = row[16] if row[16].present?
+      music.display = row[17] if row[17].present?
+      music.added_at = row[18] if row[18].present?
+      music.event = row[19]
+      music.save!
+    end
+
+    CSV.open('./db/master/legacy_charts.tsv', 'r', "\t") do |row|
+      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[0]}).id
+      chart = CxbRank::LegacyChart.find(:first, :conditions => {:music_id => music_id, :span_s => row[1]})
+      unless chart
+        chart = CxbRank::LegacyChart.new
+        chart.music_id = music_id
+        chart.span_s = row[1]
+      end
+      chart.span_e = row[2]
+      chart.esy_level = row[3]
+      chart.esy_notes = row[4]
+      chart.std_level = row[5]
+      chart.std_notes = row[6]
+      chart.hrd_level = row[7]
+      chart.hrd_notes = row[8]
+      chart.mas_level = row[9]
+      chart.mas_notes = row[10]
+      chart.unl_level = row[11]
+      chart.unl_notes = row[12]
+      chart.save!
+    end
+
+    CSV.open('./db/master/courses.tsv', 'r', "\t") do |row|
+      course = CxbRank::Course.find(:first, :conditions => {:lookup_key => row[0]})
+      unless course
+        course = CxbRank::Course.new
+        course.lookup_key = row[0]
+      end
+      course.text_id = row[1]
+      course.title = row[2]
+      course.sort_key = row[3]
+      course.level = row[4]
+      course.limited = row[5]
+      course.hidden = row[6]
+      course.display = row[7]
+      course.added_at = row[8] if row[8].present?
+      course.event = row[9]
+      course.save!
+    end
+
+    CSV.open('./db/master/course_musics.tsv', 'r', "\t") do |row|
+      course_id = CxbRank::Course.find(:first, :conditions => {:text_id => row[0]}).id
+      cmusic = CxbRank::CourseMusic.find(:first, :conditions => {:course_id => course_id, :seq => row[1]})
+      unless cmusic
+        cmusic = CxbRank::CourseMusic.new
+        cmusic.course_id = course_id
+        cmusic.seq = row[1]
+      end
+      cmusic.music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[2]}).id
+      cmusic.diff = row[3]
+      cmusic.save!
+    end
+
+    CSV.open('./db/master/events.tsv', 'r', "\t") do |row|
+      event = CxbRank::Event.find(:first, :conditions => {:text_id => row[0], :section => row[1]})
+      unless event
+        event = CxbRank::Event.new
+        event.text_id = row[0]
+        event.section = row[1]
+      end
+      event.title = row[2]
+      event.span_s = row[3]
+      event.span_e = row[4]
+      event.save!
+    end
+
+    CSV.open('./db/master/event_musics.tsv', 'r', "\t") do |row|
+      event_id = CxbRank::Event.find(:first, :conditions => {:text_id => row[0], :section => row[1]}).id
+      event_music = CxbRank::EventMusic.find(:first, :conditions => {:event_id => event_id, :seq => row[2]})
+      unless event_music
+        event_music = CxbRank::EventMusic.new
+        event_music.event_id = event_id
+        event_music.seq = row[2]
+      end
+      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[3]}).id
+      event_music.music_id = music_id
+      event_music.save!
+    end
+  end
+end

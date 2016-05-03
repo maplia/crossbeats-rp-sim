@@ -1,0 +1,31 @@
+source 'https://rubygems.org'
+ruby '1.8.7'
+
+gem 'rack', '~> 1.5.0'
+gem 'rack-mobile-detect'
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'sinatra_more'
+gem 'sinatra-jsonp'
+gem 'sinatra-cross_origin'
+gem 'sinatra-default_charset'
+
+gem 'i18n', '~> 0.6.0'
+gem 'mime-types', '~> 1.0'
+gem 'padrino'
+
+gem 'mysql2', '~> 0.3.10'
+gem 'activerecord', '~> 3.0'
+
+gem 'json'
+gem 'rinku'
+
+gem 'rake'
+gem 'sinatra-activerecord'
+gem 'sqlite3'
+gem 'fastercsv'
+
+gem 'haml'
+gem 'sass'
+gem 'chronic'

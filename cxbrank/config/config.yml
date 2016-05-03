@@ -1,10 +1,12 @@
 site_name: CxB RankPoint Simulator
 site_mode: cxb
+site_base: /
 description: 「CROSS×BEATS」のランクポイント表作成Webツールを公開しているサイトです。
 style_pc: pc.css
 style_sp: sp.css
 session_key: cxbrank
 secret: 
-environment: development 
+environment: development
+comrank_path: ../comrank
 #tracker_id: 
 #domain: 

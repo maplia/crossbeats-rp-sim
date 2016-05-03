@@ -1,0 +1,12 @@
+development:
+  adapter: mysql2
+  host: 
+  username: 
+  password: 
+  database: 
+production:
+  adapter: mysql2
+  host: 
+  username: 
+  password: 
+  database: 

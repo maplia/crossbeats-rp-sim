@@ -13,7 +13,7 @@
               %th.level レベル
               %th.point RP
               %th.rate RATE
-              - if rev_mode?
+              - if CxbRank::SiteSettings.rev_mode?
                 %th.u_rate S/U
               - else
                 %th.u_rate ULT

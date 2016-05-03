@@ -1,3 +1,4 @@
+require 'uri'
 require 'rinku'
 require 'cxbrank/const'
 
@@ -7,7 +8,7 @@ module CxbRank
       def registered app
         app.helpers do
           def site_top?
-            return request.path_info.blank? || (request.path_info == CxbRank::SITE_TOP_URI)
+            return request.path_info.blank? || (request.path_info == SITE_TOP_URI)
           end
 
           def page_title(path_info=request.path_info)
@@ -20,26 +21,6 @@ module CxbRank
 
           def mobile?
             return request.env['X_MOBILE_DEVICE'].present?
-          end
-
-          def cxb_mode?
-            return settings.site_mode == MODE_CXB
-          end
-
-          def rev_mode?
-            return settings.site_mode == MODE_REV
-          end
-
-          def music_diffs
-            return MUSIC_DIFFS[settings.site_mode]
-          end
-
-          def music_types
-            return MUSIC_TYPES[settings.site_mode]
-          end
-
-          def level_format
-            return LEVEL_FORMATS[settings.site_mode]
           end
 
           def underscore(klass)

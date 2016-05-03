@@ -1,11 +1,11 @@
-- form_for skill, CxbRank::SKILL_ITEM_EDIT_URI do |f|
+- form_for skill, action do |f|
   %table.skill_edit
     %tbody
-      - music_diffs.keys.sort.each do |diff|
+      - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
         - next unless skill.music.exist?(diff)
         - diff_prefix = CxbRank::MUSIC_DIFF_PREFIXES[diff]
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
-          %th.diff{:rowspan => (mobile? ? 4 : 2)}= music_diffs[diff]
+          %th.diff{:rowspan => (mobile? ? 4 : 2)}= CxbRank::SiteSettings.music_diffs[diff]
           %td.input
             %label<
               = f.radio_button "#{diff_prefix}_stat".to_sym,
@@ -45,7 +45,7 @@
             - if mobile?
               %br
               &nbsp;&nbsp;&nbsp;&nbsp;
-            - if cxb_mode?
+            - if CxbRank::SiteSettings.cxb_mode?
               %label<
                 = f.check_box "#{diff_prefix}_gauge".to_sym, :checked => skill.ultimate?(diff)
                 = 'ULTIMATE'
@@ -69,15 +69,16 @@
               %label<
                 = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
                 = '未取得/ロック譜面'
-              - if skill.music.exist_legacy?(diff)
-                %label<
-                  = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
-                  = (cxb_mode? ? '旧譜面' : '旧レベル') 
-              - else
-                %label<
-                  = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
-                  %del<>
-                    = (cxb_mode? ? '旧譜面' : '旧レベル') 
+              - if CxbRank::SiteSettings.legacy_chart_enabled?
+                - if skill.music.exist_legacy?(diff)
+                  %label<
+                    = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
+                    = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
+                - else
+                  %label<
+                    = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
+                    %del<>
+                      = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
         - else
           %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
             %td
@@ -97,20 +98,21 @@
                 = f.check_box "#{diff_prefix}_locked".to_sym, :checked => skill.locked(diff)
                 = '未取得/ロック譜面'
               %br
-              - if skill.music.exist_legacy?(diff)
-                %label<
-                  = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
-                  = (cxb_mode? ? '旧譜面' : '旧レベル') 
-              - else
-                %label<
-                  = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
-                  %del<>
-                    = (cxb_mode? ? '旧譜面' : '旧レベル') 
+              - if CxbRank::SiteSettings.legacy_chart_enabled?
+                - if skill.music.exist_legacy?(diff)
+                  %label<
+                    = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
+                    = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
+                - else
+                  %label<
+                    = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
+                    %del<>
+                      = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
       %tr
         %th コメント
         %td.comment
           = f.text_field :comment, :value => skill.comment
   %p
     = f.submit '登録', :name => 'update'
-    = f.submit '削除', :name => 'delete', :disabled => skill.id.blank?
+    = f.submit '削除', :name => 'delete', :disabled => skill.new_record?
     = input_tag :reset, :value=> '入力リセット'

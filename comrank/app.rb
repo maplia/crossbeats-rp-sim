@@ -12,6 +12,7 @@ require 'sinatra/default_charset'
 require 'tilt/haml'
 require 'rack/mobile-detect'
 require 'padrino-helpers'
+require 'cxbrank/site_settings'
 require 'cxbrank/helpers'
 require 'cxbrank/const'
 require 'cxbrank/authenticate'
@@ -47,12 +48,12 @@ module CxbRank
     end
 
     before do
-      settings.views = ['views', '../comrank/views', '../comrank/views/application']
+      SiteSettings.settings = settings
+      settings.views = ['views',
+        SiteSettings.join_comrank_path('views'), SiteSettings.join_comrank_path('views/application'),
+      ]
       ActiveRecord::Base.configurations = YAML.load_file(DATABASE_FILE)
       ActiveRecord::Base.establish_connection(settings.environment)
-      CxbRank::Music.mode = settings.site_mode
-      CxbRank::Skill.mode = settings.site_mode
-      CxbRank::User.mode = settings.site_mode
     end
 
     helpers Sinatra::Jsonp
@@ -79,10 +80,10 @@ module CxbRank
         end
         if date_error
           haml :error, :layout => true,
-            :locals => {:error_no => ERROR_DATE_IS_INVALID, :back_uri => SITE_TOP_URI}
+            :locals => {:error_no => ERROR_DATE_IS_INVALID, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
         elsif date.present? and date < DATE_LOW_LIMITS[settings.site_mode]
           haml :error, :layout => true,
-            :locals => {:error_no => ERROR_DATE_OUT_OF_RANGE, :back_uri => SITE_TOP_URI}
+            :locals => {:error_no => ERROR_DATE_OUT_OF_RANGE, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
         else
           yield date
         end
@@ -91,7 +92,7 @@ module CxbRank
       def private_page(&block)
         if session[:user_id].blank? or (user = User.find_by_id(session[:user_id])).nil?
           haml :error, :layout => true,
-            :locals => {:error_no => ERROR_SESSION_IS_DEAD, :back_uri => SITE_TOP_URI}
+            :locals => {:error_no => ERROR_SESSION_IS_DEAD, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
         else
           yield user
         end
@@ -110,7 +111,7 @@ module CxbRank
       end
 
       def skill_list_page(user, edit, skill_options={})
-        settings.views << '../comrank/views/skill_list'
+        settings.views << SiteSettings.join_comrank_path('views/skill_list')
         skill_set = SkillSet.new(settings.site_mode, user, skill_options)
         unless edit
           last_modified skill_set.last_modified
@@ -127,12 +128,12 @@ module CxbRank
           session[:music_text_id] = params[:music_text_id]
         end
         if session[:music_text_id].blank?
-          haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_MUSIC_IS_UNDECIDED}
-        elsif (music = CxbRank::Music.find_by_param_id(session[:music_text_id])).nil?
-          haml :error, :layout => true, :locals => {:error_no => CxbRank::ERROR_MUSIC_NOT_EXIST}
+          haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
+        elsif (music = Music.find_by_param_id(session[:music_text_id])).nil?
+          haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
         else
-          curr_skill = CxbRank::Skill.find_by_user_and_music(user, music)
-          temp_skill = CxbRank::Skill.find_by_user_and_music(user, music)
+          curr_skill = Skill.find_by_user_and_music(user, music)
+          temp_skill = Skill.find_by_user_and_music(user, music)
           if params[underscore(CxbRank::Skill)]
             temp_skill.attributes = params[underscore(CxbRank::Skill)]
           end
@@ -143,12 +144,12 @@ module CxbRank
 
     get '/common/stylesheets/:file_name' do
       content_type :css
-      send_file File.expand_path(params[:file_name], '../comrank/stylesheets')
+      send_file File.expand_path(params[:file_name], SiteSettings.join_comrank_path('stylesheets'))
     end
 
     get '/common/javascripts/:file_name' do
       content_type :js
-      send_file File.expand_path(params[:file_name], '../comrank/javascripts')
+      send_file File.expand_path(params[:file_name], SiteSettings.join_comrank_path('javascripts'))
     end
 
     get SITE_TOP_URI do
@@ -168,7 +169,7 @@ module CxbRank
     end
 
     get "#{MUSIC_LIST_VIEW_URI}/?:date_string?" do
-      settings.views << '../comrank/views/music_list'
+      settings.views << SiteSettings.join_comrank_path('views/music_list')
       past_date_page(params[:date_string]) do |date|
         music_set = MusicSet.new(settings.site_mode, date)
         last_modified music_set.last_modified
@@ -196,7 +197,7 @@ module CxbRank
     end
 
     get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
-      settings.views << '../comrank/views/skill_list'
+      settings.views << SiteSettings.join_comrank_path('views/skill_list')
       past_date_page(params[:date_string]) do |date|
         skill_set = SkillMaxSet.new(settings.site_mode, date)
         last_modified skill_set.last_modified
@@ -213,7 +214,7 @@ module CxbRank
     end
 
     get USER_ADD_URI do
-      settings.views << '../comrank/views/user_edit'
+      settings.views << SiteSettings.join_comrank_path('views/user_edit')
       user = User.new
       user = User.create_by_params(session[underscore(CxbRank::User)])
       session[:user_added] = false
@@ -221,12 +222,12 @@ module CxbRank
     end
 
     post USER_ADD_URI do
-      settings.views << '../comrank/views/user_edit_conf'
+      settings.views << SiteSettings.join_comrank_path('views/user_edit_conf')
       user = User.create_by_params(params[underscore(CxbRank::User)])
       session[underscore(CxbRank::User)] = Hash[params[underscore(CxbRank::User)]]
       unless user.valid?
         haml :error, :layout => true,
-          :locals => {:errors => user.errors, :back_uri => request.path_info}
+          :locals => {:errors => user.errors, :back_uri => SiteSettings.join_site_base(request.path_info)}
       else
         haml :user_add_conf, :layout => true, :locals => {:user => user}
       end
@@ -234,9 +235,9 @@ module CxbRank
 
     put USER_ADD_URI do
       if params[:y].present?
-        settings.views << '../comrank/views/user_edit'
+        settings.views << SiteSettings.join_comrank_path('views/user_edit')
         if session[:user_added]
-          user = CxbRank::User.find_by_id(session[:user_id])
+          user = User.find_by_id(session[:user_id])
           haml :user_add_result, :layout => true, :locals => {:user => user}
         else
           begin
@@ -248,16 +249,16 @@ module CxbRank
             haml :user_add_result, :layout => true, :locals => {:user => user}
           rescue
             haml :error, :layout => true,
-              :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+              :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
           end
         end
       else
-        redirect USER_ADD_URI
+        redirect SiteSettings.join_site_base(USER_ADD_URI)
       end
     end
 
     get USER_LIST_URI do
-      settings.views << '../comrank/views/user_list'
+      settings.views << SiteSettings.join_comrank_path('views/user_list')
       last_modified User.last_modified
       users = User.find_actives
       haml :user_list, :layout => true, :locals => {:users => users}
@@ -268,21 +269,21 @@ module CxbRank
       error_no = Authenticator.authenticate(params)
       if error_no != NO_ERROR
         haml :error, :layout => true,
-          :locals => {:error_no => error_no, :back_uri => SITE_TOP_URI}
+          :locals => {:error_no => error_no, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
       else
         session[:user_id] = User.find_by_param_id(params[:user_id]).id
-        redirect SKILL_LIST_EDIT_URI
+        redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
       end
     end
 
     get USER_LOGOUT_URI do
       session[:user_id] = nil
-      redirect SITE_TOP_URI
+      redirect SiteSettings.join_site_base(SITE_TOP_URI)
     end
 
     get USER_EDIT_URI do
       private_page do |user|
-        settings.views << '../comrank/views/user_edit'
+        settings.views << SiteSettings.join_comrank_path('views/user_edit')
         user.update_by_params!(session[underscore(CxbRank::User)])
         haml :user_edit, :layout => true, :locals => {:user => user}
       end
@@ -290,12 +291,12 @@ module CxbRank
 
     post USER_EDIT_URI do
       private_page do |user|
-        settings.views << '../comrank/views/user_edit_conf'
+        settings.views << SiteSettings.join_comrank_path('views/user_edit_conf')
         user.update_by_params!(params[underscore(CxbRank::User)])
         session[underscore(CxbRank::User)] = Hash[params[underscore(CxbRank::User)]]
         unless user.valid?
           haml :error, :layout => true,
-            :locals => {:errors => user.errors, :back_uri => request.path_info}
+            :locals => {:errors => user.errors, :back_uri => SiteSettings.join_site_base(request.path_info)}
         else
           haml :user_edit_conf, :layout => true, :locals => {:user => user}
         end
@@ -305,19 +306,19 @@ module CxbRank
     put USER_EDIT_URI do
       if params[:y].present?
         private_page do |user|
-          settings.views << '../comrank/views/user_edit'
+          settings.views << SiteSettings.join_comrank_path('views/user_edit')
           begin
             user.update_by_params!(session[underscore(CxbRank::User)])
             user.save!
             session[underscore(CxbRank::User)] = nil
-            redirect SKILL_LIST_EDIT_URI
+            redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
           rescue
             haml :error, :layout => true,
-              :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+              :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
           end
         end
       else
-        redirect USER_EDIT_URI
+        redirect SiteSettings.join_site_base(USER_EDIT_URI)
       end
     end
 
@@ -327,132 +328,133 @@ module CxbRank
       end
     end
 
-    get "#{CxbRank::SKILL_LIST_VIEW_URI}/?:user_id?" do
+    get "#{SKILL_LIST_VIEW_URI}/?:user_id?" do
       public_user_page do |user|
         skill_list_page user, false
       end
     end
 
-    get "#{CxbRank::SKILL_LIST_VIEW_IGLOCK_URI}/?:user_id?" do
+    get "#{SKILL_LIST_VIEW_IGLOCK_URI}/?:user_id?" do
       public_user_page do |user|
         skill_list_page user, false, :ignore_locked => true
       end
     end
 
-    get "#{CxbRank::CLEAR_LIST_VIEW_URI}/?:user_id?" do
+    get "#{CLEAR_LIST_VIEW_URI}/?:user_id?" do
       public_user_page do |user|
-        settings.views << '../comrank/views/skill_chart'
-        settings.views << '../comrank/views/skill_list'
+        settings.views << SiteSettings.join_comrank_path('views/skill_chart')
+        settings.views << SiteSettings.join_comrank_path('views/skill_list')
         skill_chart = CxbRank::SkillChart.load(settings.site_mode, user)
         last_modified skill_chart.last_modified
-        fixed_title = "#{user.name}さんの#{CxbRank::PAGE_TITLES[CxbRank::CLEAR_LIST_VIEW_URI]}"
+        fixed_title = "#{user.name}さんの#{PAGE_TITLES[CLEAR_LIST_VIEW_URI]}"
         haml :skill_chart, :layout => true, :locals => {
           :user => user, :skill_chart => skill_chart, :fixed_title => fixed_title}
       end
     end
 
-    get "#{CxbRank::SKILL_ITEM_EDIT_URI}/?:music_text_id?" do
+    get "#{SKILL_ITEM_EDIT_URI}/?:music_text_id?" do
       private_page do |user|
         music_skill_edit_page(user) do |curr_skill, temp_skill|
-          settings.views << '../comrank/views/music_skill_edit'
-          fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
+          settings.views << SiteSettings.join_comrank_path('views/music_skill_edit')
+          fixed_title = "#{PAGE_TITLES[SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
           haml :music_skill_edit, :layout => true, :locals => {
-            :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title}
+            :user => user, :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title}
         end
       end
     end
 
-    post CxbRank::SKILL_ITEM_EDIT_URI do
+    post SKILL_ITEM_EDIT_URI do
       private_page do |user|
         music_skill_edit_page(user) do |curr_skill, temp_skill|
-          settings.views << '../comrank/views/music_skill_edit'
+          settings.views << SiteSettings.join_comrank_path('views/music_skill_edit')
           unless temp_skill.valid?
             haml :error, :layout => true,
-              :locals => {:errors => temp_skill.errors, :back_uri => request.path_info}
+              :locals => {:errors => temp_skill.errors, :back_uri => SiteSettings.join_site_base(request.path_info)}
           else
             temp_skill.calc!
             method = (params[:update].present? ? 'put' : 'delete')
-            fixed_title = "#{CxbRank::PAGE_TITLES[CxbRank::SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
+            fixed_title = "#{PAGE_TITLES[SKILL_ITEM_EDIT_URI]} [#{curr_skill.music.full_title}]"
             haml :music_skill_edit_conf, :layout => true, :locals => {
-              :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title, :method => method}
+              :user => user, :curr_skill => curr_skill, :temp_skill => temp_skill,
+              :fixed_title => fixed_title, :method => method}
           end
         end
       end
     end
 
-    put CxbRank::SKILL_ITEM_EDIT_URI do
+    put SKILL_ITEM_EDIT_URI do
       private_page do |user|
         if params[:y].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
             begin
               temp_skill.calc!
               temp_skill.save!
-              user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
+              user.point = SkillSet.new(settings.site_mode, user).total_point
               user.point_direct = false
               user.point_updated_at = Time.now
               user.save!
               session[:music_text_id] = nil
-              redirect CxbRank::SKILL_LIST_EDIT_URI
+              redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
             rescue
                haml :error, :layout => true,
-                 :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+                 :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
             end
           end
         else
-          redirect CxbRank::SKILL_ITEM_EDIT_URI
+          redirect SiteSettings.join_site_base(SKILL_ITEM_EDIT_URI)
         end
       end
     end
 
-    delete CxbRank::SKILL_ITEM_EDIT_URI do
+    delete SKILL_ITEM_EDIT_URI do
       private_page do |user|
         if params['y'].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
             begin
               temp_skill.destroy
-              user.point = CxbRank::SkillSet.load(settings.site_mode, user).total_point
+              user.point = SkillSet.new(settings.site_mode, user).total_point
               user.point_direct = false
               user.point_updated_at = Time.now
               user.save!
               session[:music_text_id] = nil
-              redirect CxbRank::SKILL_LIST_EDIT_URI
+              redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
             rescue
               haml :error, :layout => true,
-                :locals => {:error_no => CxbRank::ERROR_DATABASE_SAVE_FAILED, :back_uri => request.path_info}
+                :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
             end
           end
         else
-          redirect CxbRank::SKILL_ITEM_EDIT_URI
+          redirect SiteSettings.join_site_base(SKILL_ITEM_EDIT_URI)
         end
       end
     end
 
-    get CxbRank::RANK_CALC_URI do
-      last_modified CxbRank::Music.last_modified
-      musics = CxbRank::Music.find(:all, :conditions => {:limited => false})
+    get RANK_CALC_URI do
+      last_modified Music.last_modified
+      musics = Music.find(:all, :conditions => {:limited => false})
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
       end
       diffs = []
-      music_diffs.keys.sort.each do |diff|
-        diffs << CxbRank::MUSIC_DIFF_PREFIXES[diff]
+      SiteSettings.music_diffs.keys.sort.each do |diff|
+        diffs << MUSIC_DIFF_PREFIXES[diff]
       end
       haml :calc_rank, :layout => true, :locals => {:data => music_hashes, :diffs => diffs}
     end
 
-    get CxbRank::RATE_CALC_URI do
-      last_modified CxbRank::Music.last_modified
-      musics = CxbRank::Music.find(:all, :conditions => {:limited => false})
+    get RATE_CALC_URI do
+      last_modified Music.last_modified
+      musics = Music.find(:all, :conditions => {:limited => false})
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
       end
-      haml :calc_rate, :layout => true, :locals => {:data => music_hashes, :diffs => music_diffs}
+      haml :calc_rate, :layout => true, :locals => {:data => music_hashes, :diffs => SiteSettings.music_diffs}
     end
 
     get EVENT_SHEET_URI do
-      settings.views << '../comrank/views/event_list'
+      settings.views << SiteSettings.join_comrank_path('views/event_list')
       last_modified Event.last_modified
       events = Event.where(true).sort
       fixed_title = "#{PAGE_TITLES[EVENT_SHEET_URI]}一覧"

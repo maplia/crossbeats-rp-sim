@@ -4,28 +4,28 @@
       %tr
         %th{:colspan => 2} レベル
         %th.locked
-          = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
         %th.gauge
-          - if rev_mode?
-            = image_tag '/images/survival.png', :alt => 'S', :height => 12
-          = image_tag '/images/ultimate.png', :alt => 'U', :height => 12
+          - if CxbRank::SiteSettings.rev_mode?
+            = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => 'S', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => 'U', :height => 12
         %th.point RP
         - if defined? prev_skill
           %th.point 差異
         %th.rate RATE
-        - if rev_mode?
+        - if CxbRank::SiteSettings.rev_mode?
           %th.u_rate S/U
         - else
           %th.u_rate ULT
         %th.rank ランク
         %th.combo コンボ
   %tbody
-    - music_diffs.keys.sort.each do |diff|
+    - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
       - next unless skill.music.exist?(diff)
       - unless mobile?
         %tr{:class => "#{CxbRank::MUSIC_DIFF_CLASSES[diff]} diff"}
           %th.diff
-            = music_diffs[diff]
+            = CxbRank::SiteSettings.music_diffs[diff]
             - if skill.legacy(diff)
               [旧]
           %td.level
@@ -35,12 +35,12 @@
               = skill.music.level_to_s(diff)
           %td.mark
             - if skill.locked(diff)
-              = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+              = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
           %td.mark
             - if skill.survival?(diff)
-              = image_tag '/images/survival.png', :alt => '[S]', :height => 12
+              = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
             - elsif skill.ultimate?(diff)
-              = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+              = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
           %td.point= skill.point_to_s(diff)
           - if defined? prev_skill
             - difference = (skill.point(diff) || 0.0) - (prev_skill.point(diff) || 0.0)
@@ -60,7 +60,7 @@
       - else
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %th.diff{:rowspan => 2}
-            = music_diffs[diff]
+            = CxbRank::SiteSettings.music_diffs[diff]
             - if skill.legacy(diff)
               [旧]
           %td.point= skill.point_to_s(diff)
@@ -74,11 +74,11 @@
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %td.mark
             - if skill.locked(diff)
-              = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+              = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
             - if skill.survival?(diff)
-              = image_tag '/images/survival.png', :alt => '[S]', :height => 12
+              = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
             - if skill.ultimate?(diff)
-              = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+              = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
             - unless skill.locked(diff) or skill.survival?(diff) or skill.ultimate?(diff)
               &nbsp;
           - if skill.cleared?(diff)

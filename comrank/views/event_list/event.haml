@@ -1,14 +1,14 @@
 - unless mobile?
   %tr
     %th
-      %a{:href => "#{CxbRank::EVENT_SHEET_URI}/#{event.text_id}"}
+      %a{:href => event.sheet_uri}
         = event.title
     %td.span= strftime_over24(event.span_s, '%Y/%m/%d %H:%M', 4)
     %td.span= strftime_over24(event.span_e, '%Y/%m/%d %H:%M', 4)
 - else
   %tr
     %td
-      %a{:href => "#{CxbRank::EVENT_SHEET_URI}/#{event.text_id}"}
+      %a{:href => event.sheet_uri}
         = event.title
   %tr
     %td.span

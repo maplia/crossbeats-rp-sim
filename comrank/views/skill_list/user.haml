@@ -1,3 +1,4 @@
+- base_uri = "#{request.scheme}://#{request.host}"
 - unless mobile?
   %div.unit
     %div.subunit
@@ -10,16 +11,16 @@
             %tr
               %th RP表公開URL
               %td.text
-                #{link_to "http://#{request.host}#{user.skill_view_uri}", user.skill_view_uri}
+                #{link_to File.join(base_uri, user.skill_view_uri), user.skill_view_uri}
                 %br
-                #{link_to "http://#{request.host}#{user.skill_ignore_uri}", user.skill_ignore_uri}（未取得/ロックフラグ無視版）
+                #{link_to File.join(base_uri, user.skill_ignore_uri), user.skill_ignore_uri}（未取得/ロックフラグ無視版）
             %tr
               %th クリア表公開URL
               %td.text
-                #{link_to "http://#{request.host}#{user.skill_chart_uri}", user.skill_chart_uri}
-          - if user.game_id.present? and (cxb_mode? or user.game_id_display)
+                #{link_to File.join(base_uri, user.skill_chart_uri), user.skill_chart_uri}
+          - if user.game_id.present? and (CxbRank::SiteSettings.cxb_mode? or user.game_id_display)
             %tr
-              - if cxb_mode?
+              - if CxbRank::SiteSettings.cxb_mode?
                 %th C&times;B ID
               - else
                 %th REV.ユーザーID
@@ -29,7 +30,7 @@
               %th コメント
               %td.text= multiline(user.comment, true)
       - if edit
-        #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::USER_EDIT_URI}
+        #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_EDIT_URI)}
       - else
         - if request.path_info =~ Regexp.new(CxbRank::SKILL_LIST_VIEW_URI)
           通常RP表
@@ -40,7 +41,7 @@
           ロック状態無視RP表
         - else
           #{link_to 'ロック状態無視RP表', user.skill_ignore_uri}
-        - if rev_mode?
+        - if CxbRank::SiteSettings.rev_mode?
           & /
           - if request.path_info =~ Regexp.new(CxbRank::CLEAR_LIST_VIEW_URI)
             クリア状況表
@@ -48,4 +49,4 @@
             #{link_to 'クリア状況表', user.skill_chart_uri}
 - else
   - if edit
-    %p #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::USER_EDIT_URI}
+    %p #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_EDIT_URI)}

@@ -1,0 +1,40 @@
+= haml :navi
+%h1= settings.site_name
+%div.sidebar
+  = haml :common_sidebar
+  %div.unit
+    %h2 リンク
+    %div.subunit
+      %dl
+        %dt ■公式サイト
+        %dd
+          %ul
+            %li #{link_to '公式サイト', 'http://www.capcom.co.jp/arcade/rev/'}
+        %dt ■Wiki/個人サイト
+        %dd
+          %ul
+            %li #{link_to 'crossbeats REV.Wiki', 'http://crossbeatsrev.wiki.fc2.com/'}
+            %li #{link_to 'MapWiki - crossbeats REV.', 'http://wiki.maplia.jp/?crossbeats%20REV.'}
+        %dt ■姉妹サイト
+        %dd
+          %ul
+            %li #{link_to 'CxB RankPoint Simulator', 'http://cxbrank.maplia.jp/'}
+%div.main
+  %div.unit
+    %h2 このサイトについて
+    %div.subunit
+      %dl
+        %dt これは何ですか?
+        %dd
+          %p #{link_to 'カプコン', 'http://www.capcom.co.jp/'}のアーケードゲーム「#{link_to 'crossbeats REV.（クロスビーツ レヴ）', 'http://www.capcom.co.jp/arcade/rev/'}」のランクポイント管理Webアプリケーションです。「#{link_to 'CxB RankPoint Simulator', 'http://cxbrank.maplia.jp/'}」のREV.対応版となります。
+          %p 登録はご自由にどうぞ。
+          %p 何か不都合があった場合などの問い合わせは、Twitterのアカウント #{link_to '@maplia', 'https://twitter.com/maplia'}で受けつけますので、お気軽にご連絡いただければと思います。
+  %div.unit
+    %h2 最近の登録曲
+    %div.subunit
+      %p 新規収録曲のデータは、ブックマークレットによる最初のプレイデータ登録時にあわせて登録します
+      = haml :new_music
+  %div.unit
+    %h2 最新の運営情報
+    %div.subunit
+      = haml :index_news

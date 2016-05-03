@@ -18,6 +18,10 @@ module CxbRank
       end
     end
 
+    def sheet_uri
+      return SiteSettings.join_site_base(File.join(EVENT_SHEET_URI, text_id))
+    end
+
     def to_hash
       event_music_hashes = []
       event_musics.sort.each do |event_music|

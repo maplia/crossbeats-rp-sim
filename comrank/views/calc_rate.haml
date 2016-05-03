@@ -1,8 +1,8 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
 %h1= page_title
 = javascript_include_tag 'http://maplia.jp/script/jquery.json2table.js'
-= javascript_include_tag '/common/javascripts/common.js'
-= javascript_include_tag '/common/javascripts/scorerate.js'
+= javascript_include_tag '/sunrise/common/javascripts/common.js'
+= javascript_include_tag '/sunrise/common/javascripts/scorerate.js'
 :javascript
   var data = null;
   var diffs = null;
@@ -24,10 +24,10 @@
         譜面難度:
         - if mobile?
           %br
-        - music_diffs.keys.sort.each do |diff|
+        - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
           %label
-            = radio_button_tag :diff, :value => CxbRank::MUSIC_DIFF_PREFIXES[diff], :checked => (diff == music_diffs.keys.max)
-            = music_diffs[diff]
+            = radio_button_tag :diff, :value => CxbRank::MUSIC_DIFF_PREFIXES[diff], :checked => (diff == CxbRank::SiteSettings.music_diffs.keys.max)
+            = CxbRank::SiteSettings.music_diffs[diff]
           - if mobile? and diff == CxbRank::MUSIC_DIFF_HRD
             %br
       %p

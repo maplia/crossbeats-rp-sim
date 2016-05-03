@@ -13,19 +13,13 @@ module CxbRank
       :is => GAME_ID_FIGURE, :message => ERRORS[ERROR_GAME_ID_LENGTH_IS_INVALID]
     validates_format_of :point_before_type_cast, :allow_nil => true, :allow_blank => true,
       :with => /\A\d+(\.\d+)?\z/, :message => ERRORS[ERROR_REAL_RP_NOT_NUMERIC]
-    validates_presence_of :point, :if => (lambda do |a| @@mode == MODE_REV and a.id end),
+    validates_presence_of :point, :if => (lambda do |a| SiteSettings.rev_mode? and a.id end),
       :message => ERRORS[ERROR_REAL_RP_IS_UNINPUTED]
 
     before_save do |b|
       if b.password_changed?
         b.password = Digest::MD5.hexdigest(b.password)
       end
-    end
-
-    @@mode = nil
-
-    def self.mode=(mode)
-      @@mode = mode
     end
 
     def self.last_modified
@@ -71,15 +65,15 @@ module CxbRank
     end
 
     def skill_view_uri
-      return "#{SKILL_LIST_VIEW_URI}/#{user_id}"
+      return SiteSettings.join_site_base(File.join(SKILL_LIST_VIEW_URI, user_id))
     end
 
     def skill_ignore_uri
-      return "#{SKILL_LIST_VIEW_IGLOCK_URI}/#{user_id}"
+      return SiteSettings.join_site_base(File.join(SKILL_LIST_VIEW_IGLOCK_URI, user_id))
     end
 
     def skill_chart_uri
-      return "#{CLEAR_LIST_VIEW_URI}/#{user_id}"
+      return SiteSettings.join_site_base(File.join(CLEAR_LIST_VIEW_URI, user_id))
     end
 
     def to_hash

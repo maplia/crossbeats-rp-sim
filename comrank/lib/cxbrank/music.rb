@@ -2,6 +2,7 @@ require 'rubygems'
 require 'active_record'
 require 'chronic'
 require 'cxbrank/const'
+require 'cxbrank/site_settings'
 require 'cxbrank/course'
 
 module CxbRank
@@ -9,20 +10,6 @@ module CxbRank
     include Comparable
     has_many :monthlies
     has_many :legacy_charts
-
-    @@mode = nil
-
-    def self.mode=(mode)
-      @@mode = mode
-    end
-
-    def music_diffs
-      return MUSIC_DIFFS[@@mode]
-    end
-
-    def level_format
-      return LEVEL_FORMATS[@@mode]
-    end
 
     def self.create_by_request(body)
       music = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
@@ -120,7 +107,7 @@ module CxbRank
 
     def max_notes
       note_data = []
-      music_diffs.keys.each do |diff|
+      SiteSettings.music_diffs.keys.each do |diff|
         note_data << (notes(diff) || 0)
       end
       return note_data.max
@@ -147,7 +134,7 @@ module CxbRank
       unless exist?(diff)
         return '-'
       else
-        return (level(diff) == 0) ? '-' : sprintf(level_format, level(diff))
+        return (level(diff) == 0) ? '-' : sprintf(SiteSettings.level_format, level(diff))
       end
     end
 
@@ -155,7 +142,7 @@ module CxbRank
       unless exist_legacy?(diff)
         return '-'
       else
-        return (legacy_level(diff) == 0) ? '-' : sprintf(level_format, legacy_level(diff))
+        return (legacy_level(diff) == 0) ? '-' : sprintf(SiteSettings.level_format, legacy_level(diff))
       end
     end
 
@@ -242,12 +229,11 @@ module CxbRank
     def initialize(mode, date=nil)
       @mode = mode
       @date = date
-      case @mode
-      when MODE_CXB
+      if SiteSettings.cxb_mode?
         @hash = {
           MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
         }
-      when MODE_REV
+      else
         @hash = {
           MUSIC_TYPE_REV_SINGLE => [], MUSIC_TYPE_REV_LIMITED => [],
           MUSIC_TYPE_REV_COURSE => [],
@@ -258,8 +244,7 @@ module CxbRank
 
     def load!
       musics = Music.find_actives(@date).sort
-      case @mode
-      when MODE_CXB
+      if SiteSettings.cxb_mode?
         musics.each do |music|
           if music.monthly?
             @hash[MUSIC_TYPE_SPECIAL] << music
@@ -267,7 +252,7 @@ module CxbRank
             @hash[MUSIC_TYPE_NORMAL] << music
           end
         end
-      when MODE_REV
+      else
         musics.each do |music|
           if music.limited?
             @hash[MUSIC_TYPE_REV_LIMITED] << music

@@ -2,19 +2,19 @@
   - unless mobile?
     %thead
       %tr
-        - music_types.keys.sort.each do |type|
+        - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
           - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
-          %th.part= music_types[type]
+          %th.part= CxbRank::SiteSettings.music_types[type]
         %th.sum 合計RP
     %tbody
       %tr
-        - music_types.keys.sort.each do |type|
+        - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
           - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
           %td= sprintf('%.2f', skill_set[type][:point])
         %td= sprintf('%.2f', skill_set.total_point)
   - else
     %tbody
-      - music_types.keys.sort.each do |type|
+      - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
         - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
         %tr
           %th.type= music_types[type].sub(/RP対象曲/, '')

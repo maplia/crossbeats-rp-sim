@@ -3,7 +3,7 @@ require 'bigdecimal'
 module CxbRank
   # エンジン名
   ENGINE_NAME = 'CxB RankPoint Simulator REV.'
-  ENGINE_VERSION = '1.4.0'
+  ENGINE_VERSION = '1.4.1'
 
   # URI
   SITE_TOP_URI = '/'                                # サイトトップ
@@ -59,22 +59,26 @@ module CxbRank
   # 動作モード
   MODE_CXB = 'cxb'
   MODE_REV = 'rev'
+  MODE_REV_SUNRISE = 'rev_sunrise'
 
   # レベル表記
   LEVEL_FORMATS = {
-    MODE_CXB => '%.1f',
-    MODE_REV => '%d',
+    MODE_CXB         => '%.1f',
+    MODE_REV         => '%d',
   }
+  LEVEL_FORMATS[MODE_REV_SUNRISE] = LEVEL_FORMATS[MODE_REV]
 
   # 日付範囲下限値
   DATE_LOW_LIMITS = {
-    MODE_CXB => Date.parse('2013-12-02'),
-    MODE_REV => Date.parse('2015-07-23'),
+    MODE_CXB         => Date.parse('2013-12-02'),
+    MODE_REV         => Date.parse('2015-07-23'),
+    MODE_REV_SUNRISE => Date.parse('2016-04-28'),
   }
   # ULTIMATEモード導入日
   ULTIMATE_START_DATE = {
-    MODE_CXB => Date.parse('2014-01-08'),
-    MODE_REV => DATE_LOW_LIMITS[MODE_REV]
+    MODE_CXB         => Date.parse('2014-01-08'),
+    MODE_REV         => DATE_LOW_LIMITS[MODE_REV],
+    MODE_REV_SUNRISE => DATE_LOW_LIMITS[MODE_REV_SUNRISE],
   }
 
   # 編集操作モード
@@ -112,6 +116,7 @@ module CxbRank
       MUSIC_TYPE_REV_LIMITED => MUSIC_TYPE_REV_LIMITED_NAME,
     }
   }
+  MUSIC_TYPES[MODE_REV_SUNRISE] = MUSIC_TYPES[MODE_REV]
   # 曲種別ごとの最大スキル対象曲数
   MUSIC_TYPE_ST_COUNTS = {
     MUSIC_TYPE_NORMAL      => 20,
@@ -147,6 +152,7 @@ module CxbRank
       MUSIC_DIFF_UNL => MUSIC_DIFF_UNL_NAME,
     },
   }
+  MUSIC_DIFFS[MODE_REV_SUNRISE] = MUSIC_DIFFS[MODE_REV]
   MUSIC_DIFF_PREFIXES = {
     MUSIC_DIFF_ESY => MUSIC_DIFF_ESY_NAME.downcase,
     MUSIC_DIFF_STD => MUSIC_DIFF_STD_NAME.downcase,
@@ -259,21 +265,27 @@ module CxbRank
   SP_GAUGE_SURVIVAL_REV_NAME = 'SURV'
   SP_GAUGE_ULTIMATE_REV = 2
   SP_GAUGE_ULTIMATE_REV_NAME = 'ULT'
+  SP_GAUGE_SURVIVAL_REV_SUNRISE_NAME = 'SUV'
   SP_GAUGES = {
     MODE_CXB => {
-      SP_GAUGE_NORMAL       => SP_GAUGE_NORMAL_NAME, 
+      SP_GAUGE_NORMAL       => SP_GAUGE_NORMAL_NAME,
       SP_GAUGE_ULTIMATE_CXB => SP_GAUGE_ULTIMATE_CXB_NAME,
     },
     MODE_REV => {
-      SP_GAUGE_NORMAL       => SP_GAUGE_NORMAL_NAME, 
-      SP_GAUGE_SURVIVAL_REV => SP_GAUGE_SURVIVAL_REV_NAME, 
-      SP_GAUGE_ULTIMATE_REV => SP_GAUGE_ULTIMATE_REV_NAME, 
-    }
+      SP_GAUGE_NORMAL       => SP_GAUGE_NORMAL_NAME,
+      SP_GAUGE_SURVIVAL_REV => SP_GAUGE_SURVIVAL_REV_NAME,
+      SP_GAUGE_ULTIMATE_REV => SP_GAUGE_ULTIMATE_REV_NAME,
+    },
+    MODE_REV_SUNRISE => {
+      SP_GAUGE_NORMAL       => SP_GAUGE_NORMAL_NAME,
+      SP_GAUGE_SURVIVAL_REV => SP_GAUGE_SURVIVAL_REV_SUNRISE_NAME,
+      SP_GAUGE_ULTIMATE_REV => SP_GAUGE_ULTIMATE_REV_NAME,
+    },
   }
   SP_GAUGE_STATUS_OPTIONS = [
-    [SP_GAUGE_NORMAL_NAME,       SP_GAUGE_NORMAL],
-    [SP_GAUGE_SURVIVAL_REV_NAME, SP_GAUGE_SURVIVAL_REV],
-    [SP_GAUGE_ULTIMATE_REV_NAME, SP_GAUGE_ULTIMATE_REV],
+    [SP_GAUGE_NORMAL_NAME,               SP_GAUGE_NORMAL],
+    [SP_GAUGE_SURVIVAL_REV_SUNRISE_NAME, SP_GAUGE_SURVIVAL_REV],
+    [SP_GAUGE_ULTIMATE_REV_NAME,         SP_GAUGE_ULTIMATE_REV],
   ]
 
   # ゲージ・難易度によるボーナスレート

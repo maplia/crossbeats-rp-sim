@@ -6,6 +6,6 @@
         %br
       &gt;
     - if path != request.path_info
-      = link_to page_title(path), path
+      = link_to page_title(path), File.join(settings.site_base, path)
     - else
       = page_title(path)

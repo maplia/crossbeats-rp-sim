@@ -1,8 +1,8 @@
 = javascript_include_tag 'http://maplia.jp/script/jquery.cookie.js'
 = javascript_include_tag 'http://maplia.jp/script/jquery.json2table.js'
 = javascript_include_tag 'http://maplia.jp/script/strftime-min.js'
-= javascript_include_tag '/common/javascripts/common.js'
-= javascript_include_tag '/common/javascripts/event.js'
+= javascript_include_tag CxbRank::SiteSettings.join_site_common_script_base('common.js')
+= javascript_include_tag CxbRank::SiteSettings.join_site_common_script_base('event.js')
 :javascript
   var data = null;
   var event_id = null;
@@ -16,12 +16,12 @@
     initialize();
   });
 %p.top_navi
-  #{link_to settings.site_name, CxbRank::SITE_TOP_URI}
+  #{link_to settings.site_name, CxbRank::SiteSettings.join_site_base(CxbRank::SITE_TOP_URI)}
   - if mobile?
     %br
   - else
     \ /
-  - if cxb_mode?
+  - if CxbRank::SiteSettings.cxb_mode?
     #{link_to 'MapWiki - CROSS&times;BEATS', 'http://wiki.maplia.jp/?CROSS%C3%97BEATS'}
   - else
     #{link_to 'MapWiki - crossbeats REV.', 'http://wiki.maplia.jp/?crossbeats%20REV.'}
@@ -33,7 +33,7 @@
   %table#table_input
   %p
     = button_tag '計算', :onClick => 'submitScores();'
-    - if cxb_mode?
+    - if CxbRank::SiteSettings.cxb_mode?
       %label
         = check_box_tag :show_history, :id => :show_history, :checked => mobile?
         日別履歴を非表示にする
@@ -49,6 +49,6 @@
         });
 %p#p_mtime
 %table#table_chart.calc
-- if cxb_mode?
+- if CxbRank::SiteSettings.cxb_mode?
   %p#p_history 日別履歴
   %table#table_history.calc

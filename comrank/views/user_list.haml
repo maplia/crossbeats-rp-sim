@@ -13,7 +13,7 @@
               %th.user_id ユーザーID
               %th.name ユーザー名
               %th.game_id
-                - if cxb_mode?
+                - if CxbRank::SiteSettings.cxb_mode?
                   CxB ID
                 - else
                   REV.ID

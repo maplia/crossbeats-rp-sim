@@ -1,4 +1,4 @@
-- form_for skill, CxbRank::SKILL_COURSE_ITEM_EDIT_URI do |f|
+- form_for skill, action do |f|
   %table.skill_edit
     -unless mobile?
       %tbody
@@ -96,5 +96,5 @@
             = f.text_field :comment, :value => skill.comment, :class => 'comment'
   %p
     = f.submit '登録', :name => 'update'
-    = f.submit '削除', :name => 'delete', :disabled => skill.id.blank?
+    = f.submit '削除', :name => 'delete', :disabled => skill.new_record?
     = input_tag :reset, :value=> '入力リセット'
