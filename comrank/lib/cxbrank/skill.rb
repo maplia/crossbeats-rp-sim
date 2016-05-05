@@ -127,10 +127,24 @@ module CxbRank
         skill.send("#{prefix}_rate_f=", true)
         skill.send("#{prefix}_rank=", body[prefix.to_sym][:rank])
         skill.send("#{prefix}_combo=", body[prefix.to_sym][:combo])
+        skill.send("#{prefix}_score=", body[prefix.to_sym][:score])
         skill.send("#{prefix}_gauge=", body[prefix.to_sym][:gauge])
       end
       skill.calc!
       return skill
+    end
+
+    def update_by_params!(params)
+      if params.present?
+        self.attributes = params
+      end
+    end
+
+    def played?
+      SiteSettings.music_diffs.keys.each do |diff|
+        return true unless stat(diff) == SP_STATUS_NO_PLAY
+      end
+      return false
     end
 
     def stat(diff)
@@ -155,6 +169,10 @@ module CxbRank
 
     def combo(diff)
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_combo")
+    end
+
+    def score(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_score")
     end
 
     def gauge(diff)
@@ -448,8 +466,15 @@ module CxbRank
       end
       skill.stat = body[:stat]
       skill.point = body[:point]
+      skill.rate = body[:rate]
       skill.calc!
       return skill
+    end
+
+    def update_by_params!(params)
+      if params.present?
+        self.attributes = params
+      end
     end
 
     def self.max(mode, course, date=nil)
@@ -525,7 +550,15 @@ module CxbRank
     end
 
     def rate_to_s(nlv='&ndash;')
-      return ((played? and rate) ? sprintf('%.1f%%', rate) : nlv)
+      if played? and rate
+        if rate_f
+          return sprintf('%.2f%%', rate)
+        else
+          return sprintf('%d%%', rate.to_i)
+        end
+      else
+        return nlv
+      end
     end
 
     def rate_to_input_value()
@@ -554,6 +587,7 @@ module CxbRank
       @mode = mode
       @user = user
       @date = skill_options[:date]
+      @fill_empty = skill_options[:fill_empty]
       @skill_options = skill_options
       if SiteSettings.cxb_mode?
         @hash = {
@@ -577,7 +611,6 @@ module CxbRank
         @music_set = MusicSet.new(@mode, @date)
         @last_modified = @music_set.last_modified
       end
-      calc!
     end
 
     def load!
@@ -588,6 +621,7 @@ module CxbRank
         @hash[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
         music_skills.each do |skill|
+          next if !skill.played? and !@fill_empty
           if skill.music.monthly?
             @hash[MUSIC_TYPE_SPECIAL][:skills] << skill
           else
@@ -601,6 +635,7 @@ module CxbRank
         @hash[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
         music_skills.dup.each do |skill|
+          next if !skill.played? and !@fill_empty
           if skill.music.limited
             @hash[MUSIC_TYPE_REV_LIMITED][:skills] << skill
           else
@@ -698,10 +733,10 @@ module CxbRank
       skill_chart = self.new
 
       skills = Skill.find_by_user(user, :fill_empty => true)
-      if mode == MODE_CXB
+      if SiteSettings.cxb_mode?
         skills.sort! do |a, b| a.music.number <=> b.music.number end
       else
-        skills.sort!
+        skills.sort! do |a, b| a.music.sort_key <=> b.music.sort_key end
       end
       skill_chart[:skills] = skills
       skill_chart.last_modified = Skill.last_modified(user)

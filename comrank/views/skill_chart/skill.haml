@@ -13,9 +13,11 @@
         - rank_class = (skill.fullcombo?(diff) ? 'fullcombo' : (skill.failed?(diff) ? 'failed' : ''))
         %td{:class => "rank #{rank_class}", :rowspan => 2}
           - if skill.cleared?(diff)
-            = CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
+            %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
           - elsif skill.failed?(diff)
-            F
+            %div{:class => 'mark'} F
+          - if skill.cleared?(diff) or skill.failed?(diff)
+            %div{:class => 'score'}= skill.score(diff)
         - if skill.best_diff == diff and skill.rp_target?
           %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
         - else

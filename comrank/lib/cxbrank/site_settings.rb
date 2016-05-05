@@ -20,8 +20,12 @@ module CxbRank
       return File.join(@@settings.site_style_base || '', uri)
     end
 
-    def self.join_site_common_script_base(uri)
-      return File.join(@@settings.site_common_script_base || '', uri)
+    def self.join_common_style_base(uri)
+      return File.join(@@settings.common_style_base || '', uri)
+    end
+
+    def self.join_common_script_base(uri)
+      return File.join(@@settings.common_script_base || '', uri)
     end
 
     def self.join_comrank_path(path)

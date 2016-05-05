@@ -10,10 +10,12 @@
       %meta{:name => 'description', :content => settings.description}
     - else
       %meta{:name => 'robots', :content => 'noindex, nofollow'}
+    = stylesheet_link_tag CxbRank::SiteSettings.join_site_style_base('color.css')
+    = stylesheet_link_tag CxbRank::SiteSettings.join_common_style_base('common.css')
     - if mobile?
-      = stylesheet_link_tag CxbRank::SiteSettings.join_site_style_base(settings.style_sp)
+      = stylesheet_link_tag CxbRank::SiteSettings.join_common_style_base('common_sp.css')
     - else
-      = stylesheet_link_tag CxbRank::SiteSettings.join_site_style_base(settings.style_pc)
+      = stylesheet_link_tag CxbRank::SiteSettings.join_common_style_base('common_pc.css')
     = favicon_tag CxbRank::SiteSettings.join_site_image_base('favicon.ico')
     - if site_top?
       %title= settings.site_name

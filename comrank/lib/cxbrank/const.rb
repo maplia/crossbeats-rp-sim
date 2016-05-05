@@ -299,6 +299,7 @@ module CxbRank
 
   # 入力受付桁数
   POINT_FIGURE = 6            # RP入力の最大桁数（0.00～xxx.xx）
+  SCORE_FIGURE = 5            # スコアの最大桁数
   RATE_FIGURE = 6             # 達成率入力の最大桁数（0.00～100.00）
   COURSE_RATE_FIGURE = 5      # 達成率入力の最大桁数（0.0～100.0）
   GAME_ID_FIGURE = 8          # ゲームIDの桁数

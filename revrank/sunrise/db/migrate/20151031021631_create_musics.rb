@@ -1,4 +1,4 @@
-$LOAD_PATH << '../comrank/lib'
+$LOAD_PATH << '../../comrank/lib'
 require 'cxbrank/const'
 
 class CreateMusics < ActiveRecord::Migration

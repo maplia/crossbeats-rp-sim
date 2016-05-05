@@ -5,7 +5,7 @@
       %a{:href => user.skill_view_uri}
         = NKF.nkf('-wW', user.name[0, 20]) + (user.name.size > 20 ? '...' : '')
     %td.game_id
-      - if user.game_id.present? and (cxb_mode? or user.game_id_display)
+      - if user.game_id.present? and (CxbRank::SiteSettings.cxb_mode? or user.game_id_display)
         = user.game_id
     %td.point
       - if user.point
@@ -19,7 +19,7 @@
       %a{:href => user.skill_view_uri}
         = NKF.nkf('-wW', user.name[0, 8]) + (user.name.size > 8 ? '...' : '')
     %td.game_id
-      - if user.game_id.present? and (cxb_mode? or user.game_id_display)
+      - if user.game_id.present? and (CxbRank::SiteSettings.cxb_mode? or user.game_id_display)
         = user.game_id
     %td.point
       - if user.point

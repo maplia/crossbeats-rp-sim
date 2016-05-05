@@ -35,10 +35,10 @@ module CxbRank
       course = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
       unless course
         course = self.new
-        course.text_id = body[:lookup_key]
-        course.title = body[:lookup_key]
+        course.text_id = body[:text_id]
+        course.title = body[:title]
         course.level = 0
-        course.sort_key = body[:lookup_key]
+        course.sort_key = body[:text_id]
         course.lookup_key = body[:lookup_key]
         course.added_at = Date.today
       end

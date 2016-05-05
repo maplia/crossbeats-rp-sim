@@ -1,8 +1,8 @@
 $LOAD_PATH << '../comrank/lib'
 
 require 'yaml'
-require 'csv'
 require 'rubygems'
+require 'fastercsv'
 require 'active_record'
 require 'sinatra/activerecord'
 require 'sinatra/activerecord/rake'
@@ -10,18 +10,27 @@ require 'cxbrank/const'
 require 'cxbrank/music'
 require 'cxbrank/event'
 
-def quote(value)
-  if value.nil?
-    return 'null'
-  elsif value.is_a?(String)
-    return "'#{value.gsub(/'/, "''")}'"
-  elsif value.is_a?(Date)
-    return "'#{value.strftime('%Y-%m-%d')}'"
-  elsif value.is_a?(Time)
-    return "'#{value.strftime('%Y-%m-%d %H:%M:%S')}'"
-  else
-    return value.to_s
-  end
+CSV_OPTIONS = {:col_sep => "\t", :converters => nil}
+
+MUSICS_COLUMNS = []
+MUSICS_COLUMNS.push(:text_id, :number, :title, :subtitle, :sort_key)
+CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
+  MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
+  MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
+end
+MUSICS_COLUMNS.push(:limited, :hidden, :display, :added_at, :event)
+MONTHLIES_COLUMNS = [:text_id, :span_s, :span_e]
+LEGACY_CHARTS_COLUMNS = []
+LEGACY_CHARTS_COLUMNS.push(:text_id, :span_s, :span_e)
+CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
+  LEGACY_CHARTS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
+  LEGACY_CHARTS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
+end
+EVENTS_COLUMNS = [:text_id, :section, :title, :span_s, :span_e]
+EVENT_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id]
+
+def get_music(text_id)
+  return CxbRank::Music.where(:text_id => text_id).first
 end
 
 ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
@@ -30,210 +39,145 @@ ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['en
 namespace :cxbrank do
   desc 'initialize music master'
   task :init_master do
-    CSV.open('./db/master/musics.tsv', 'r', "\t") do |row|
-      music = CxbRank::Music.find(:first, :conditions => {:lookup_key => row[0]})
-      unless music
-        music = CxbRank::Music.new
-        music.lookup_key = row[0]
+    MUSICS_COLUMNS.delete(:text_id)
+    FasterCSV.table('db/master/musics.tsv', CSV_OPTIONS).each do |row|
+      data = get_music(row.field(:text_id))
+      unless data
+        data = CxbRank::Music.new
+        data.text_id = row.field(:text_id)
+        data.lookup_key = row.field(:text_id)
       end
-      music.text_id = row[0]
-      music.number = row[1]
-      music.title = row[2]
-      music.subtitle = row[3]
-      music.sort_key = row[4]
-      music.esy_level = row[5]
-      music.esy_notes = row[6]
-      music.std_level = row[7]
-      music.std_notes = row[8]
-      music.hrd_level = row[9]
-      music.hrd_notes = row[10]
-      music.mas_level = row[11]
-      music.mas_notes = row[12]
-      music.unl_level = row[13]
-      music.unl_notes = row[14]
-      music.limited = row[15] if row[15].present?
-      music.hidden = row[16] if row[16].present?
-      music.display = row[17] if row[17].present?
-      music.added_at = row[18] if row[18].present?
-      music.event = row[19]
-      music.save!
+      MUSICS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
     end
 
-    CSV.open('./db/master/monthlies.tsv', 'r', "\t") do |row|
-      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[0]}).id
-      monthly = CxbRank::Monthly.find(:first, :conditions => {:music_id => music_id, :span_s => row[1]})
-      unless monthly
-        monthly = CxbRank::Monthly.new
-        monthly.music_id = music_id
-        monthly.span_s = row[1]
+    FasterCSV.table('db/master/monthlies.tsv', CSV_OPTIONS).each do |row|
+      MONTHLIES_COLUMNS.delete(:text_id)
+      music_id = get_music(row.field(:text_id)).id
+      data = CxbRank::Monthly.where(:music_id => music_id).first
+      unless data
+        data = CxbRank::Monthly.new
+        data.music_id = music_id
       end
-      monthly.span_e = row[2]
-      monthly.save!
+      MONTHLIES_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
     end
 
-    CSV.open('./db/master/legacy_charts.tsv', 'r', "\t") do |row|
-      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[0]}).id
-      chart = CxbRank::LegacyChart.find(:first, :conditions => {:music_id => music_id, :span_s => row[1]})
-      unless chart
-        chart = CxbRank::LegacyChart.new
-        chart.music_id = music_id
-        chart.span_s = row[1]
+    FasterCSV.table('db/master/legacy_charts.tsv', CSV_OPTIONS).each do |row|
+      LEGACY_CHARTS_COLUMNS.delete(:text_id)
+      music_id = get_music(row.field(:text_id)).id
+      data = CxbRank::LegacyChart.where(:music_id => music_id).first
+      unless data
+        data = CxbRank::LegacyChart.new
+        data.music_id = music_id
       end
-      chart.span_e = row[2]
-      chart.esy_level = row[3]
-      chart.esy_notes = row[4]
-      chart.std_level = row[5]
-      chart.std_notes = row[6]
-      chart.hrd_level = row[7]
-      chart.hrd_notes = row[8]
-      chart.mas_level = row[9]
-      chart.mas_notes = row[10]
-      chart.unl_level = row[11]
-      chart.unl_notes = row[12]
-      chart.save!
+      LEGACY_CHARTS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
     end
 
-    CSV.open('./db/master/events.tsv', 'r', "\t") do |row|
-      event = CxbRank::Event.find(:first, :conditions => {:text_id => row[0], :section => row[1]})
-      unless event
-        event = CxbRank::Event.new
-        event.text_id = row[0]
-        event.section = row[1]
+    EVENTS_COLUMNS.delete(:text_id)
+    FasterCSV.table('db/master/events.tsv', CSV_OPTIONS).each do |row|
+      data = CxbRank::Event.where(:text_id => row.field(:text_id)).first
+      unless data
+        data = CxbRank::Event.new
+        data.text_id = row.field(:text_id)
       end
-      event.title = row[2]
-      event.span_s = row[3]
-      event.span_e = row[4]
-      event.save!
+      EVENTS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
     end
 
-    CSV.open('./db/master/event_musics.tsv', 'r', "\t") do |row|
-      event_id = CxbRank::Event.find(:first, :conditions => {:text_id => row[0], :section => row[1]}).id
-      event_music = CxbRank::EventMusic.find(:first, :conditions => {:event_id => event_id, :seq => row[2]})
-      unless event_music
-        event_music = CxbRank::EventMusic.new
-        event_music.event_id = event_id
-        event_music.seq = row[2]
+    FasterCSV.table('db/master/event_musics.tsv', CSV_OPTIONS).each do |row|
+      EVENT_MUSICS_COLUMNS.delete(:text_id)
+      EVENT_MUSICS_COLUMNS.delete(:seq)
+      EVENT_MUSICS_COLUMNS.delete(:music_text_id)
+      event_id = CxbRank::Event.where(:text_id => row.field(:text_id)).first.id
+      seq = row.field(:seq)
+      music_id = get_music(row.field(:music_text_id)).id
+      data = CxbRank::EventMusic.where(:event_id => event_id, :seq => seq).first
+      unless data
+        data = CxbRank::EventMusic.new
+        data.event_id = event_id
+        data.seq = seq
       end
-      music_id = CxbRank::Music.find(:first, :conditions => {:text_id => row[3]}).id
-      event_music.music_id = music_id
-      event_music.save!
+      EVENT_MUSICS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.music_id = music_id
+      data.save!
     end
   end
 
-  desc 'make upsert sql'
-  task :make_upsert_sql do
-    output = File.open('upsert.sql', 'w')
-    output.puts '-- musics'
-    CSV.open('./db/master/musics.tsv', 'r', "\t") do |row|
-      music = CxbRank::Music.new
-      music.lookup_key = row[0]
-      music.text_id = row[0]
-      music.number = row[1]
-      music.title = row[2]
-      music.subtitle = row[3]
-      music.sort_key = row[4]
-      music.esy_level = row[5]
-      music.esy_notes = row[6]
-      music.std_level = row[7]
-      music.std_notes = row[8]
-      music.hrd_level = row[9]
-      music.hrd_notes = row[10]
-      music.mas_level = row[11]
-      music.mas_notes = row[12]
-      music.unl_level = row[13]
-      music.unl_notes = row[14]
-      music.limited = row[15] if row[15].present?
-      music.hidden = row[16] if row[16].present?
-      music.display = row[17] if row[17].present?
-      music.added_at = row[18] if row[18].present?
-      music.event = row[19]
-      sql = <<EOS
-        insert into musics (lookup_key, text_id, number,
-          title, subtitle, sort_key,
-          esy_level, esy_notes, std_level, std_notes, hrd_level, hrd_notes,
-          mas_level, mas_notes, unl_level, unl_notes,
-          limited, hidden, display, added_at, event, created_at, updated_at)
-        values (#{quote(music.lookup_key)}, #{quote(music.text_id)}, #{quote(music.number)},
-          #{quote(music.title)}, #{quote(music.subtitle)}, #{quote(music.sort_key)},
-          #{quote(music.esy_level)}, #{quote(music.esy_notes)},
-          #{quote(music.std_level)}, #{quote(music.std_notes)},
-          #{quote(music.hrd_level)}, #{quote(music.hrd_notes)},
-          #{quote(music.mas_level)}, #{quote(music.mas_notes)},
-          #{quote(music.unl_level)}, #{quote(music.unl_notes)},
-          #{quote(music.limited)}, #{quote(music.hidden)}, #{quote(music.display)},
-          #{quote(music.added_at)}, #{quote(music.event)}, now(), now())
-        on duplicate key update
-          text_id = #{quote(music.text_id)},
-          title = #{quote(music.title)}, subtitle = #{quote(music.subtitle)},
-          sort_key = #{quote(music.sort_key)},
-          esy_level = #{quote(music.esy_level)}, esy_notes = #{quote(music.esy_notes)},
-          std_level = #{quote(music.std_level)}, std_notes = #{quote(music.std_notes)},
-          hrd_level = #{quote(music.hrd_level)}, hrd_notes = #{quote(music.hrd_notes)},
-          mas_level = #{quote(music.mas_level)}, mas_notes = #{quote(music.mas_notes)},
-          unl_level = #{quote(music.unl_level)}, unl_notes = #{quote(music.unl_notes)},
-          limited = #{quote(music.limited)}, hidden = #{quote(music.hidden)}, display = #{quote(music.display)},
-          added_at = #{quote(music.added_at)}, event = #{quote(music.event)}, updated_at = now();
-EOS
-      output.puts sql
+  desc 'dump music master'
+  task :dump_master do
+    FasterCSV.open('db/master/musics.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << MUSICS_COLUMNS
+      CxbRank::Music.all.each do |music|
+        data = []
+        MUSICS_COLUMNS.each do |column|
+          data << music.send(column)
+        end
+        csv << data
+      end
     end
 
-    output.puts '-- monthlies'
-    CSV.open('./db/master/monthlies.tsv', 'r', "\t") do |row|
-      text_id = row[0]
-      monthly = CxbRank::Monthly.new
-      monthly.span_s = row[1]
-      monthly.span_e = row[2]
-      sql = <<EOS
-        insert into monthlies (music_id, span_s, span_e, created_at, updated_at)
-        values (
-          (select id from musics where text_id = #{quote(text_id)}),
-          #{quote(monthly.span_s)}, #{quote(monthly.span_e)}, now(), now())
-        on duplicate key update
-          span_e = #{quote(monthly.span_e)}, updated_at = now();
-EOS
-      output.puts sql
+    FasterCSV.open('db/master/monthlies.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << MONTHLIES_COLUMNS
+      MONTHLIES_COLUMNS.delete(:text_id)
+      CxbRank::Monthly.all.each do |monthly|
+        data = []
+        data << CxbRank::Music.find(monthly.music_id).text_id
+        MONTHLIES_COLUMNS.each do |column|
+          data << monthly.send(column)
+        end
+        csv << data
+      end
     end
 
-    output.puts '-- legacy_charts'
-    CSV.open('./db/master/legacy_charts.tsv', 'r', "\t") do |row|
-      text_id = row[0]
-      chart = CxbRank::LegacyChart.new
-      chart.span_s = row[1]
-      chart.span_e = row[2]
-      chart.esy_level = row[3]
-      chart.esy_notes = row[4]
-      chart.std_level = row[5]
-      chart.std_notes = row[6]
-      chart.hrd_level = row[7]
-      chart.hrd_notes = row[8]
-      chart.mas_level = row[9]
-      chart.mas_notes = row[10]
-      chart.unl_level = row[11]
-      chart.unl_notes = row[12]
-      sql = <<EOS
-        insert into legacy_charts (music_id, span_s, span_e,
-          esy_level, esy_notes, std_level, std_notes, hrd_level, hrd_notes,
-          mas_level, mas_notes, unl_level, unl_notes,
-          created_at, updated_at)
-        values (
-          (select id from musics where text_id = #{quote(text_id)}),
-          #{quote(chart.span_s)}, #{quote(chart.span_e)},
-          #{quote(chart.esy_level)}, #{quote(chart.esy_notes)},
-          #{quote(chart.std_level)}, #{quote(chart.std_notes)},
-          #{quote(chart.hrd_level)}, #{quote(chart.hrd_notes)},
-          #{quote(chart.mas_level)}, #{quote(chart.mas_notes)},
-          #{quote(chart.unl_level)}, #{quote(chart.unl_notes)}, now(), now())
-        on duplicate key update
-          span_e = #{quote(chart.span_e)},
-          esy_level = #{quote(chart.esy_level)}, esy_notes = #{quote(chart.esy_notes)},
-          std_level = #{quote(chart.std_level)}, std_notes = #{quote(chart.std_notes)},
-          hrd_level = #{quote(chart.hrd_level)}, hrd_notes = #{quote(chart.hrd_notes)},
-          mas_level = #{quote(chart.mas_level)}, mas_notes = #{quote(chart.mas_notes)},
-          unl_level = #{quote(chart.unl_level)}, unl_notes = #{quote(chart.unl_notes)},
-          updated_at = now();
-EOS
-      output.puts sql
+    FasterCSV.open('db/master/legacy_charts.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << LEGACY_CHARTS_COLUMNS
+      LEGACY_CHARTS_COLUMNS.delete(:text_id)
+      CxbRank::LegacyChart.all.each do |chart|
+        data = []
+        data << CxbRank::Music.find(chart.music_id).text_id
+        LEGACY_CHARTS_COLUMNS.each do |column|
+          data << chart.send(column)
+        end
+        csv << data
+      end
     end
-    output.close
+
+    FasterCSV.open('db/master/events.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << EVENTS_COLUMNS
+      CxbRank::Event.all.each do |event|
+        data = []
+        EVENTS_COLUMNS.each do |column|
+          data << event.send(column)
+        end
+        csv << data
+      end
+    end
+
+    FasterCSV.open('db/master/event_musics.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << EVENT_MUSICS_COLUMNS
+      EVENT_MUSICS_COLUMNS.delete(:text_id)
+      EVENT_MUSICS_COLUMNS.delete(:music_text_id)
+      CxbRank::EventMusic.all.each do |music|
+        data = []
+        data << CxbRank::Event.find(music.event_id).text_id
+        EVENT_MUSICS_COLUMNS.each do |column|
+          data << music.send(column)
+        end
+        data << CxbRank::Music.find(music.music_id).text_id
+        csv << data
+      end
+    end
   end
 end

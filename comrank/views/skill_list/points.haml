@@ -17,7 +17,7 @@
       - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
         - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
         %tr
-          %th.type= music_types[type].sub(/RP対象曲/, '')
+          %th.type= CxbRank::SiteSettings.music_types[type].sub(/RP対象曲/, '')
           %td.point= sprintf('%.2f', skill_set[type][:point])
       %tr
         %th.type 合計RP

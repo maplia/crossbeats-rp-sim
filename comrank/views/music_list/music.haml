@@ -22,7 +22,7 @@
       = haml :music_title, :locals => {:music => music}
       - if CxbRank::SiteSettings.rev_mode? and music.hidden
         = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
-  - CxbRank::SiteSettings.music_diffs_blocks.each do |block|
+  - music_diffs_blocks.each do |block|
     %tr
       - block.each do |diff|
         - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]

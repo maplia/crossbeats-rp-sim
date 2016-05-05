@@ -1,4 +1,7 @@
-event16	0	エレクトロ☆ポップ特集	2015/09/08 15:00	2015/09/15 1:00
-event18	0	NEW YEARフェスティバル2016	2016/01/07 18:00	2016/01/14 1:00
-event19	0	ULTIMATE BEATS 第4弾	2016/03/02 18:00	2016/03/10 1:00
-event20	0	SUNRISEカウントダウン記念杯	2016/04/15 18:00	2016/04/23 1:00
+text_id	section	title	span_s	span_e
+event15	0	crossbeats REV. 稼働記念フェスティバル	Fri Jul 24 18:00:00 +0900 2015	Thu Jul 30 13:00:00 +0900 2015
+event16	0	エレクトロ☆ポップ特集	Tue Sep 08 15:00:00 +0900 2015	Tue Sep 15 01:00:00 +0900 2015
+event17	0	ATTACK THE MUSIC特集	Fri Dec 04 18:00:00 +0900 2015	Sat Dec 12 01:00:00 +0900 2015
+event18	0	NEW YEARフェスティバル2016	Thu Jan 07 18:00:00 +0900 2016	Thu Jan 14 01:00:00 +0900 2016
+event19	0	ULTIMATE BEATS 第4弾	Wed Mar 02 18:00:00 +0900 2016	Thu Mar 10 01:00:00 +0900 2016
+event20	0	SUNRISEカウントダウン記念杯	Fri Apr 15 18:00:00 +0900 2016	Sat Apr 23 01:00:00 +0900 2016

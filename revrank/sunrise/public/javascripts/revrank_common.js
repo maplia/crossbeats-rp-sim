@@ -21,7 +21,7 @@ var MUSIC_DIFFS = ['esy', 'std', 'hrd', 'mas', 'unl'];
 var GRADES = ['S++', 'S+', 'S', 'A+', 'A', 'B+', 'B', 'C', 'D', 'E'];
 var WAIT_MSEC = 1000;
 var DIALOG_TITLE = 'REV. RankPoint Simulator';
-var DIALOG_FONT_SIZE = '1.7em';
+var DIALOG_FONT_SIZE = '12pt';
 var PROGRESS_OPTIONS = {
   title: DIALOG_TITLE, cancelable: false, width: 300, font_size: DIALOG_FONT_SIZE, detail_height: '3.2em'
 };
@@ -81,6 +81,23 @@ function loadJQueryLibrary(callback) {
   return deferred.promise();
 }
 
+// ユーザの情報を取得する
+function getUserData(progress, userData) {
+  var deferred = $.Deferred();
+  // プロフィールページから情報を取得する
+  $.getWithRetries('/profile', function (document) {
+    if (!isMyDataSessionAlive(document)) {
+      console.log('ミュージックRP: セッション無効');
+      deferred.reject(MESSAGE_SESSION_IS_DEAD);
+    } else {
+      userData.revUserId = $(document).find('.mb20 dl dd')[0].textContent.trim();
+      console.log('REV.ユーザID: ' + userData.revUserId);
+      deferred.resolve();
+    }
+  });
+  return deferred.promise();
+}
+
 // RPシミュレータにログインする
 function loginToRpSim(progress, userData) {
   var deferred = $.Deferred();
@@ -113,13 +130,27 @@ function parseMusicItem(document) {
     item.sort_key = item.sort_key.toLowerCase();
     item.sort_key = item.sort_key.replace(/[\_\-\(\)]/g, ' ');
   }
-  item.title = $(document).find('.title')[0].textContent;
+  item.title = $(document).find('.title')[0].textContent.trim();
   $.each($(document).find('.pdm-result'), function (i, element) {
     var itemDiff = {};
-    itemDiff.level = parseInt(/Lv.(\d+)/.exec($(element).find('.lv')[0].textContent)[1]);
-    itemDiff.notes = parseInt(/Note:(\d+)/.exec($(element).find('.note')[0].textContent)[1]);
+    itemDiff.level = parseInt(/Lv.\s*(\d+)/.exec($(element).find('.lv')[0].textContent)[1].trim());
+    itemDiff.notes = parseInt(/Note:\s*(\d+)/.exec($(element).find('.note')[0].textContent)[1].trim());
     item[MUSIC_DIFFS[i]] = itemDiff;
   });
+  return item;
+}
+
+// チャレンジデータの取得
+function parseClassItem(document) {
+  var item = {};
+  // チャレンジRPページから取得する
+  if ($(document).find('.c-event')[0] != undefined) {
+    item.text_id = /\/([^\/]*).png/.exec($(document).find('.c-event__banner img')[0].src)[1];
+    item.text_id = item.text_id.toLowerCase();
+    item.text_id = item.text_id.replace(/[\_\-\(\)]/g, '');
+    item.sort_key = item.text_id;
+    item.title = $(document).find('.c-event__ttl--big')[0].textContent.trim();
+  }
   return item;
 }
 
@@ -133,7 +164,7 @@ function updateMasterData(sessionKey, type, item) {
     if (postData.type == 'music') {
       var logLabel = 'ミュージック [' + item.title + ']';
     } else {
-      var logLabel = 'チャレンジ [' + item.lookup_key + ']';
+      var logLabel = 'チャレンジ [' + item.title + ']';
     }
     switch (response.status) {
     case 401: case 500:
@@ -159,7 +190,7 @@ function updateRp(progress, postData, item) {
       if (postData.type == 'music') {
         var logLabel = 'ミュージックRP [' + item.title + ']';
       } else {
-        var logLabel = 'チャレンジRP [' + item.lookup_key + ']';
+        var logLabel = 'チャレンジRP [' + item.title + ']';
       }
       switch (response.status) {
       case 401:
@@ -191,6 +222,32 @@ function updateRp(progress, postData, item) {
   }
 }
 
+// ミュージックRPの更新（入口）
+function updateMusicRps(progress, userData, musicList) {
+  var deferred = $.Deferred();
+  var deferred_each = $.Deferred();
+  var chain = deferred_each;
+  progress.setMessage1('ミュージックRPを更新中です');
+  progress.setMessage2('');
+  $.each(musicList, function (i, musicItem) {
+    chain = chain.then(function () {
+      return updateMusicRp(progress, userData, musicItem);
+    }).then(function () {
+      return wait(WAIT_MSEC);
+    }).then(function () {
+      progress.incProgressbarValue();
+      return $.Deferred().resolve().promise();
+    });
+  });
+  chain.done(function () {
+    deferred.resolve();
+  }).fail(function (e) {
+    deferred.reject(e);
+  });
+  deferred_each.resolve();
+  return deferred.promise();
+}
+
 // ミュージックRPの更新（単曲）
 function updateMusicRp(progress, userData, musicItem) {
   var deferred = $.Deferred();
@@ -216,7 +273,7 @@ function updateMusicRp(progress, userData, musicItem) {
 }
 
 // ミュージックRPの取得
-function parseMusicRp(document, lookupKey) {
+function parseMusicRp(document) {
   var body = {};
   // ミュージックRPの取得
   $.each($(document).find('.pdm-result'), function (i, element) {
@@ -231,13 +288,16 @@ function parseMusicRp(document, lookupKey) {
       bodyDiff.stat = 1;      // クリア
       bodyDiff.rank = grade;
     }
+    // スコア
+    var score = parseInt($(element).find('.pdResultList dd')[0].textContent.trim());
+    bodyDiff.score = score;
     // 以下はクリアしている譜面のみ取得
     if (bodyDiff.stat == 1) {
       // RP
-      var point = parseFloat($(element).find('.pdResultList dd')[2].textContent);
+      var point = parseFloat($(element).find('.pdResultList dd')[2].textContent.trim());
       bodyDiff.point = point;
       // クリアレート
-      var rate = parseFloat($(element).find('.pdResultList dd')[1].textContent);
+      var rate = parseFloat($(element).find('.pdResultList dd')[1].textContent.trim());
       bodyDiff.rate = rate;
       // ゲージタイプ
       var gaugeSrc = ($(element).find('.clear p').length == 1 ? $(element).find('.clear p img')[0].src : 'bnr_dummy_CLEAR.png'); 
@@ -251,7 +311,7 @@ function parseMusicRp(document, lookupKey) {
       }
       // フルコンボ
       if ($(element).find('.fullcombo').length == 1) {
-        var notes = parseInt(/Note:(\d+)/.exec($(element).find('.note')[0].textContent)[1]);
+        var notes = parseInt(/Note:\s*(\d+)/.exec($(element).find('.note')[0].textContent)[1].trim());
         var score = parseInt($(element).find('.pdResultList dd')[0].textContent);
         if (notes * 100 == score) {
           bodyDiff.combo = 2; // フルコンボ（All Flawless）
@@ -266,6 +326,88 @@ function parseMusicRp(document, lookupKey) {
   });
   return {
     'type': 'music',
+    'body': body
+  };
+}
+
+// チャレンジRPの更新（入口）
+function updateClassRps(progress, userData, classList) {
+  var deferred = $.Deferred();
+  var deferred_each = $.Deferred();
+  var chain = deferred_each;
+  progress.setMessage1('チャレンジRPを更新中です');
+  progress.setMessage2('');
+  $.each(classList, function (i, classItem) {
+    chain = chain.then(function () {
+      return updateClassRp(progress, userData, classItem);
+    }).then(function () {
+      return wait(WAIT_MSEC);
+    }).then(function () {
+      progress.incProgressbarValue();
+      return $.Deferred().resolve().promise();
+    });
+  });
+  chain.done(function () {
+    deferred.resolve();
+  }).fail(function (e) {
+    deferred.reject(e);
+  });
+  deferred_each.resolve();
+  return deferred.promise();
+}
+
+// チャレンジRPの更新（単体）
+function updateClassRp(progress, userData, classItem) {
+  var deferred = $.Deferred();
+  progress.setMessage2(classItem.title);
+  $.getWithRetries(classItem.uri, function (document) {
+    if (!isMyDataSessionAlive(document)) {
+      console.log('チャレンジRP: セッション無効');
+      deferred.reject(MESSAGE_SESSION_IS_DEAD);
+    } else {
+      var postData = parseClassRp(document);
+      postData.key = userData.key;
+      postData.lookup_key = /playdatachallenge\/(.+)/.exec(classItem.uri)[1];
+      classItem = parseClassItem(document);
+      classItem.lookup_key = postData.lookup_key; 
+      updateRp(progress, postData, classItem).done(function () {
+        deferred.resolve();
+      }).fail(function (e) {
+        deferred.reject(e);
+      });
+    }
+  });
+  return deferred.promise();
+}
+
+// チャレンジRPの取得
+function parseClassRp(document) {
+  var body = {};
+  // プレイ状況
+  // 1曲目が未プレイならコース全部未プレイ、4曲目が未プレイか失敗でなければ完走とみなす
+  var grade = parseInt(/grade_(\d+).png/.exec($(document).find('.chMissionBlock .chmGrade img')[0].src)[1]) + 1;
+  if (grade == GRADES.length + 2) {
+  	body.stat = 0;          // プレイなし
+  } else {
+    grade = parseInt(/grade_(\d+).png/.exec($(document).find('.chMissionBlock .chmGrade img')[3].src)[1]) + 1;
+    if (grade >= GRADES.length + 1) {
+      body.stat = 2;        // クリア失敗
+    } else {
+      body.stat = 1;        // クリア成功
+    }
+  }
+  // 以下はプレイしているクラスのみ取得
+  if (body.stat != 0) {
+    // RP
+    var point = parseFloat(/(\d+\.\d+)/.exec($(document).find('.eventResult dd')[3].textContent.trim())[1]);
+     body.point = point;
+    // クリアレート
+    var rate = parseFloat(/(\d+\.\d+)/.exec($(document).find('.eventResult dd')[2].textContent.trim())[1]);
+    body.rate = rate;
+  }
+
+  return {
+    'type': 'course',
     'body': body
   };
 }
@@ -313,7 +455,8 @@ function updateTotalRp(progress, userData) {
 // 総合RPの取得
 function parseTotalRp(document) {
   body = {};
-  body.point = parseFloat($(document).find('.f220')[0].textContent + $(document).find('.f200')[0].textContent);
+  pointParts = /(\d+).*(\.\d+)/.exec($(document).find('.m-profile__rp')[0].textContent.trim());
+  body.point = parseFloat(pointParts[1] + pointParts[2]);
   return {
     'body': body
   };
@@ -338,5 +481,17 @@ function logoutFromRpSim(progress, userData) {
     }
     deferred.resolve();
   });
+  return deferred.promise();
+}
+
+// 取得できる楽曲とクラスの件数を進捗件数に反映する
+function setProgressbarMax(progress, musicList, classList, isForRpUpdate) {
+  var deferred = $.Deferred();
+  if (isForRpUpdate) {
+    progress.setProgressbarMax(musicList.length + classList.length + 2);
+  } else {
+    progress.setProgressbarMax(musicList.length + classList.length);
+  }
+  deferred.resolve();
   return deferred.promise();
 }

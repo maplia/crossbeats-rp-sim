@@ -1,42 +1,24 @@
-var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/';
-var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/';
+//var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/';
+//var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/';
+var RPSIM_HTTP_BASE_URI = 'http://revtest.maplia.jp/sunrise/';
+var RPSIM_HTTPS_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/sunrise/';
 
 var COMMON_SCRIPT_URI = RPSIM_HTTPS_BASE_URI + 'javascripts/revrank_common.js';
 
 var progress = null;
 var userData = {};
-var musicItem = {};
+var musicList = [];
 
 // 取得する楽曲の情報を取得する
-function getMusicItem(progress, musicItem, isForRpUpdate) {
+function getMusicItem(musicList) {
   var deferred = $.Deferred();
   // 現在のページから情報を取得する
-  musicItem.title = $('.title').first().text();
+  var musicItem = {};
+  musicItem.title = $('.title')[0].textContent.trim();
   musicItem.uri = $(location).attr('href');
+  musicList.push(musicItem);
   console.log('楽曲件数: ' + 1);
-  if (isForRpUpdate) {
-    progress.setProgressbarMax(1 + 2);
-  } else {
-    progress.setProgressbarMax(1);
-  }
   deferred.resolve();
-  return deferred.promise();
-}
-
-// ユーザの情報を取得する
-function getUserData(progress, userData) {
-  var deferred = $.Deferred();
-  // プロフィールページから情報を取得する
-  $.getWithRetries('/profile', function (document) {
-    if (!isMyDataSessionAlive(document)) {
-      console.log('ミュージックRP: セッション無効');
-      deferred.reject(MESSAGE_SESSION_IS_DEAD);
-    } else {
-      userData.revUserId = $(document).find('.u-profList li dl dd')[0].textContent;
-      console.log('REV.ユーザID: ' + userData.revUserId);
-      deferred.resolve();
-    }
-  });
   return deferred.promise();
 }
 
@@ -65,13 +47,15 @@ $.getScript(COMMON_SCRIPT_URI).done(function () {
     progress.open();
     console.log('ダイアログ初期化完了');
   }).then(function () {
-    return getMusicItem(progress, musicItem, true);
+    return getMusicItem(musicList);
+  }).then(function () {
+    return setProgressbarMax(progress, musicList, [], true);
   }).then(function () {
     return getUserData(progress, userData);
   }).then(function () {
     return loginToRpSim(progress, userData);
   }).then(function () {
-    return updateMusicRps(progress, userData, musicItem);
+    return updateMusicRps(progress, userData, musicList);
   }).then(function () {
     return updateTotalRp(progress, userData);
   }).then(function () {

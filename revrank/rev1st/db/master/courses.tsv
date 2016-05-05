@@ -1,5 +1,6 @@
-Class_01.png	class1	CLASS I	class1	20	0	0	1
-Class_02.png	class2	CLASS II	class2	35	0	0	1
-Class_03.png	class3	CLASS III	class3	45	0	0	1
-Class_04.png	class4	CLASS IV	class4	60	0	0	1
-Class_05.png	class5	CLASS V	class5	70	0	0	1
+lookup_key	text_id	title	sort_key	level	limited	hidden	display	added_at
+Class_01.png	class1	CLASS I	class1	20	0	0	1	2015/7/23
+Class_02.png	class2	CLASS II	class2	35	0	0	1	2015/7/23
+Class_03.png	class3	CLASS III	class3	45	0	0	1	2015/7/23
+Class_04.png	class4	CLASS IV	class4	60	0	0	1	2015/7/23
+Class_05.png	class5	CLASS V	class5	70	0	0	1	2015/7/23

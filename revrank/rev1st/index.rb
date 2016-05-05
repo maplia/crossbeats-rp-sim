@@ -1,6 +1,6 @@
 #!/usr/local/bin/ruby -Ku
 
-load './app.rb'
+load './../common/app.rb'
 
 STDOUT.binmode
 Rack::Handler::CGI.run RevRankApp

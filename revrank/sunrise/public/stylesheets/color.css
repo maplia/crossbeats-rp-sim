@@ -28,7 +28,7 @@ table {
 }
 th, table.skill_list th.number, table.skill_course_list th.number, table.skill_summary td {
   color: inherit;
-  background-color: #f4be9b;
+  background-color: #ffde9b;
   border-color: #6d3d33 !important;
 }
 td {

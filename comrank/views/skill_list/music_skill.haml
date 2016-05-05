@@ -59,12 +59,12 @@
       - if target_diff and skill.legacy(target_diff)
         [旧]
       - if target_diff and skill.locked(target_diff)
-        = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+        = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
       - if target_diff
         - if skill.survival?(target_diff)
-          = image_tag '/images/survival.png', :alt => '[S]', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
         - elsif skill.ultimate?(target_diff)
-          = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
   %tr{:class => css_class}
     - if !target_diff or !skill.cleared?(target_diff)
       %td.status{:colspan => 5} 記録なし

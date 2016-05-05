@@ -1,23 +1,17 @@
-var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/';
-var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/';
+//var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/';
+//var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/';
+var RPSIM_HTTP_BASE_URI = 'http://revtest.maplia.jp/sunrise/';
+var RPSIM_HTTPS_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/sunrise/';
 
 var COMMON_SCRIPT_URI = RPSIM_HTTPS_BASE_URI + 'javascripts/revrank_common.js';
 
 var progress = null;
 var userData = {};
 var musicList = [];
-
-// ユーザの情報を取得する
-function getUserData(progress, userData) {
-  var deferred = $.Deferred();
-  userData.revUserId = $('.u-profList li dl dd')[0].textContent;
-  console.log('REV.ユーザID: ' + userData.revUserId);
-  deferred.resolve();
-  return deferred.promise();
-}
+var classList = [];
 
 // 取得できる楽曲の情報を取得する
-function getMusicList(progress, musicList, isForRpUpdate) {
+function getMusicList(musicList) {
   var deferred = $.Deferred();
   // ミュージックデータのリンクリストから情報を取得する
   $.getWithRetries('playdatamusic', function (document) {
@@ -31,96 +25,42 @@ function getMusicList(progress, musicList, isForRpUpdate) {
             return false;
           }
           var musicItem = {};
-          musicItem.title = $(element).find('.pdMtitle').first().text();
+          musicItem.title = $(element).find('.pdMtitle')[0].textContent.trim();
           musicItem.uri = href;
           musicList.push(musicItem);
         }
       });
       console.log('楽曲件数: ' + musicList.length);
-      if (isForRpUpdate) {
-        progress.setProgressbarMax(musicList.length + 2);
-      } else {
-        progress.setProgressbarMax(musicList.length);
-      }
       deferred.resolve();
     }
   });
   return deferred.promise();
 }
 
-// チャレンジRPの更新
-function updateChallengeRp(progress, userData) {
+// 取得できるクラスの情報を取得する
+function getClassList(classList) {
   var deferred = $.Deferred();
-  progress.setMessage1('チャレンジRPを更新中です');
-  progress.setMessage2('');
-  // RP対象曲一覧のチャレンジRP部分を参照する
-  $.getWithRetries('rplist', function (document) {
+  // チャレンジデータのリンクリストから情報を取得する
+  $.getWithRetries('playdatachallenge', function (document) {
     if (!isMyDataSessionAlive(document)) {
-      console.log('チャレンジRP: セッション無効');
       deferred.reject(MESSAGE_SESSION_IS_DEAD);
     } else {
-      var postData = parseChallengeRp(document);
-      if (!postData) {
-        console.log('チャレンジRP: 対象なし');
-        progress.incProgressbarValue();
-        deferred.resolve();
-      } else {
-        postData.key = userData.key;
-        var item = {
-          'lookup_key': postData.lookup_key
-        };
-        updateRp(progress, postData, item).then(function () {
-          progress.incProgressbarValue();
-          deferred.resolve();
-        }, function (e) {
-          deferred.reject(e);
-        });
-      }
+      $.each($(document).find('.c-event__list li'), function (i, element) {
+        if ($(element).find('a').length > 0) {
+          href = $(element).find('a')[0].href;
+          if ((href.split('/').length > 3) && (href.split('/')[2] != location.hostname)) {
+            return false;
+          }
+          var classItem = {};
+          classItem.title = $(element).find('.c-event__ttl')[0].textContent.trim();
+          classItem.uri = href;
+          classList.push(classItem);
+        }
+      });
+      console.log('クラス件数: ' + classList.length);
+      deferred.resolve();
     }
   });
-  return deferred.promise();
-}
-
-// チャレンジRPの取得
-function parseChallengeRp(document) {
-  if ($(document).find('.rpc-image').length == 0) {
-    return null;
-  } else {
-    // 対象クラスとチャレンジRPを取得して、post用データを作成する
-    var lookupKey = /(Class_\d\d\.png)/.exec($(document).find('.rpc-image')[0].src)[1];
-    var point = parseFloat(/(\d+\.\d+)/.exec($(document).find('.rpc-cTxt')[0].textContent)[1]);
-    return {
-      'type': 'course', 'lookup_key': lookupKey,
-      'body': {
-        'stat': 1, 'point': point
-      }
-    };
-  }
-}
-
-// ミュージックRPの更新（入口）
-function updateMusicRps(progress, userData, musicList) {
-  var deferred = $.Deferred();
-  var deferred_each = $.Deferred();
-  var chain = deferred_each;
-  progress.setMessage1('ミュージックRPを更新中です');
-  progress.setMessage2('');
-  $.each(musicList, function (i, musicItem) {
-    chain = chain.then(function () {
-      return updateMusicRp(progress, userData, musicItem);
-    }).then(function () {
-      return wait(WAIT_MSEC);
-    }).then(function () {
-      progress.incProgressbarValue();
-      return $.Deferred().resolve().promise();
-    });
-  });
-  chain.done(function () {
-    deferred.resolve();
-  }).fail(function (e) {
-    deferred.reject(e);
-  });
-  deferred_each.resolve();
   return deferred.promise();
 }
 
@@ -135,11 +75,15 @@ $.getScript(COMMON_SCRIPT_URI).done(function () {
   }).then(function () {
     return loginToRpSim(progress, userData);
   }).then(function () {
-    return getMusicList(progress, musicList, true);
+    return getMusicList(musicList);
   }).then(function () {
-    return updateChallengeRp(progress, userData);
+    return getClassList(classList);
+  }).then(function () {
+    return setProgressbarMax(progress, musicList, classList, true);
   }).then(function () {
     return updateMusicRps(progress, userData, musicList);
+  }).then(function () {
+    return updateClassRps(progress, userData, classList);
   }).then(function () {
     return updateTotalRp(progress, userData);
   }).then(function () {

@@ -133,7 +133,7 @@ function updateMasterData(sessionKey, type, item) {
     if (postData.type == 'music') {
       var logLabel = 'ミュージック [' + item.title + ']';
     } else {
-      var logLabel = 'チャレンジ [' + item.lookup_key + ']';
+      var logLabel = 'チャレンジ [' + item.title + ']';
     }
     switch (response.status) {
     case 401: case 500:
@@ -159,7 +159,7 @@ function updateRp(progress, postData, item) {
       if (postData.type == 'music') {
         var logLabel = 'ミュージックRP [' + item.title + ']';
       } else {
-        var logLabel = 'チャレンジRP [' + item.lookup_key + ']';
+        var logLabel = 'チャレンジRP [' + item.title + ']';
       }
       switch (response.status) {
       case 401:

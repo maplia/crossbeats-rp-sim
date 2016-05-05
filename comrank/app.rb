@@ -134,9 +134,7 @@ module CxbRank
         else
           curr_skill = Skill.find_by_user_and_music(user, music)
           temp_skill = Skill.find_by_user_and_music(user, music)
-          if params[underscore(CxbRank::Skill)]
-            temp_skill.attributes = params[underscore(CxbRank::Skill)]
-          end
+          temp_skill.update_by_params!(session[underscore(CxbRank::Skill)])
           yield curr_skill, temp_skill
         end
       end
@@ -364,6 +362,7 @@ module CxbRank
     end
 
     post SKILL_ITEM_EDIT_URI do
+      session[underscore(CxbRank::Skill)] = Hash[params[underscore(CxbRank::Skill)]]
       private_page do |user|
         music_skill_edit_page(user) do |curr_skill, temp_skill|
           settings.views << SiteSettings.join_comrank_path('views/music_skill_edit')
@@ -389,11 +388,14 @@ module CxbRank
             begin
               temp_skill.calc!
               temp_skill.save!
-              user.point = SkillSet.new(settings.site_mode, user).total_point
+              skill_set = SkillSet.new(settings.site_mode, user)
+              skill_set.load!
+              user.point = skill_set.total_point
               user.point_direct = false
               user.point_updated_at = Time.now
               user.save!
               session[:music_text_id] = nil
+              session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
             rescue
                haml :error, :layout => true,
@@ -412,11 +414,14 @@ module CxbRank
           music_skill_edit_page(user) do |curr_skill, temp_skill|
             begin
               temp_skill.destroy
-              user.point = SkillSet.new(settings.site_mode, user).total_point
+              skill_set = SkillSet.new(settings.site_mode, user)
+              skill_set.load!
+              user.point = skill_set.total_point
               user.point_direct = false
               user.point_updated_at = Time.now
               user.save!
               session[:music_text_id] = nil
+              session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
             rescue
               haml :error, :layout => true,

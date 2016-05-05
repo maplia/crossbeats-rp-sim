@@ -23,9 +23,7 @@ class RevRankApp < CxbRank::AppBase
       else
         curr_skill = CourseSkill.find_by_user_and_course(user, course)
         temp_skill = CourseSkill.find_by_user_and_course(user, course)
-        if params[underscore(CxbRank::CourseSkill)]
-          temp_skill.attributes = params[underscore(CxbRank::CourseSkill)]
-        end
+        temp_skill.update_by_params!(session[underscore(CxbRank::CourseSkill)])
         yield curr_skill, temp_skill
       end
     end
@@ -60,6 +58,7 @@ class RevRankApp < CxbRank::AppBase
   end
 
   post SKILL_COURSE_ITEM_EDIT_URI do
+    session[underscore(CxbRank::CourseSkill)] = Hash[params[underscore(CxbRank::CourseSkill)]]
     private_page do |user|
       course_skill_edit_page(user) do |curr_skill, temp_skill|
         settings.views << SiteSettings.join_comrank_path('views/course_skill_edit')
@@ -84,11 +83,14 @@ class RevRankApp < CxbRank::AppBase
           begin
             temp_skill.calc!
             temp_skill.save!
-            user.point = SkillSet.new(settings.site_mode, user).total_point
+            skill_set = SkillSet.new(settings.site_mode, user)
+            skill_set.calc!
+            user.point = skill_set.total_point
             user.point_direct = false
             user.point_updated_at = Time.now
             user.save!
             session[:course_text_id] = nil
+            session[underscore(CxbRank::CourseSkill)] = nil
             redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
           rescue
             haml :error, :layout => true,
@@ -107,7 +109,9 @@ class RevRankApp < CxbRank::AppBase
         course_skill_edit_page(user) do |curr_skill, temp_skill|
           begin
             temp_skill.destroy
-            user.point = SkillSet.new(settings.site_mode, user).total_point
+            skill_set = SkillSet.new(settings.site_mode, user)
+            skill_set.calc!
+            user.point = skill_set.total_point
             user.point_direct = false
             user.point_updated_at = Time.now
             user.save!
