@@ -133,7 +133,7 @@ function updateMasterData(sessionKey, type, item) {
     if (postData.type == 'music') {
       var logLabel = 'ミュージック [' + item.title + ']';
     } else {
-      var logLabel = 'チャレンジ [' + item.title + ']';
+      var logLabel = 'チャレンジ [' + item.lookup_key + ']';
     }
     switch (response.status) {
     case 401: case 500:
@@ -159,7 +159,7 @@ function updateRp(progress, postData, item) {
       if (postData.type == 'music') {
         var logLabel = 'ミュージックRP [' + item.title + ']';
       } else {
-        var logLabel = 'チャレンジRP [' + item.title + ']';
+        var logLabel = 'チャレンジRP [' + item.lookup_key + ']';
       }
       switch (response.status) {
       case 401:
@@ -231,6 +231,9 @@ function parseMusicRp(document, lookupKey) {
       bodyDiff.stat = 1;      // クリア
       bodyDiff.rank = grade;
     }
+    // スコア
+    var score = parseInt($(element).find('.pdResultList dd')[0].textContent.trim());
+    bodyDiff.score = score;
     // 以下はクリアしている譜面のみ取得
     if (bodyDiff.stat == 1) {
       // RP

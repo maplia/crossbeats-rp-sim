@@ -1,7 +1,5 @@
-//var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/';
-//var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/';
-var RPSIM_HTTP_BASE_URI = 'http://revtest.maplia.jp/sunrise/';
-var RPSIM_HTTPS_BASE_URI = 'https://secure508.sakura.ne.jp/revtest.maplia.jp/sunrise/';
+var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/sunrise/';
+var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/sunrise/';
 
 var COMMON_SCRIPT_URI = RPSIM_HTTPS_BASE_URI + 'javascripts/revrank_common.js';
 
@@ -84,8 +82,8 @@ $.getScript(COMMON_SCRIPT_URI).done(function () {
     return updateMusicRps(progress, userData, musicList);
   }).then(function () {
     return updateClassRps(progress, userData, classList);
-  }).then(function () {
-    return updateTotalRp(progress, userData);
+//  }).then(function () {
+//    return updateTotalRp(progress, userData);
   }).then(function () {
     return logoutFromRpSim(progress, userData);
   }).done(function () {

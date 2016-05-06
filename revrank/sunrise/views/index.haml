@@ -18,6 +18,7 @@
         %dt ■姉妹サイト
         %dd
           %ul
+            %li #{link_to 'REV RankPoint Simulator', 'http://cxbrank.maplia.jp/rev1st/'}
             %li #{link_to 'CxB RankPoint Simulator', 'http://cxbrank.maplia.jp/'}
 %div.main
   %div.unit
@@ -27,13 +28,23 @@
         %dt これは何ですか?
         %dd
           %p #{link_to 'カプコン', 'http://www.capcom.co.jp/'}のアーケードゲーム「#{link_to 'crossbeats REV. SUNRISE（クロスビーツ レヴ サンライズ）', 'http://www.capcom.co.jp/arcade/rev/'}」のランクポイント管理Webアプリケーションです。「#{link_to 'CxB RankPoint Simulator', 'http://cxbrank.maplia.jp/'}」のREV.対応版となります。
-          %p
-            %del 登録はご自由にどうぞ。
-          %p
-            %del 何か不都合があった場合などの問い合わせは、Twitterのアカウント #{link_to '@maplia', 'https://twitter.com/maplia'}で受けつけますので、お気軽にご連絡いただければと思います。
-          %p
-            %strong これはテスト公開版です。動作保証は一切しません。不具合があればご報告ください
-          %p RP計算に関する修正はまだ実施していません。情報あればお寄せくださると助かります
+          %p 登録はご自由にどうぞ。
+          %p 何か不都合があった場合などの問い合わせは、Twitterのアカウント #{link_to '@maplia', 'https://twitter.com/maplia'}で受けつけますので、お気軽にご連絡いただければと思います。
+        %dt RP計算について
+        %dd
+          %p RP計算は以下の合計で調整しています。問題なければこれで確定します
+          %ol
+            %li <u>単曲RP上位20曲のRP合計</u>
+            %ul
+              %li 単曲RPの計算についてはクリアレートの小数点以下はすべて切り捨てです
+            %li <u><em>すべて</em>のUNLIMITED譜面RPの1%RP合計</u>
+            %ul
+              %li 初代REV.とは違い、上位20曲かどうかに関係なく合計します
+              %li 1%のもとになるRPは、クリアレートの小数点以下も第2位まで含めて計算しています
+              %li すべて合計したあと、RPの小数点以下第3位で切り捨て
+            %li <u>チャレンジの上位1コースのRP</u>
+            %ul
+              %li クリアレートの小数点以下も計算に使います
   %div.unit
     %h2 最近の登録曲
     %div.subunit

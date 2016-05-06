@@ -109,9 +109,10 @@ namespace :revrank do
 
     FasterCSV.table('db/master/event_musics.tsv', CSV_OPTIONS).each do |row|
       EVENT_MUSICS_COLUMNS.delete(:text_id)
+      EVENT_MUSICS_COLUMNS.delete(:section)
       EVENT_MUSICS_COLUMNS.delete(:seq)
       EVENT_MUSICS_COLUMNS.delete(:music_text_id)
-      event_id = CxbRank::Event.where(:text_id => row.field(:text_id)).first.id
+      event_id = CxbRank::Event.where(:text_id => row.field(:text_id), :section => row.field(:section)).first.id
       seq = row.field(:seq)
       music_id = get_music(row.field(:music_text_id)).id
       data = CxbRank::EventMusic.where(:event_id => event_id, :seq => seq).first

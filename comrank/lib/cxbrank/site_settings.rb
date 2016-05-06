@@ -40,6 +40,10 @@ module CxbRank
       return @@settings.site_mode.start_with?(MODE_REV)
     end
 
+    def self.rev_sunrise_mode?
+      return @@settings.site_mode == MODE_REV_SUNRISE
+    end
+
     def self.music_diffs
       return MUSIC_DIFFS[@@settings.site_mode]
     end
@@ -50,6 +54,10 @@ module CxbRank
 
     def self.level_format
       return LEVEL_FORMATS[@@settings.site_mode]
+    end
+
+    def self.date_low_limit
+      return DATE_LOW_LIMITS[@@settings.site_mode]
     end
 
     def self.legacy_chart_enabled?

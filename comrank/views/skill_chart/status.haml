@@ -35,7 +35,7 @@
         %th 最高クリアレベル
         %td.mark
           - if status[:clear][:max_level] > 0
-            = "Lv.#{sprintf(level_format, status[:clear][:max_level])}"
+            = "Lv.#{sprintf(CxbRank::SiteSettings.level_format, status[:clear][:max_level])}"
           - else
             &ndash;
     - count_title = 'フルコンボ譜面数'

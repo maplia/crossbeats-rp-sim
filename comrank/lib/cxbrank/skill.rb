@@ -83,6 +83,8 @@ module CxbRank
           skill.music = music
           skills << skill
         end
+      else
+        skills.delete_if do |skill| !skill.played? end
       end
       return skills
     end
@@ -350,6 +352,16 @@ module CxbRank
       return (survival?(diff) ? BONUS_RATE_SURVIVAL : (ultimate?(diff) ? BONUS_RATE_ULTIMATE : BONUS_RATE_NONE))
     end
 
+    def unlimited_bonus
+      diff = MUSIC_DIFF_UNL
+      if music.exist?(diff) and cleared?(diff)
+        pure_point = music.level(diff) * (rate(diff) / 100.0) * gauge_bonus_rate(diff)
+        return pure_point * BONUS_RATE_UNLIMITED
+      else
+        return 0.0
+      end
+    end
+
     def to_hash
       hash = {
         :music => music.to_hash, :comment => comment,
@@ -443,6 +455,8 @@ module CxbRank
             skills << skill
           end
         end
+      else
+        skills.delete_if do |skill| !skill.played? end
       end
       return skills
     end
@@ -587,7 +601,6 @@ module CxbRank
       @mode = mode
       @user = user
       @date = skill_options[:date]
-      @fill_empty = skill_options[:fill_empty]
       @skill_options = skill_options
       if SiteSettings.cxb_mode?
         @hash = {
@@ -621,7 +634,6 @@ module CxbRank
         @hash[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
         music_skills.each do |skill|
-          next if !skill.played? and !@fill_empty
           if skill.music.monthly?
             @hash[MUSIC_TYPE_SPECIAL][:skills] << skill
           else
@@ -635,7 +647,6 @@ module CxbRank
         @hash[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
         music_skills.dup.each do |skill|
-          next if !skill.played? and !@fill_empty
           if skill.music.limited
             @hash[MUSIC_TYPE_REV_LIMITED][:skills] << skill
           else
@@ -658,10 +669,18 @@ module CxbRank
         @total_point += type_set[:point]
       end
       if SiteSettings.rev_mode?
-        min_target = @hash[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
-        @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
-          if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
-            @hash[MUSIC_TYPE_REV_BONUS][:skills] << skill
+        if !SiteSettings.rev_sunrise_mode?
+          min_target = @hash[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
+          @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
+            if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
+              @hash[MUSIC_TYPE_REV_BONUS][:skills] << skill
+            end
+          end
+        else
+          @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
+            if skill.cleared?(MUSIC_DIFF_UNL)
+              @hash[MUSIC_TYPE_REV_BONUS][:skills] << skill
+            end
           end
         end
         @hash[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
@@ -677,10 +696,14 @@ module CxbRank
         else
           @hash[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
             if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
-              @hash[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+              if !SiteSettings.rev_sunrise_mode?
+                @hash[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
+              else
+                @hash[MUSIC_TYPE_REV_BONUS][:point] += skill.unlimited_bonus
+              end
             end
           end
-          @hash[MUSIC_TYPE_REV_BONUS][:point] = (@hash[MUSIC_TYPE_REV_BONUS][:point] * 100.0).to_i / 100.0
+          @hash[MUSIC_TYPE_REV_BONUS][:point] = BigDecimal.new(@hash[MUSIC_TYPE_REV_BONUS][:point].to_s).floor(2)
         end
         @total_point += @hash[MUSIC_TYPE_REV_BONUS][:point]
       end
@@ -733,6 +756,7 @@ module CxbRank
       skill_chart = self.new
 
       skills = Skill.find_by_user(user, :fill_empty => true)
+      skills.delete_if do |skill| !skill.music.display end
       if SiteSettings.cxb_mode?
         skills.sort! do |a, b| a.music.number <=> b.music.number end
       else

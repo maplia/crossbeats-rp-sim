@@ -1,5 +1,5 @@
-var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/';
-var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/';
+var RPSIM_HTTP_BASE_URI = 'http://revrank.maplia.jp/rev1st/';
+var RPSIM_HTTPS_BASE_URI = 'https://revrank.maplia.jp/rev1st/';
 
 var COMMON_SCRIPT_URI = RPSIM_HTTPS_BASE_URI + 'javascripts/revrank_common.js';
 

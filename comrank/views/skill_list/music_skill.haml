@@ -6,7 +6,7 @@
   - css_class = ((ignore_locked or skill.target_diff == skill.best_diff) ? CxbRank::MUSIC_DIFF_CLASSES[target_diff] : 'etc')
 - unless mobile?
   %tr{:class => css_class}
-    - if skill.rp_target?
+    - if skill.rp_target? and !bonus
       %th.number.target= row
     - else
       %th.number= row
@@ -47,7 +47,7 @@
 - else
   - row_count = (skill.comment.present? ? 3 : 2)
   %tr{:class => css_class}
-    - if skill.rp_target?
+    - if skill.rp_target? and !bonus
       %th.number.target{:rowspan => row_count}= row
     - else
       %th.number{:rowspan => row_count}= row

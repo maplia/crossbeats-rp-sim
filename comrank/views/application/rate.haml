@@ -1,7 +1,15 @@
-- if skill.cleared?(diff)
-  - if skill.rate_f(diff)
-    = sprintf('%d<small>.%02d</small>%%', skill.rate(diff).to_i, (skill.rate(diff) * 100).to_i % 100)
+- if skill.instance_of?(CxbRank::Skill)
+  - cleared = skill.cleared?(diff)
+  - rate = skill.rate(diff)
+  - rate_f = skill.rate_f(diff)
+- else
+  - cleared = skill.cleared?
+  - rate = skill.rate
+  - rate_f = skill.rate_f
+- if cleared
+  - if rate_f
+    = sprintf('%d<small>.%02d</small>%%', rate.to_i, (rate * 100).to_i % 100)
   - else
-    = sprintf('%d%%', skill.rate(diff).to_i)
+    = sprintf('%d%%', rate.to_i)
 - else
   = '&ndash;'

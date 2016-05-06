@@ -16,8 +16,8 @@
             %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
           - elsif skill.failed?(diff)
             %div{:class => 'mark'} F
-          - if skill.cleared?(diff) or skill.failed?(diff)
-            %div{:class => 'score'}= skill.score(diff)
+          - if skill.cleared?(diff) or skill.failed?(diff) and skill.score(diff)
+            %div{:class => 'score'}= skill.score(diff) > 0 ? skill.score(diff) : '&ndash;'
         - if skill.best_diff == diff and skill.rp_target?
           %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
         - else
@@ -46,24 +46,26 @@
         %td{:class => "mark #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}
           = CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
 - else
-  - CxbRank::SiteSettings.music_diffs_blocks = []
-  - ((music_diffs.size/2.0).ceil).times do |i|
-    - music_diffs_blocks << [music_diffs.keys.sort[i*2+0], music_diffs.keys.sort[i*2+1]]
+  - music_diffs_blocks = []
+  - ((CxbRank::SiteSettings.music_diffs.size/2.0).ceil).times do |i|
+    - music_diffs_blocks << [CxbRank::SiteSettings.music_diffs.keys.sort[i*2+0], CxbRank::SiteSettings.music_diffs.keys.sort[i*2+1]]
   %tr
     %td.title.text{:colspan => 4}
       = skill.music.title
       - if skill.music.subtitle
         %small= skill.music.subtitle
-  - CxbRank::SiteSettings.music_diffs_blocks.each do |block|
+  - music_diffs_blocks.each do |block|
     %tr
       - block.each do |diff|
         - if diff
           - rank_class = (skill.fullcombo?(diff) ? 'fullcombo' : (skill.failed?(diff) ? 'failed' : ''))
           %td{:class => "rank #{rank_class}", :rowspan => 2}
             - if skill.cleared?(diff)
-              = CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
+              %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
             - elsif skill.failed?(diff)
-              F
+              %div{:class => 'mark'} F
+            - if skill.cleared?(diff) or skill.failed?(diff) and skill.score(diff)
+              %div{:class => 'score'}= skill.score(diff) > 0 ? skill.score(diff) : '&ndash;'
           - if skill.best_diff == diff and skill.rp_target?
             %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
           - else
