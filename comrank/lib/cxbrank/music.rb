@@ -12,7 +12,7 @@ module CxbRank
     has_many :legacy_charts
 
     def self.create_by_request(body)
-      music = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
+      music = self.where(:lookup_key => body[:lookup_key]).first
       unless music
         music = self.new
         music.number = 0

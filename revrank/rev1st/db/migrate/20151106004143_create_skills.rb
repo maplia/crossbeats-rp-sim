@@ -1,4 +1,4 @@
-$LOAD_PATH << '../comrank/lib'
+$LOAD_PATH << '../../comrank/lib'
 require 'cxbrank/const'
 
 class CreateSkills < ActiveRecord::Migration
@@ -16,6 +16,7 @@ class CreateSkills < ActiveRecord::Migration
         t.boolean "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_rate_f".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_rank".to_sym
         t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_combo".to_sym
+        t.integer "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_score".to_sym
         t.boolean "#{CxbRank::MUSIC_DIFF_PREFIXES[key]}_legacy".to_sym, :default => false
       end
       t.string :comment

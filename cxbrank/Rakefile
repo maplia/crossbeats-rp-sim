@@ -1,8 +1,7 @@
 $LOAD_PATH << '../comrank/lib'
 
 require 'yaml'
-require 'rubygems'
-require 'fastercsv'
+require 'csv'
 require 'active_record'
 require 'sinatra/activerecord'
 require 'sinatra/activerecord/rake'
@@ -33,14 +32,16 @@ def get_music(text_id)
   return CxbRank::Music.where(:text_id => text_id).first
 end
 
+Time.zone = 'Tokyo'
 ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
-ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['environment'])
+ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['environment'].to_sym)
+ActiveRecord::Base.default_timezone = :local
 
 namespace :cxbrank do
   desc 'initialize music master'
   task :init_master do
     MUSICS_COLUMNS.delete(:text_id)
-    FasterCSV.table('db/master/musics.tsv', CSV_OPTIONS).each do |row|
+    CSV.table('db/master/musics.tsv', CSV_OPTIONS).each do |row|
       data = get_music(row.field(:text_id))
       unless data
         data = CxbRank::Music.new
@@ -53,7 +54,7 @@ namespace :cxbrank do
       data.save!
     end
 
-    FasterCSV.table('db/master/monthlies.tsv', CSV_OPTIONS).each do |row|
+    CSV.table('db/master/monthlies.tsv', CSV_OPTIONS).each do |row|
       MONTHLIES_COLUMNS.delete(:text_id)
       music_id = get_music(row.field(:text_id)).id
       data = CxbRank::Monthly.where(:music_id => music_id).first
@@ -67,7 +68,7 @@ namespace :cxbrank do
       data.save!
     end
 
-    FasterCSV.table('db/master/legacy_charts.tsv', CSV_OPTIONS).each do |row|
+    CSV.table('db/master/legacy_charts.tsv', CSV_OPTIONS).each do |row|
       LEGACY_CHARTS_COLUMNS.delete(:text_id)
       music_id = get_music(row.field(:text_id)).id
       data = CxbRank::LegacyChart.where(:music_id => music_id).first
@@ -82,7 +83,7 @@ namespace :cxbrank do
     end
 
     EVENTS_COLUMNS.delete(:text_id)
-    FasterCSV.table('db/master/events.tsv', CSV_OPTIONS).each do |row|
+    CSV.table('db/master/events.tsv', CSV_OPTIONS).each do |row|
       data = CxbRank::Event.where(:text_id => row.field(:text_id)).first
       unless data
         data = CxbRank::Event.new
@@ -94,7 +95,7 @@ namespace :cxbrank do
       data.save!
     end
 
-    FasterCSV.table('db/master/event_musics.tsv', CSV_OPTIONS).each do |row|
+    CSV.table('db/master/event_musics.tsv', CSV_OPTIONS).each do |row|
       EVENT_MUSICS_COLUMNS.delete(:text_id)
       EVENT_MUSICS_COLUMNS.delete(:seq)
       EVENT_MUSICS_COLUMNS.delete(:music_text_id)
@@ -117,7 +118,7 @@ namespace :cxbrank do
 
   desc 'dump music master'
   task :dump_master do
-    FasterCSV.open('db/master/musics.tsv', 'w', CSV_OPTIONS) do |csv|
+    CSV.open('db/master/musics.tsv', 'w', CSV_OPTIONS) do |csv|
       csv << MUSICS_COLUMNS
       CxbRank::Music.all.each do |music|
         data = []
@@ -128,7 +129,7 @@ namespace :cxbrank do
       end
     end
 
-    FasterCSV.open('db/master/monthlies.tsv', 'w', CSV_OPTIONS) do |csv|
+    CSV.open('db/master/monthlies.tsv', 'w', CSV_OPTIONS) do |csv|
       csv << MONTHLIES_COLUMNS
       MONTHLIES_COLUMNS.delete(:text_id)
       CxbRank::Monthly.all.each do |monthly|
@@ -141,7 +142,7 @@ namespace :cxbrank do
       end
     end
 
-    FasterCSV.open('db/master/legacy_charts.tsv', 'w', CSV_OPTIONS) do |csv|
+    CSV.open('db/master/legacy_charts.tsv', 'w', CSV_OPTIONS) do |csv|
       csv << LEGACY_CHARTS_COLUMNS
       LEGACY_CHARTS_COLUMNS.delete(:text_id)
       CxbRank::LegacyChart.all.each do |chart|
@@ -154,7 +155,7 @@ namespace :cxbrank do
       end
     end
 
-    FasterCSV.open('db/master/events.tsv', 'w', CSV_OPTIONS) do |csv|
+    CSV.open('db/master/events.tsv', 'w', CSV_OPTIONS) do |csv|
       csv << EVENTS_COLUMNS
       CxbRank::Event.all.each do |event|
         data = []
@@ -165,7 +166,7 @@ namespace :cxbrank do
       end
     end
 
-    FasterCSV.open('db/master/event_musics.tsv', 'w', CSV_OPTIONS) do |csv|
+    CSV.open('db/master/event_musics.tsv', 'w', CSV_OPTIONS) do |csv|
       csv << EVENT_MUSICS_COLUMNS
       EVENT_MUSICS_COLUMNS.delete(:text_id)
       EVENT_MUSICS_COLUMNS.delete(:music_text_id)

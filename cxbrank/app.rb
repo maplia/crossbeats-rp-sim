@@ -2,6 +2,7 @@ require '../comrank/app'
 
 class CxbRankApp < CxbRank::AppBase
   include CxbRank
+
   post '/api/authorize' do
     data = JSON.parse(request.body.read, {:symbolize_names => true})
     error_no = Authenticator.authenticate({:user_id => data[:user_id], :password => data[:password]})
@@ -11,7 +12,7 @@ class CxbRankApp < CxbRank::AppBase
   get '/api/skills/:user_id' do
     user = User.find_by_param_id(params[:user_id])
     last_modified Skill.last_modified(user)
-    skills = Skill.find_by_user(user, {:fill_empty => true})
+    skills = Skill.find_by_user(user, {:fill_empty => true}).to_a
     skills.sort! do |a, b| a.music.number <=> b.music.number end
     skill_hashes = []
     skills.each do |skill|
@@ -28,7 +29,7 @@ class CxbRankApp < CxbRank::AppBase
     else
       begin
         user = User.find_by_param_id(data[:user_id])
-        music = Music.find(:first, :conditions => {:text_id => data[:text_id]})
+        music = Music.where(:text_id => data[:text_id]).first
         skill = Skill.find_by_user_and_music(user, music)
         skill.user_id = user.id
         skill.music = music

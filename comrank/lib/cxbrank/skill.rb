@@ -69,7 +69,7 @@ module CxbRank
     end
 
     def self.last_modified(user)
-      skill = self.where(:user_id => user.id).maximum(:updated_at)
+      return self.where(:user_id => user.id).maximum(:updated_at)
     end
 
     def self.find_by_user(user, options={})
@@ -84,6 +84,7 @@ module CxbRank
           skills << skill
         end
       else
+        skills = skills.to_a
         skills.delete_if do |skill| !skill.played? end
       end
       return skills
@@ -116,7 +117,7 @@ module CxbRank
     end
 
     def self.create_by_request(user, music, body)
-      skill = self.find(:first, :conditions => {:user_id => user.id, :music_id => music.id})
+      skill = self.where(:user_id => user.id, :music_id => music.id).first
       unless skill
         skill = Skill.new
         skill.user_id = user.id
@@ -440,29 +441,29 @@ module CxbRank
     end
 
     def self.last_modified(user)
-      skill = self.find(:first, :conditions => {:user_id => user.id}, :order => 'updated_at desc')
-      return (skill ? skill.updated_at : nil)
+      return self.where(:user_id => user.id).maximum(:updated_at)
     end
 
     def self.find_by_user(user, options={})
-      skills = self.find(:all, :conditions => {:user_id => user.id})
+      skills = self.where(:user_id => user.id)
       if options[:fill_empty]
-        courses = Course.find(:all, :conditions => {:display => true})
+        courses = Course.where(:display => true)
         courses.each do |course|
-          unless CourseSkill.exists?({:user_id => user.id, :course_id => course.id})
+          unless CourseSkill.exists?(:user_id => user.id, :course_id => course.id)
             skill = CourseSkill.new
             skill.course = course
             skills << skill
           end
         end
       else
+        skills = skills.to_a
         skills.delete_if do |skill| !skill.played? end
       end
       return skills
     end
 
     def self.find_by_user_and_course(user, course)
-      skill = self.find(:first, :conditions => {:user_id => user.id, :course_id => course.id})
+      skill = self.where(:user_id => user.id, :course_id => course.id).first
       unless skill
         skill = self.new
         skill.user_id = user.id
@@ -472,7 +473,7 @@ module CxbRank
     end
 
     def self.create_by_request(user, course, body)
-      skill = self.find(:first, :conditions => {:user_id => user.id, :course_id => course.id})
+      skill = self.where(:user_id => user.id, :course_id => course.id).first
       unless skill
         skill = self.new
         skill.user_id = user.id
@@ -755,7 +756,7 @@ module CxbRank
     def self.load(mode, user)
       skill_chart = self.new
 
-      skills = Skill.find_by_user(user, :fill_empty => true)
+      skills = Skill.find_by_user(user, :fill_empty => true).to_a
       skills.delete_if do |skill| !skill.music.display end
       if SiteSettings.cxb_mode?
         skills.sort! do |a, b| a.music.number <=> b.music.number end

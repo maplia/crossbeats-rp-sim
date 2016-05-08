@@ -3,7 +3,7 @@
     %th= user.user_id
     %td.text
       %a{:href => user.skill_view_uri}
-        = NKF.nkf('-wW', user.name[0, 30]) + (user.name.size > 30 ? '...' : '')
+        = user.name.truncate(10)
     %td.game_id
       - if user.game_id.present? and (CxbRank::SiteSettings.cxb_mode? or user.game_id_display)
         = user.game_id
@@ -11,13 +11,13 @@
       - if user.point
         = sprintf("%.2f", user.point)
     %td.text{:style => 'width: 17em'}
-      = NKF.nkf('-wW', (user.comment || '')[0, 100]) + ((user.comment || '').size > 100 ? '...' : '')
+      = (user.comment || '').truncate(100)
     %td= user.point_updated_at.strftime("%Y-%m-%d %H:%M:%S")
 - else
   %tr
     %td.name
       %a{:href => user.skill_view_uri}
-        = NKF.nkf('-wW', user.name[0, 8]) + (user.name.size > 8 ? '...' : '')
+        = user.name.slice(4) + (user.name.size > 4 ? '...' : '')
     %td.game_id
       - if user.game_id.present? and (CxbRank::SiteSettings.cxb_mode? or user.game_id_display)
         = user.game_id
@@ -29,4 +29,4 @@
       - if user.comment.blank?
         &nbsp;
       - else
-        = NKF.nkf('-wW', (user.comment || '')[0, 30]) + ((user.comment || '').size > 30 ? '...' : '')
+        = (user.comment || '').truncate(30)

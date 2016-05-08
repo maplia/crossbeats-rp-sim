@@ -1,5 +1,6 @@
 require 'uri'
 require 'rinku'
+require 'action_view/helpers'
 require 'cxbrank/const'
 
 module CxbRank
@@ -28,7 +29,8 @@ module CxbRank
           end
 
           def multiline(text, autolink=false)
-            result = simple_format(escape_html(text).gsub(/&#x2F;/, '/'))
+            result = escape_html(text).gsub(/&#x2F;/, '/')
+            result.gsub!(/\r\n|\r|\n/, '<br />')
             if autolink
               return Rinku.auto_link(result)
             else

@@ -32,7 +32,7 @@ module CxbRank
     end
 
     def self.create_by_request(body)
-      course = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
+      course = self.where(:lookup_key => body[:lookup_key]).first
       unless course
         course = self.new
         course.text_id = body[:text_id]

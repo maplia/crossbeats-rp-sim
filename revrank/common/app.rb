@@ -2,7 +2,6 @@ $LOAD_PATH << '../../comrank/lib'
 require '../../comrank/app'
 require 'rubygems'
 require 'json'
-require 'sinatra/cross_origin'
 require 'cxbrank/const'
 require 'cxbrank/music'
 require 'cxbrank/course'
@@ -33,7 +32,7 @@ class RevRankApp < CxbRank::AppBase
         data = JSON.parse(request.body.read, {:symbolize_names => true})
         if data[:key].blank?
           jsonx :status => 401, :message => 'セッションキーが指定されていません'
-        elsif (session = CxbRank::BookmarkletSession.find(:first, :conditions => {:key => data[:key]})).nil?
+        elsif (session = CxbRank::BookmarkletSession.where(:key => data[:key]).first).nil?
           jsonx :status => 401, :message => 'セッションキーが間違っています'
         else
           session.edit_count += 1

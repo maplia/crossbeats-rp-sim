@@ -1,7 +1,6 @@
 $LOAD_PATH << '../comrank/lib'
-ENV['GEM_HOME'] = '/home/marines/local/gems/1.8'
 
-require 'rubygems'
+require 'active_support/all'
 require 'sinatra/base'
 require 'sinatra/config_file'
 require 'sinatra/multi_route'
@@ -9,9 +8,10 @@ require 'sinatra/json'
 require 'sinatra/jsonp'
 require 'sinatra/cross_origin'
 require 'sinatra/default_charset'
+require 'sinatra_more/markup_plugin'
 require 'tilt/haml'
 require 'rack/mobile-detect'
-require 'padrino-helpers'
+require 'rack/protection'
 require 'cxbrank/site_settings'
 require 'cxbrank/helpers'
 require 'cxbrank/const'
@@ -28,7 +28,7 @@ module CxbRank
     register Sinatra::CrossOrigin
     register Sinatra::DefaultCharset
     register Sinatra::MultiRoute
-    register Padrino::Helpers
+    register SinatraMore::MarkupPlugin
     register CxbRank::Helpers
 
     config_file File.expand_path(CONFIG_FILE, Dir.pwd)
@@ -48,12 +48,14 @@ module CxbRank
     end
 
     before do
+      Time.zone = 'Tokyo'
       SiteSettings.settings = settings
       settings.views = ['views',
         SiteSettings.join_comrank_path('views'), SiteSettings.join_comrank_path('views/application'),
       ]
       ActiveRecord::Base.configurations = YAML.load_file(DATABASE_FILE)
       ActiveRecord::Base.establish_connection(settings.environment)
+      ActiveRecord::Base.default_timezone = :local
     end
 
     helpers Sinatra::Jsonp
@@ -134,10 +136,17 @@ module CxbRank
         else
           curr_skill = Skill.find_by_user_and_music(user, music)
           temp_skill = Skill.find_by_user_and_music(user, music)
-          temp_skill.update_by_params!(session[underscore(CxbRank::Skill)])
+          if session[underscore(CxbRank::Skill)].present?
+            temp_skill.update_by_params!(session[underscore(CxbRank::Skill)])
+          end
           yield curr_skill, temp_skill
         end
       end
+    end
+
+    get '/googlee47e6c106efd57d5.html' do
+      content_type :html
+      send_file 'googlee47e6c106efd57d5.html'
     end
 
     get '/common/stylesheets/:file_name' do
@@ -214,7 +223,9 @@ module CxbRank
     get USER_ADD_URI do
       settings.views << SiteSettings.join_comrank_path('views/user_edit')
       user = User.new
-      user = User.create_by_params(session[underscore(CxbRank::User)])
+      if session[underscore(CxbRank::User)].present?
+        user = User.update_by_params!(session[underscore(CxbRank::User)])
+      end
       session[:user_added] = false
       haml :user_add, :layout => true, :locals => {:user => user}
     end
@@ -436,7 +447,7 @@ module CxbRank
 
     get RANK_CALC_URI do
       last_modified Music.last_modified
-      musics = Music.find(:all, :conditions => {:limited => false})
+      musics = Music.where(:limited => false)
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
@@ -450,7 +461,7 @@ module CxbRank
 
     get RATE_CALC_URI do
       last_modified Music.last_modified
-      musics = Music.find(:all, :conditions => {:limited => false})
+      musics = Music.where(:limited => false)
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
@@ -461,7 +472,7 @@ module CxbRank
     get EVENT_SHEET_URI do
       settings.views << SiteSettings.join_comrank_path('views/event_list')
       last_modified Event.last_modified
-      events = Event.where(true).sort
+      events = Event.all.order('span_s desc')
       fixed_title = "#{PAGE_TITLES[EVENT_SHEET_URI]}一覧"
       haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
     end

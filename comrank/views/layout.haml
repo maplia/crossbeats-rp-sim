@@ -10,13 +10,13 @@
       %meta{:name => 'description', :content => settings.description}
     - else
       %meta{:name => 'robots', :content => 'noindex, nofollow'}
-    = stylesheet_link_tag CxbRank::SiteSettings.join_site_style_base('color.css')
-    = stylesheet_link_tag CxbRank::SiteSettings.join_common_style_base('common.css')
+    %link{:rel => 'stylesheet', :type => 'text/css', :href => CxbRank::SiteSettings.join_site_style_base('color.css')}
+    %link{:rel => 'stylesheet', :type => 'text/css', :href => CxbRank::SiteSettings.join_common_style_base('common.css')}
     - if mobile?
-      = stylesheet_link_tag CxbRank::SiteSettings.join_common_style_base('common_sp.css')
+      %link{:rel => 'stylesheet', :type => 'text/css', :href => CxbRank::SiteSettings.join_common_style_base('common_sp.css')}
     - else
-      = stylesheet_link_tag CxbRank::SiteSettings.join_common_style_base('common_pc.css')
-    = favicon_tag CxbRank::SiteSettings.join_site_image_base('favicon.ico')
+      %link{:rel => 'stylesheet', :type => 'text/css', :href => CxbRank::SiteSettings.join_common_style_base('common_pc.css')}
+    %link{:rel => 'shortcut icon', :href => CxbRank::SiteSettings.join_site_image_base('favicon.ico')}
     - if site_top?
       %title= settings.site_name
     - elsif defined? fixed_title
