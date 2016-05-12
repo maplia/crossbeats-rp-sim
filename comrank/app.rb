@@ -199,7 +199,7 @@ module CxbRank
 
     get '/api/musics' do
       last_modified Music.last_modified
-      music_hashes = Music.find_actives.map! do |music| music.to_hash end
+      music_hashes = Music.find_actives.to_a.map! do |music| music.to_hash end
       jsonx music_hashes, params[:callback]
     end
 

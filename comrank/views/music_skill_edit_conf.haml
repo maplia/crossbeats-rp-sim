@@ -8,10 +8,11 @@
   %h2 入力情報
   %div.subunit
     = haml :skill, :locals => {:prev_skill => curr_skill, :skill => temp_skill}
+- org_method = method.dup
 - form_tag File.join(settings.site_base, CxbRank::SKILL_ITEM_EDIT_URI), :method => method do
   - params[underscore(CxbRank::Skill)].each do |key, value|
     = hidden_field_tag "#{underscore(CxbRank::Skill)}[#{key}]".to_sym, :value => value
-  - if method == 'put'
+  - if org_method == 'put'
     %p 以上のプレイ情報を登録します。よろしいですか?
   - else
     %p 以上のプレイ情報を削除します。よろしいですか?

@@ -356,8 +356,12 @@ module CxbRank
     def unlimited_bonus
       diff = MUSIC_DIFF_UNL
       if music.exist?(diff) and cleared?(diff)
-        pure_point = music.level(diff) * (rate(diff) / 100.0) * gauge_bonus_rate(diff)
-        return pure_point * BONUS_RATE_UNLIMITED
+        if !SiteSettings.rev_sunrise_mode?
+          return point(diff)
+        else
+          pure_point = music.level(diff) * (rate(diff) / 100.0) * gauge_bonus_rate(diff)
+          return pure_point * BONUS_RATE_UNLIMITED
+        end
       else
         return 0.0
       end
@@ -672,24 +676,21 @@ module CxbRank
       if SiteSettings.rev_mode?
         if !SiteSettings.rev_sunrise_mode?
           min_target = @hash[MUSIC_TYPE_REV_SINGLE][:skills][MUSIC_TYPE_ST_COUNTS[MUSIC_TYPE_REV_SINGLE]-1]
-          @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
+        end
+        @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
+          if !SiteSettings.rev_sunrise_mode?
             if !skill.rp_target? and skill.cleared?(MUSIC_DIFF_UNL) and (min_target.target_point > skill.target_point)
               @hash[MUSIC_TYPE_REV_BONUS][:skills] << skill
             end
-          end
-        else
-          @hash[MUSIC_TYPE_REV_SINGLE][:skills].each do |skill|
+          else
             if skill.cleared?(MUSIC_DIFF_UNL)
               @hash[MUSIC_TYPE_REV_BONUS][:skills] << skill
             end
           end
         end
         @hash[MUSIC_TYPE_REV_BONUS][:skills].sort! do |a, b|
-          if a.locked(MUSIC_DIFF_UNL) != b.locked(MUSIC_DIFF_UNL)
-            (a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)
-          else
-            -a.point(MUSIC_DIFF_UNL) <=> -b.point(MUSIC_DIFF_UNL)
-          end
+          ((a.locked(MUSIC_DIFF_UNL) ? 1 : 0) <=> (b.locked(MUSIC_DIFF_UNL) ? 1 : 0)).nonzero? ||
+            (-a.unlimited_bonus <=> -b.unlimited_bonus)
         end
         if @user and @user.point_direct
           @hash[MUSIC_TYPE_REV_BONUS][:point] =
