@@ -17,7 +17,7 @@
   %tr
     %td.name
       %a{:href => user.skill_view_uri}
-        = user.name.slice(4) + (user.name.size > 4 ? '...' : '')
+        = user.name.truncate(6)
     %td.game_id
       - if user.game_id.present? and (CxbRank::SiteSettings.cxb_mode? or user.game_id_display)
         = user.game_id
