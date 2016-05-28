@@ -56,11 +56,13 @@ namespace :cxbrank do
 
     CSV.table('db/master/monthlies.tsv', CSV_OPTIONS).each do |row|
       MONTHLIES_COLUMNS.delete(:text_id)
+      MONTHLIES_COLUMNS.delete(:span_s)
       music_id = get_music(row.field(:text_id)).id
-      data = CxbRank::Monthly.where(:music_id => music_id).first
+      data = CxbRank::Monthly.where(:music_id => music_id, :span_s => row.field(:span_s)).first
       unless data
         data = CxbRank::Monthly.new
         data.music_id = music_id
+        data.span_s = row.field(:span_s)
       end
       MONTHLIES_COLUMNS.each do |column|
         data.send("#{column}=".to_sym, row.field(column))

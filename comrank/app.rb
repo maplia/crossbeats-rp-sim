@@ -223,8 +223,8 @@ module CxbRank
     get USER_ADD_URI do
       settings.views << SiteSettings.join_comrank_path('views/user_edit')
       user = User.new
-      if session[underscore(CxbRank::User)].present?
-        user = User.update_by_params!(session[underscore(CxbRank::User)])
+      if session["#{underscore(CxbRank::User)}_temp"].present?
+        user.update_by_params!(session[underscore(CxbRank::User)])
       end
       session[:user_added] = false
       haml :user_add, :layout => true, :locals => {:user => user}
@@ -233,7 +233,7 @@ module CxbRank
     post USER_ADD_URI do
       settings.views << SiteSettings.join_comrank_path('views/user_edit_conf')
       user = User.create_by_params(params[underscore(CxbRank::User)])
-      session[underscore(CxbRank::User)] = Hash[params[underscore(CxbRank::User)]]
+      session["#{underscore(CxbRank::User)}_temp"] = Hash[params[underscore(CxbRank::User)]]
       unless user.valid?
         haml :error, :layout => true,
           :locals => {:errors => user.errors, :back_uri => SiteSettings.join_site_base(request.path_info)}
@@ -250,11 +250,11 @@ module CxbRank
           haml :user_add_result, :layout => true, :locals => {:user => user}
         else
           begin
-            user = User.create_by_params(session[underscore(CxbRank::User)])
+            user = User.create_by_params(session["#{underscore(CxbRank::User)}_temp"])
             user.save!
             session[:user_id] = user.id
             session[:user_added] = true
-            session[underscore(CxbRank::User)] = nil
+            session["#{underscore(CxbRank::User)}_temp"] = nil
             haml :user_add_result, :layout => true, :locals => {:user => user}
           rescue
             haml :error, :layout => true,
