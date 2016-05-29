@@ -117,6 +117,7 @@ module CxbRank
     end
 
     def self.create_by_request(user, music, body)
+      invert_music_diffs = MUSIC_DIFF_PREFIXES.invert
       skill = self.where(:user_id => user.id, :music_id => music.id).first
       unless skill
         skill = Skill.new
@@ -124,6 +125,7 @@ module CxbRank
         skill.music = music
       end
       body.keys.each do |prefix|
+        return nil unless music.exist?(invert_music_diffs[prefix.to_s])
         skill.send("#{prefix}_stat=", body[prefix.to_sym][:stat])
         skill.send("#{prefix}_point=", body[prefix.to_sym][:point])
         skill.send("#{prefix}_rate=", body[prefix.to_sym][:rate])

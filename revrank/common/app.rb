@@ -170,10 +170,11 @@ class RevRankApp < CxbRank::AppBase
       begin
         case data[:type]
         when 'music'
-          unless (music = CxbRank::Music.find_by_lookup_key(data[:lookup_key]))
+          if (music = CxbRank::Music.find_by_lookup_key(data[:lookup_key])).nil?
+            jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
+          elsif (skill = CxbRank::Skill.create_by_request(session.user, music, data[:body])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
-            skill = CxbRank::Skill.create_by_request(session.user, music, data[:body])
             skill.save!
           end
         when 'course'

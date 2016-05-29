@@ -22,11 +22,11 @@ module CxbRank
         music.lookup_key = body[:lookup_key]
         music.limited = false
         music.added_at = Date.today
-        MUSIC_DIFF_PREFIXES.values.each do |prefix|
-          next unless body[prefix.to_sym]
-          music.send("#{prefix}_level=", body[prefix.to_sym][:level])
-          music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
-        end
+      end
+      MUSIC_DIFF_PREFIXES.values.each do |prefix|
+        next unless body[prefix.to_sym]
+        music.send("#{prefix}_level=", body[prefix.to_sym][:level])
+        music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
       end
       return music
     end
