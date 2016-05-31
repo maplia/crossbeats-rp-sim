@@ -21,6 +21,7 @@ module CxbRank
         music.sort_key = body[:sort_key]
         music.lookup_key = body[:lookup_key]
         music.limited = false
+        music.unlock_unl = UNLOCK_UNL_TYPE_FC
         music.added_at = Date.today
       end
       MUSIC_DIFF_PREFIXES.values.each do |prefix|

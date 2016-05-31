@@ -3,7 +3,7 @@ require 'bigdecimal'
 module CxbRank
   # エンジン名
   ENGINE_NAME = 'CxB RankPoint Simulator REV.'
-  ENGINE_VERSION = '1.4.1'
+  ENGINE_VERSION = '1.4.2'
 
   # URI
   SITE_TOP_URI = '/'                                # サイトトップ
@@ -96,6 +96,8 @@ module CxbRank
   MUSIC_TYPE_NORMAL_NAME = '一般曲'
   MUSIC_TYPE_SPECIAL = 0
   MUSIC_TYPE_SPECIAL_NAME = '期間限定RP対象曲'
+  MUSIC_TYPE_DELETED = 2
+  MUSIC_TYPE_DELETED_NAME = '削除曲'
   MUSIC_TYPE_REV_SINGLE = 10
   MUSIC_TYPE_REV_SINGLE_NAME = 'MUSIC PLAY'
   MUSIC_TYPE_REV_BONUS = 11
@@ -108,6 +110,7 @@ module CxbRank
     MODE_CXB => {
       MUSIC_TYPE_NORMAL      => MUSIC_TYPE_NORMAL_NAME,
       MUSIC_TYPE_SPECIAL     => MUSIC_TYPE_SPECIAL_NAME,
+#      MUSIC_TYPE_DELETED     => MUSIC_TYPE_DELETED_NAME,
     },
     MODE_REV => {
       MUSIC_TYPE_REV_SINGLE  => MUSIC_TYPE_REV_SINGLE_NAME,
@@ -121,6 +124,7 @@ module CxbRank
   MUSIC_TYPE_ST_COUNTS = {
     MUSIC_TYPE_NORMAL      => 20,
     MUSIC_TYPE_SPECIAL     => nil,
+    MUSIC_TYPE_DELETED     => 0,
     MUSIC_TYPE_REV_SINGLE  => 20,
     MUSIC_TYPE_REV_BONUS   => nil,
     MUSIC_TYPE_REV_COURSE  => 1,
@@ -161,6 +165,16 @@ module CxbRank
     MUSIC_DIFF_UNL => MUSIC_DIFF_UNL_NAME.downcase,
   }
   MUSIC_DIFF_CLASSES = MUSIC_DIFF_PREFIXES
+
+  # UNLIMITED譜面解禁条件
+  UNLOCK_UNL_TYPE_S = 1
+  UNLOCK_UNL_TYPE_SP = 2
+  UNLOCK_UNL_TYPE_FC = 3
+  UNLOCK_UNL_TYPE_COLORS = {
+    UNLOCK_UNL_TYPE_S  => 'unlock_unl_s',
+    UNLOCK_UNL_TYPE_SP => 'unlock_unl_sp',
+    UNLOCK_UNL_TYPE_FC => 'unlock_unl_fc',
+  }
 
   # スキルポイント情報ステータス定数
   SP_STATUS_NO_PLAY = 0

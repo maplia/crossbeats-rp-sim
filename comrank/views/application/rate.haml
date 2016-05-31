@@ -6,7 +6,7 @@
   - cleared = skill.cleared?
   - rate = skill.rate
   - rate_f = skill.rate_f
-- if cleared
+- if cleared or (skill.instance_of?(CxbRank::CourseSkill) and skill.played?)
   - if rate_f
     = sprintf('%d<small>.%02d</small>%%', rate.to_i, (rate * 100).to_i % 100)
   - else

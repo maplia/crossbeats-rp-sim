@@ -488,7 +488,7 @@ function logoutFromRpSim(progress, userData) {
 function setProgressbarMax(progress, musicList, classList, isForRpUpdate) {
   var deferred = $.Deferred();
   if (isForRpUpdate) {
-    progress.setProgressbarMax(musicList.length + classList.length + 2);
+    progress.setProgressbarMax(musicList.length + classList.length + 1);
   } else {
     progress.setProgressbarMax(musicList.length + classList.length);
   }

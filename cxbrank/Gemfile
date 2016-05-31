@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails'
+gem 'actionview'
 
 gem 'rack'
 gem 'rack-mobile-detect'

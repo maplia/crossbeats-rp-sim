@@ -18,7 +18,7 @@ CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
 end
-MUSICS_COLUMNS.push(:limited, :hidden, :display, :added_at, :event)
+MUSICS_COLUMNS.push(:limited, :hidden, :display, :unlock_unl, :added_at, :event)
 LEGACY_CHARTS_COLUMNS = []
 LEGACY_CHARTS_COLUMNS.push(:text_id, :span_s, :span_e)
 CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
@@ -57,11 +57,13 @@ namespace :revrank do
 
     CSV.table('db/master/legacy_charts.tsv', CSV_OPTIONS).each do |row|
       LEGACY_CHARTS_COLUMNS.delete(:text_id)
+      LEGACY_CHARTS_COLUMNS.delete(:span_s)
       music_id = get_music(row.field(:text_id)).id
-      data = CxbRank::LegacyChart.where(:music_id => music_id).first
+      data = CxbRank::LegacyChart.where(:music_id => music_id, :span_s => row.field(:span_s)).first
       unless data
         data = CxbRank::LegacyChart.new
         data.music_id = music_id
+        data.span_s = row.field(:span_s)
       end
       LEGACY_CHARTS_COLUMNS.each do |column|
         data.send("#{column}=".to_sym, row.field(column))

@@ -27,20 +27,25 @@ class RevRankApp < CxbRank::AppBase
       end
     end
 
+    def valid_referrer?
+      return (request.referrer || '').include?(settings.mydata_host)
+    end
+
     def bookmarklet_session(&block)
-      begin
-        data = JSON.parse(request.body.read, {:symbolize_names => true})
-        if data[:key].blank?
-          jsonx :status => 401, :message => 'セッションキーが指定されていません'
-        elsif (session = CxbRank::BookmarkletSession.where(:key => data[:key]).first).nil?
-          jsonx :status => 401, :message => 'セッションキーが間違っています'
-        else
+      if !valid_referrer?
+        jsonx :status => 401, :message => 'MY PAGEからのアクセスではありません'
+      elsif (data = JSON.parse(request.body.read, {:symbolize_names => true}))[:key].blank?
+        jsonx :status => 401, :message => 'セッションキーが指定されていません'
+      elsif (session = CxbRank::BookmarkletSession.where(:key => data[:key]).first).nil?
+        jsonx :status => 401, :message => 'セッションキーが間違っています'
+      else
+        begin
           session.edit_count += 1
           session.save!
           yield session, data
+        rescue
+          jsonx :status => 400, :message => $!.message
         end
-      rescue
-        jsonx :status => 400, :message => $!.message
       end
     end
   end
@@ -128,8 +133,9 @@ class RevRankApp < CxbRank::AppBase
   end
 
   post '/bml_login' do
-    error_no = CxbRank::BookmarkletAuthenticator.authenticate(params)
-    if error_no != CxbRank::NO_ERROR
+    if !valid_referrer?
+      jsonx :status => 401, :message => 'MY PAGEからのアクセスではありません'
+    elsif (error_no = CxbRank::BookmarkletAuthenticator.authenticate(params)) != CxbRank::NO_ERROR
       jsonx :status => 401, :message => CxbRank::ERRORS[error_no]
     else
       session = CxbRank::BookmarkletSession.new
