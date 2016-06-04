@@ -389,13 +389,13 @@ module CxbRank
         if music.exist?(diff)
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
             :stat => stat(diff), :locked => locked(diff), :legacy => legacy(diff),
-            :point => point(diff), :rate => rate(diff),
+            :point => point(diff), :rate => rate(diff), :score => score(diff),
             :rank => rank(diff), :combo => combo(diff), :gauge => gauge(diff)
           }
         else
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
             :stat => nil, :locked => nil,
-            :point => nil, :rate => nil,
+            :point => nil, :rate => nil, :score => nil,
             :rank => nil, :combo => nil, :gauge => nil
           }
         end

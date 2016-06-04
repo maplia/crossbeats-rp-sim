@@ -16,7 +16,7 @@
             %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
           - elsif skill.failed?(diff)
             %div{:class => 'mark'} F
-          - if skill.cleared?(diff) or skill.failed?(diff) and skill.score(diff)
+          - if (skill.cleared?(diff) or skill.failed?(diff)) and skill.score(diff)
             %div{:class => 'score'}= skill.score(diff) > 0 ? skill.score(diff) : '&ndash;'
         - if skill.best_diff == diff and skill.rp_target?
           %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
@@ -64,7 +64,7 @@
               %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
             - elsif skill.failed?(diff)
               %div{:class => 'mark'} F
-            - if skill.cleared?(diff) or skill.failed?(diff) and skill.score(diff)
+            - if (skill.cleared?(diff) or skill.failed?(diff)) and skill.score(diff)
               %div{:class => 'score'}= skill.score(diff) > 0 ? skill.score(diff) : '&ndash;'
           - if skill.best_diff == diff and skill.rp_target?
             %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)

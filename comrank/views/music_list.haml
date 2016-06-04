@@ -10,6 +10,15 @@
   %p<
     = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
     マークのついている曲は初期状態でプレイできない曲です
+  %p<
+    UNLIMITED譜面のレベルは解禁条件で色分けしています（
+    %span{:class => 'unlock_unl_s'} &nbsp;青&nbsp;
+    MASTERをSクリア /
+    %span{:class => 'unlock_unl_sp'} &nbsp;緑&nbsp;
+    MASTERをS+クリア /
+    %span{:class => 'unlock_unl_fc'} &nbsp;赤&nbsp;
+    MASTERをフルコンボ
+    ）
 - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
   - if type == CxbRank::MUSIC_TYPE_REV_COURSE
     = haml :courses, :locals => {:courses => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}
