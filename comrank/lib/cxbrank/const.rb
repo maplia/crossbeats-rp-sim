@@ -23,6 +23,10 @@ module CxbRank
   MAX_SKILL_VIEW_URI = '/max_view'                  # 理論値スキル表
   MAX_SKILL_VIEW_IGLOCK_URI = '/max_iglock'         # 理論値スキル表（ロック無視版）
 
+  SCORE_RANK_URI = '/scores'                        # スコアランキング（一覧）
+  SCORE_RANK_DETAIL_URI = '/score_detail'           # スコアランキング（詳細）
+  POINT_RANK_URI = '/rank_rp'                       # RPランキング
+
   MUSIC_LIST_VIEW_URI = '/musics'                   # 登録曲リスト
   RANK_CALC_URI = '/rankcalc'                       # 許容ミス数計算機
   RATE_CALC_URI = '/scorerate'                      # 得点率計算機
@@ -47,6 +51,8 @@ module CxbRank
     RANK_CALC_URI =>              'ランク/レート別許容ミス数計算機',
     RATE_CALC_URI =>              '得点率計算ツール',
     EVENT_SHEET_URI =>            'イベントスコアシート',
+    SCORE_RANK_URI =>             'スコアランキング一覧',
+    SCORE_RANK_DETAIL_URI =>      'スコアランキング',
   }
 
   # 画像ファイルを置いておくディレクトリへのパス
@@ -106,6 +112,8 @@ module CxbRank
   MUSIC_TYPE_REV_COURSE_NAME = 'CHALLENGE'
   MUSIC_TYPE_REV_LIMITED = 13
   MUSIC_TYPE_REV_LIMITED_NAME = '期間限定曲（RP対象外）'
+  MUSIC_TYPE_REV_COURSE_LIMITED = 14
+  MUSIC_TYPE_REV_COURSE_LIMITED_NAME = '期間限定コース（RP対象外）'
   MUSIC_TYPES = {
     MODE_CXB => {
       MUSIC_TYPE_NORMAL      => MUSIC_TYPE_NORMAL_NAME,
@@ -113,22 +121,24 @@ module CxbRank
 #      MUSIC_TYPE_DELETED     => MUSIC_TYPE_DELETED_NAME,
     },
     MODE_REV => {
-      MUSIC_TYPE_REV_SINGLE  => MUSIC_TYPE_REV_SINGLE_NAME,
-      MUSIC_TYPE_REV_BONUS   => MUSIC_TYPE_REV_BONUS_NAME,
-      MUSIC_TYPE_REV_COURSE  => MUSIC_TYPE_REV_COURSE_NAME,
-      MUSIC_TYPE_REV_LIMITED => MUSIC_TYPE_REV_LIMITED_NAME,
+      MUSIC_TYPE_REV_SINGLE         => MUSIC_TYPE_REV_SINGLE_NAME,
+      MUSIC_TYPE_REV_BONUS          => MUSIC_TYPE_REV_BONUS_NAME,
+      MUSIC_TYPE_REV_COURSE         => MUSIC_TYPE_REV_COURSE_NAME,
+      MUSIC_TYPE_REV_LIMITED        => MUSIC_TYPE_REV_LIMITED_NAME,
+      MUSIC_TYPE_REV_COURSE_LIMITED => MUSIC_TYPE_REV_COURSE_LIMITED_NAME, 
     }
   }
   MUSIC_TYPES[MODE_REV_SUNRISE] = MUSIC_TYPES[MODE_REV]
   # 曲種別ごとの最大スキル対象曲数
   MUSIC_TYPE_ST_COUNTS = {
-    MUSIC_TYPE_NORMAL      => 20,
-    MUSIC_TYPE_SPECIAL     => nil,
-    MUSIC_TYPE_DELETED     => 0,
-    MUSIC_TYPE_REV_SINGLE  => 20,
-    MUSIC_TYPE_REV_BONUS   => nil,
-    MUSIC_TYPE_REV_COURSE  => 1,
-    MUSIC_TYPE_REV_LIMITED => 0,
+    MUSIC_TYPE_NORMAL             => 20,
+    MUSIC_TYPE_SPECIAL            => nil,
+    MUSIC_TYPE_DELETED            => 0,
+    MUSIC_TYPE_REV_SINGLE         => 20,
+    MUSIC_TYPE_REV_BONUS          => nil,
+    MUSIC_TYPE_REV_COURSE         => 1,
+    MUSIC_TYPE_REV_LIMITED        => 0,
+    MUSIC_TYPE_REV_COURSE_LIMITED => 0,
   }
 
   # 譜面難度種別定数
@@ -170,10 +180,12 @@ module CxbRank
   UNLOCK_UNL_TYPE_S = 1
   UNLOCK_UNL_TYPE_SP = 2
   UNLOCK_UNL_TYPE_FC = 3
+  UNLOCK_UNL_TYPE_NEVER = 4
   UNLOCK_UNL_TYPE_COLORS = {
-    UNLOCK_UNL_TYPE_S  => 'unlock_unl_s',
-    UNLOCK_UNL_TYPE_SP => 'unlock_unl_sp',
-    UNLOCK_UNL_TYPE_FC => 'unlock_unl_fc',
+    UNLOCK_UNL_TYPE_S     => 'unlock_unl_s',
+    UNLOCK_UNL_TYPE_SP    => 'unlock_unl_sp',
+    UNLOCK_UNL_TYPE_FC    => 'unlock_unl_fc',
+    UNLOCK_UNL_TYPE_NEVER => 'unlock_unl_never',
   }
 
   # スキルポイント情報ステータス定数
@@ -366,6 +378,10 @@ module CxbRank
   ERROR_MUSIC_IS_UNDECIDED_TEXT = '曲が指定されていません。'
   ERROR_MUSIC_NOT_EXIST = '52'
   ERROR_MUSIC_NOT_EXIST_TEXT = '指定された曲は存在しません。'
+  ERROR_DIFF_IS_UNDECIDED = '53'
+  ERROR_DIFF_IS_UNDECIDED_TEXT = '難易度が指定されていません。'
+  ERROR_DIFF_NOT_EXIST = '54'
+  ERROR_DIFF_NOT_EXIST_TEXT = '指定された難易度は存在しません。'
   # コースリスト/スキルリスト関係
   ERROR_COURSE_IS_UNDECIDED = '61'
   ERROR_COURSE_IS_UNDECIDED_TEXT = 'コースが指定されていません。'
@@ -463,6 +479,8 @@ module CxbRank
     ERROR_USERID_IS_HIDDEN           => ERROR_USERID_IS_HIDDEN_TEXT,
     ERROR_MUSIC_IS_UNDECIDED         => ERROR_MUSIC_IS_UNDECIDED_TEXT,
     ERROR_MUSIC_NOT_EXIST            => ERROR_MUSIC_NOT_EXIST_TEXT,
+    ERROR_DIFF_IS_UNDECIDED          => ERROR_DIFF_IS_UNDECIDED_TEXT,
+    ERROR_DIFF_NOT_EXIST             => ERROR_DIFF_NOT_EXIST_TEXT,
     ERROR_COURSE_IS_UNDECIDED        => ERROR_COURSE_IS_UNDECIDED_TEXT,
     ERROR_COURSE_NOT_EXIST           => ERROR_COURSE_NOT_EXIST_TEXT,
     ERROR_DATE_IS_INVALID            => ERROR_DATE_IS_INVALID_TEXT,

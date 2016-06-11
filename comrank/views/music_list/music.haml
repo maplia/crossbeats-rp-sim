@@ -9,7 +9,7 @@
     - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
       - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
       %td{:class => "#{diff_class} level"}
-        - if diff == CxbRank::MUSIC_DIFF_UNL
+        - if diff == CxbRank::MUSIC_DIFF_UNL and music.exist?(CxbRank::MUSIC_DIFF_UNL)
           %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= "&nbsp;#{music.level_to_s(diff)}&nbsp;"
         - else
           = music.level_to_s(diff)
@@ -30,7 +30,7 @@
       - block.each do |diff|
         - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
         %td{:class => "#{diff_class} level"}
-          - if diff == CxbRank::MUSIC_DIFF_UNL
+          - if diff == CxbRank::MUSIC_DIFF_UNL and music.exist?(CxbRank::MUSIC_DIFF_UNL)
             %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= "&nbsp;#{music.level_to_s(diff)}&nbsp;"
           - else
             = music.level_to_s(diff)

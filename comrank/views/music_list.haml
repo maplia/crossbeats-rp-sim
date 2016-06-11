@@ -20,7 +20,7 @@
     MASTERをフルコンボ
     ）
 - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
-  - if type == CxbRank::MUSIC_TYPE_REV_COURSE
+  - if [CxbRank::MUSIC_TYPE_REV_COURSE, CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED].include?(type)
     = haml :courses, :locals => {:courses => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}
   - else
     = haml :musics, :locals => {:musics => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}

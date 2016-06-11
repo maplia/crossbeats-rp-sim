@@ -237,7 +237,7 @@ module CxbRank
       else
         @hash = {
           MUSIC_TYPE_REV_SINGLE => [], MUSIC_TYPE_REV_LIMITED => [],
-          MUSIC_TYPE_REV_COURSE => [],
+          MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
         }
       end
       @last_modified = [Music.last_modified, Course.last_modified].compact.max
@@ -262,7 +262,13 @@ module CxbRank
           end
         end
         courses = Course.find_actives(@date).sort
-        @hash[MUSIC_TYPE_REV_COURSE] = courses
+        courses.each do |course|
+          if course.limited?
+            @hash[MUSIC_TYPE_REV_COURSE_LIMITED] << course
+          else
+            @hash[MUSIC_TYPE_REV_COURSE] << course
+          end
+        end
       end
     end
 

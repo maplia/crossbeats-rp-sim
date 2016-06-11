@@ -12,6 +12,11 @@
       %tr
         %th Sランク以上クリア譜面数
         %td.mark= "#{status[:s_rank][:count]}譜面"
+        %th S+ランク以上クリア譜面数
+        %td.mark= "#{status[:sp_rank][:count]}譜面"
+      %tr
+        %th S++ランククリア譜面数
+        %td.mark= "#{status[:spp_rank][:count]}譜面"
         %th 最高クリアレベル
         %td.mark
           - if status[:clear][:max_level] > 0
@@ -31,6 +36,12 @@
       %tr
         %th Sランク以上クリア譜面数
         %td.mark= "#{status[:s_rank][:count]}譜面"
+      %tr
+        %th S+ランク以上クリア譜面数
+        %td.mark= "#{status[:sp_rank][:count]}譜面"
+      %tr
+        %th S++ランク以上クリア譜面数
+        %td.mark= "#{status[:spp_rank][:count]}譜面"
       %tr
         %th 最高クリアレベル
         %td.mark

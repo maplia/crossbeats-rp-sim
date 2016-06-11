@@ -56,7 +56,8 @@ td.etc, tr.etc td {
   background-color: white;
 }
 
-span.unlock_unl_s, span.unlock_unl_sp, span.unlock_unl_fc {
+span.unlock_unl_s, span.unlock_unl_sp,
+span.unlock_unl_fc, span.unlock_unl_never {
   font-weight: bold;
 }
 span.unlock_unl_s {
@@ -70,6 +71,10 @@ span.unlock_unl_sp {
 span.unlock_unl_fc {
   color: white;
   background-color: red;
+}
+span.unlock_unl_never {
+  color: white;
+  background-color: black;
 }
 
 table.skill_list th.target, table.skill_course_list th.target {

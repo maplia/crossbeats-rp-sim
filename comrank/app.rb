@@ -445,6 +445,34 @@ module CxbRank
       end
     end
 
+=begin
+    get SCORE_RANK_URI do
+      settings.views << SiteSettings.join_comrank_path('views/rank_score')
+      music_set = MusicSet.new(settings.site_mode)
+      last_modified music_set.last_modified
+      music_set.load!
+      haml :rank_score, :layout => true, :locals => {:music_set => music_set}
+    end
+
+    get "#{SCORE_RANK_DETAIL_URI}/?:music_text_id?/?:diff?" do
+      if params[:music_text_id].blank?
+        haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
+      elsif (music = Music.find_by_param_id(params[:music_text_id])).nil?
+        haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
+      elsif params[:diff].blank?
+        haml :error, :layout => true, :locals => {:error_no => ERROR_DIFF_IS_UNDECIDED}
+      elsif (diff = SiteSettings.music_diffs.invert[params[:diff].upcase]).nil? or !music.exist?(diff)
+        haml :error, :layout => true, :locals => {:error_no => ERROR_DIFF_NOT_EXIST}
+      else
+        settings.views << SiteSettings.join_comrank_path('views/rank_score_detail')
+        fixed_title = "#{PAGE_TITLES[SCORE_RANK_DETAIL_URI]} [#{music.full_title} (#{SiteSettings.music_diffs[diff]})]"
+        skills = Skill.get_rank_data(music, diff)
+        haml :rank_score_detail, :layout => true, :locals => {
+          :music => music, :diff => diff, :skills => skills, :fixed_title => fixed_title}
+      end
+    end
+=end
+
     get RANK_CALC_URI do
       last_modified Music.last_modified
       musics = Music.where(:limited => false)

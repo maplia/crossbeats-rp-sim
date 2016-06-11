@@ -1,4 +1,4 @@
-- musics = CxbRank::Music.where('added_at >= ?', [Date.today-28, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at desc, number')
+- musics = CxbRank::Music.where(:limited => false).where('added_at >= ?', [Date.today-28, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at desc, number')
 - if musics.blank?
   %p 最近登録された曲はありません
 - else

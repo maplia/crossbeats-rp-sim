@@ -113,7 +113,8 @@ table.skill_course_list th.rate {
   width: 4.0em;
 }
 table.skill_list th.rank,
-table.skill_list th.combo, table.skill_course_list th.combo {
+table.skill_list th.combo, table.skill_course_list th.combo,
+table.skill_list th.score, table.skill_list th.scorerate {
   width: 3.5em;
 }
 

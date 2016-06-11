@@ -10,6 +10,7 @@ module CxbRank
   class Skill < ActiveRecord::Base
     include Comparable
     belongs_to :music
+    belongs_to :user
 
     MUSIC_DIFF_PREFIXES.each do |diff, diff_prefix|
       validates_format_of "#{diff_prefix}_point_before_type_cast".to_sym,
@@ -138,6 +139,14 @@ module CxbRank
       skill.unl_locked = !skill.unlocked_unl?
       skill.calc!
       return skill
+    end
+
+    def self.get_rank_data(music, diff)
+      diff_stat_column = "#{MUSIC_DIFF_PREFIXES[diff]}_stat".to_sym
+      diff_score_column = "#{MUSIC_DIFF_PREFIXES[diff]}_score".to_sym
+      diff_rate_column = "#{MUSIC_DIFF_PREFIXES[diff]}_rate".to_sym
+      return Skill.where(:music_id => music.id).where(diff_stat_column => [SP_STATUS_FAILED, SP_STATUS_CLEAR])
+        .joins(:user).where('users.display = ?', true).order(diff_score_column => :desc, diff_rate_column => :desc)
     end
 
     def update_by_params!(params)
@@ -632,6 +641,7 @@ module CxbRank
           MUSIC_TYPE_REV_COURSE => {:skills => [], :point => 0.0},
           MUSIC_TYPE_REV_LIMITED => {:skills => [], :point => 0.0},
           MUSIC_TYPE_REV_BONUS => {:skills => [], :point => 0.0},
+          MUSIC_TYPE_REV_COURSE_LIMITED => {:skills => [], :point => 0.0},
         }
       end
       if @user
@@ -664,12 +674,20 @@ module CxbRank
         @hash[MUSIC_TYPE_REV_SINGLE] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_LIMITED] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
-        @hash[MUSIC_TYPE_REV_COURSE] = {:skills => course_skills, :point => 0.0}
+        @hash[MUSIC_TYPE_REV_COURSE] = {:skills => [], :point => 0.0}
+        @hash[MUSIC_TYPE_REV_COURSE_LIMITED] = {:skills => [], :point => 0.0}
         music_skills.dup.each do |skill|
           if skill.music.limited
             @hash[MUSIC_TYPE_REV_LIMITED][:skills] << skill
           else
             @hash[MUSIC_TYPE_REV_SINGLE][:skills] << skill
+          end
+        end
+        course_skills.dup.each do |skill|
+          if skill.course.limited
+            @hash[MUSIC_TYPE_REV_COURSE_LIMITED][:skills] << skill
+          else
+            @hash[MUSIC_TYPE_REV_COURSE][:skills] << skill
           end
         end
       end
@@ -785,6 +803,8 @@ module CxbRank
         :clear     => {:count => 0, :max_level => 0},
         :clear_mas => {:count => 0, :max_level => 0},
         :s_rank    => {:count => 0, :max_level => 0},
+        :sp_rank   => {:count => 0, :max_level => 0},
+        :spp_rank  => {:count => 0, :max_level => 0},
         :rate_100  => {:count => 0, :max_level => 0},
         :fullcombo => {:count => 0, :max_level => 0},
         :ultimate  => {:count => 0, :max_level => 0},
@@ -801,6 +821,12 @@ module CxbRank
             end
             if [SP_RANK_STATUS_SPP, SP_RANK_STATUS_SP, SP_RANK_STATUS_S].include?(skill.rank(diff))
               update_status(status[:s_rank], level)
+            end
+            if [SP_RANK_STATUS_SPP, SP_RANK_STATUS_SP].include?(skill.rank(diff))
+              update_status(status[:sp_rank], level)
+            end
+            if [SP_RANK_STATUS_SPP].include?(skill.rank(diff))
+              update_status(status[:spp_rank], level)
             end
             if skill.fullcombo?(diff)
               update_status(status[:fullcombo], level)
