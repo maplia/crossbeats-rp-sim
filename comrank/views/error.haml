@@ -3,7 +3,8 @@
 - else
   %p 入力内容にエラーがあります
   %ul
-    - errors.each do |error|
-      %li= error[1]
+    - errors.messages.each do |message_set|
+      - message_set[1].each do |message|
+        %li= message
 - if defined? back_uri
   %p= link_to '戻る', back_uri

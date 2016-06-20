@@ -28,6 +28,10 @@ module CxbRank
         :if => (lambda do |a| a.rate_before_type_cast(diff) =~ /\A\d+(\.\d+)?\z/ end),
         :greater_than_or_equal_to => 0, :less_than_or_equal_to => 100,
         :message => SKILL_ERRORS[diff][ERROR_RATE_OUT_OF_RANGE]
+      validates_format_of "#{diff_prefix}_score_before_type_cast".to_sym,
+        :allow_nil => true, :allow_blank => true,
+        :with => /\A\d+\z/, :message => SKILL_ERRORS[diff][ERROR_SCORE_NOT_NUMERIC]
+      validate "validate_#{diff_prefix}_score_range".to_sym
     end
 
     def validate_esy_point_range; return validate_point_range(MUSIC_DIFF_ESY) end
@@ -35,6 +39,11 @@ module CxbRank
     def validate_hrd_point_range; return validate_point_range(MUSIC_DIFF_HRD) end
     def validate_mas_point_range; return validate_point_range(MUSIC_DIFF_MAS) end
     def validate_unl_point_range; return validate_point_range(MUSIC_DIFF_UNL) end
+    def validate_esy_score_range; return validate_score_range(MUSIC_DIFF_ESY) end
+    def validate_std_score_range; return validate_score_range(MUSIC_DIFF_STD) end
+    def validate_hrd_score_range; return validate_score_range(MUSIC_DIFF_HRD) end
+    def validate_mas_score_range; return validate_score_range(MUSIC_DIFF_MAS) end
+    def validate_unl_score_range; return validate_score_range(MUSIC_DIFF_UNL) end
 
     def validate_point_range(diff)
       level = (legacy(diff) ? music.legacy_level(diff) : music.level(diff))
@@ -44,6 +53,19 @@ module CxbRank
       bonus_rate = gauge_bonus_rate(diff)
       if (point(diff) < 0.0) or (point(diff) > level * bonus_rate)
         errors.add("#{MUSIC_DIFF_PREFIXES[diff]}_point".to_sym, SKILL_ERRORS[diff][ERROR_RP_OUT_OF_RANGE])
+        return false
+      else
+        return true
+      end
+    end
+
+    def validate_score_range(diff)
+      notes = (legacy(diff) ? music.legacy_notes(diff) : music.notes(diff))
+      if notes.blank? or score(diff).blank? or score_before_type_cast(diff) !~ /\A\d+\z/
+        return true
+      end
+      if (score(diff) < 0) or (score(diff) > notes * 100)
+        errors.add("#{MUSIC_DIFF_PREFIXES[diff]}_score".to_sym, SKILL_ERRORS[diff][ERROR_SCORE_OUT_OF_RANGE])
         return false
       else
         return true
@@ -112,6 +134,17 @@ module CxbRank
       skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_combo=", SP_COMBO_STATUS_EX)
       if date.nil? or (date.present? and date >= ULTIMATE_START_DATE[mode])
         skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
+      end
+      if max_diff == MUSIC_DIFF_UNL and music.unlock_unl == UNLOCK_UNL_TYPE_NEVER
+        skill.unl_locked = true
+        skill.mas_stat = SP_STATUS_CLEAR
+        skill.mas_rate = 100
+        skill.mas_rate_f = false
+        skill.mas_rank = SP_RANK_STATUS_SPP
+        skill.mas_combo = SP_COMBO_STATUS_EX
+        if date.nil? or (date.present? and date >= ULTIMATE_START_DATE[mode])
+          skill.mas_gauge = (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV)
+        end
       end
       skill.calc!
       return skill
@@ -208,6 +241,10 @@ module CxbRank
 
     def rate_before_type_cast(diff)
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_rate_before_type_cast")
+    end
+
+    def score_before_type_cast(diff)
+      return send("#{MUSIC_DIFF_PREFIXES[diff]}_score_before_type_cast")
     end
 
     def cleared?(diff)

@@ -39,7 +39,6 @@ saigono1page	26	最後の1ページ		サイゴノ1ページ			19	154	31	240	57	3
 crossangel	27	Cross+Angel		crossangel			27	178	53	319	67	457			FALSE	FALSE	TRUE	2013/12/20	第1回個人戦
 aerial	39	エアリアル		エアリアル			12	63	28	166	56	389			FALSE	FALSE	TRUE	2013/12/20	WINTERキャンペーン
 anotherchance	48	Another Chance		another chance			27	132	37	195	73	519			FALSE	TRUE	TRUE	2014/1/16	第1回ランダムセレクト祭
-makaimura	54	魔界村	(平地BGM)	マカイムラ			30	281	50	429	77	607			FALSE	FALSE	TRUE	2014/1/30	カプコン30周年記念CDコラボイベント
 sundrop	42	Sundrop		sundrop			24	126	47	226	75	441			FALSE	FALSE	TRUE	2014/1/1	年越し個人戦
 childrenautomaton	43	チルドレン・オートマトン	～ある歌声の亡霊～	チルドレンオートマトン			24	133	41	181	57	292			FALSE	FALSE	TRUE	2014/1/1	年越し個人戦
 remilkyway	41	Re:Milky way		remilky way			13	77	26	192	46	317			FALSE	FALSE	TRUE	2014/1/1	2014年始ログイン特典
@@ -53,6 +52,7 @@ headphoneparty	49	HEADPHONE PARTY		headphone party			24	141	32	217	52	372			FALS
 aeug	52	A&times;E&times;U&times;G	-act.1-	aeug			44	303	69	454	90	545			FALSE	TRUE	TRUE	2014/1/16	第1回ランダムセレクト祭
 rockman	53	ロックマン	(CUTMAN STAGE)	ロックマン			27	142	48	341	73	532			FALSE	TRUE	TRUE	2014/1/16	第1回ランダムセレクト祭
 makeitfresh	51	Make It Fresh	EDM ver.	make it fresh			11	74	24	191	48	310			FALSE	FALSE	TRUE	2014/1/18	AppleStoreイベント配布
+makaimura	54	魔界村	(平地BGM)	マカイムラ			30	281	50	429	77	607			FALSE	FALSE	TRUE	2014/1/30	カプコン30周年記念CDコラボイベント
 gyakutensaiban	55	逆転裁判	(綾里真宵 ～逆転姉妹のテーマ)	ギャクテンサイバン			6	59	21	149	46	298			FALSE	FALSE	TRUE	2014/1/30	カプコン30周年記念CDコラボイベント
 sengokubasara	56	戦国BASARA	(SENGOKU BASARA)	センゴクbasara			12	78	37	212	64	462			FALSE	FALSE	TRUE	2014/1/30	カプコン30周年記念CDコラボイベント
 grandarc	58	Grand Arc		grand arc			21	159	38	216	79	459			FALSE	TRUE	TRUE	2014/1/31	第2回ランダムセレクト祭
@@ -186,4 +186,6 @@ ste	184	S.T.E		ste			30	248	58	363	87	678			FALSE	TRUE	TRUE	2016/5/3	第32回ラ
 flameup	185	Flame Up		flame up			18	111	36	232	57	359			FALSE	FALSE	TRUE	2016/5/23	SUNRISE 稼働記念杯
 harmony	186	Harmony		harmony			20	115	36	187	49	293			FALSE	FALSE	TRUE	2016/5/23	SUNRISE 稼働記念杯
 codeparadiso	187	Code Paradiso		code paradiso			29	160	55	327	70	508			FALSE	TRUE	TRUE	2016/5/27	第33回ランダムセレクト祭
-brave	190	BRAVE		brave			0	0	0	0	0	0			TRUE	TRUE	TRUE	2016/6/8	EARLY SUMMER杯 2016
+brave	190	BRAVE		brave			20	160	35	261	60	360			TRUE	TRUE	TRUE	2016/6/8	EARLY SUMMER杯 2016
+free	189	Free		free			19	145	39	268	69	479			FALSE	FALSE	TRUE	2016/6/16	EARLY SUMMER杯 2016
+indigoisle	188	Indigo Isle		indigo isle			17	99	33	195	50	292			FALSE	FALSE	TRUE	2016/6/16	EARLY SUMMER杯 2016

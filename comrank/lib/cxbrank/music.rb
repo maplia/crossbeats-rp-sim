@@ -170,7 +170,7 @@ module CxbRank
         :monthly => monthly?, :limited => limited,
       }
       MUSIC_DIFF_PREFIXES.keys.each do |diff|
-        if exist?(diff)
+        if exist?(diff) and !(diff == MUSIC_DIFF_UNL and unlock_unl == UNLOCK_UNL_TYPE_NEVER)
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
             :level => level(diff), :notes => notes(diff),
             :has_legacy => exist_legacy?(diff),

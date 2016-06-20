@@ -146,6 +146,9 @@ table.skill_conf th.rate, table.skill_conf th.u_rate {
 table.skill_conf th.rank, table.skill_conf th.combo {
   width: 3.5em;
 }
+table.skill_conf th.score {
+  width: 4.0em;
+}
 
 table.skill_status th {
   width: 15.0em;
