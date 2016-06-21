@@ -97,6 +97,9 @@ module CxbRank
 
     def self.find_by_user(user, options={})
       skills = self.where(:user_id => user.id)
+      if SiteSettings.cxb_mode?
+        skills = skills.joins(:music).where('musics.limited = ?', false)
+      end
       if options[:fill_empty]
         omit_music_ids = (skills.pluck(:music_id).empty? ? [0] : skills.pluck(:music_id))
         empty_musics = Music.find_actives.where('id not in (?)', omit_music_ids)
@@ -671,6 +674,7 @@ module CxbRank
         @hash = {
           MUSIC_TYPE_NORMAL => {:skills => [], :point => 0.0},
           MUSIC_TYPE_SPECIAL => {:skills => [], :point => 0.0},
+          MUSIC_TYPE_DELETED => {:skills => [], :point => 0.0},
         }
       else
         @hash = {
@@ -699,8 +703,11 @@ module CxbRank
       if SiteSettings.cxb_mode?
         @hash[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
+        @hash[MUSIC_TYPE_DELETED] = {:skills => [], :point => 0.0}
         music_skills.each do |skill|
-          if skill.music.monthly?
+          if skill.music.deleted?
+            @hash[MUSIC_TYPE_DELETED][:skills] << skill
+          elsif skill.music.monthly?
             @hash[MUSIC_TYPE_SPECIAL][:skills] << skill
           else
             @hash[MUSIC_TYPE_NORMAL][:skills] << skill

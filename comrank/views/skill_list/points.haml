@@ -3,22 +3,19 @@
     %thead
       %tr
         - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
-          - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
-          - next if type == CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED
+          - next if MUSIC_TYPE_ST_COUNTS[type] == 0
           %th.part= CxbRank::SiteSettings.music_types[type]
         %th.sum 合計RP
     %tbody
       %tr
         - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
-          - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
-          - next if type == CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED
+          - next if MUSIC_TYPE_ST_COUNTS[type] == 0
           %td= sprintf('%.2f', skill_set[type][:point])
         %td= sprintf('%.2f', skill_set.total_point)
   - else
     %tbody
       - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
-        - next if type == CxbRank::MUSIC_TYPE_REV_LIMITED
-        - next if type == CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED
+        - next if MUSIC_TYPE_ST_COUNTS[type] == 0
         %tr
           %th.type= CxbRank::SiteSettings.music_types[type].sub(/RP対象曲/, '')
           %td.point= sprintf('%.2f', skill_set[type][:point])

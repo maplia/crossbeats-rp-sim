@@ -13,12 +13,12 @@ require 'cxbrank/event'
 CSV_OPTIONS = {:col_sep => "\t", :converters => nil}
 
 MUSICS_COLUMNS = []
-MUSICS_COLUMNS.push(:lookup_key, :text_id, :number, :title, :subtitle, :sort_key)
+MUSICS_COLUMNS.push(:lookup_key, :text_id, :number, :title, :subtitle, :sort_key, :jacket)
 CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
 end
-MUSICS_COLUMNS.push(:limited, :hidden, :display, :unlock_unl, :added_at, :event)
+MUSICS_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at, :event)
 LEGACY_CHARTS_COLUMNS = []
 LEGACY_CHARTS_COLUMNS.push(:text_id, :span_s, :span_e)
 CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|

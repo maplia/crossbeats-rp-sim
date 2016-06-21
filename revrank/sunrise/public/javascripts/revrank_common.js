@@ -28,6 +28,10 @@ var PROGRESS_OPTIONS = {
 var ALERT_OPTIONS = {
   title: DIALOG_TITLE, width: 300, height: 210, font_size: DIALOG_FONT_SIZE
 };
+var MUSIC_BANNERS = [
+	'bnr_difficulty_ea.png', 'bnr_difficulty_st.png', 'bnr_difficulty_ha.png',
+	'bnr_difficulty_ms.png', 'bnr_difficulty_un.png'
+];
 
 // MY DATAページのセッションが継続しているか確認
 function isMyDataSessionAlive(document) {
@@ -123,10 +127,11 @@ function parseMusicItem(document) {
   var item = {};
   // ミュージックRPページから取得する
   if ($(document).find('.pdm-jkt')[0] != undefined) {
-    item.text_id = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
+  	item.jacket = /\/([^\/]*.png)/.exec($(document).find('.pdm-jkt')[0].src)[1];
+    item.text_id = /([^\/]*).png/.exec(item.jacket)[1];
     item.text_id = item.text_id.toLowerCase();
     item.text_id = item.text_id.replace(/[\_\-\(\)]/g, '');
-    item.sort_key = /\/([^\/]*).png/.exec($(document).find('.pdm-jkt')[0].src)[1];
+    item.sort_key = /([^\/]*).png/.exec(item.jacket)[1];
     item.sort_key = item.sort_key.toLowerCase();
     item.sort_key = item.sort_key.replace(/[\_\-\(\)]/g, ' ');
   }
@@ -151,6 +156,21 @@ function parseClassItem(document) {
     item.sort_key = item.text_id;
     item.title = $(document).find('.c-event__ttl--big')[0].textContent.trim();
   }
+  item.musics = [];
+  $.each($(document).find('.chMissionBlock'), function (i, element) {
+    var music = {};
+    music.jacket = /\/([^\/]*.png)/.exec($(element).find('.chJk')[0].src)[1].trim();
+    if ($(element).find('.chmdiff').length > 0) {
+      diff_banner = /\/([^\/]*.png)/.exec($(element).find('.chmdiff')[0].src)[1].trim();
+      $.each(MUSIC_BANNERS, function (i, banner) {
+        if (diff_banner == banner) {
+          music.diff = MUSIC_DIFFS[i];
+          return true;
+        }
+      });
+    }
+    item.musics[item.musics.length] = music;
+  });
   return item;
 }
 

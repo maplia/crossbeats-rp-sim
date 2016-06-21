@@ -32,6 +32,7 @@ module CxbRank
     end
 
     def self.create_by_request(body)
+      invert_music_diffs = MUSIC_DIFF_PREFIXES.invert
       course = self.where(:lookup_key => body[:lookup_key]).first
       unless course
         course = self.new
@@ -41,6 +42,15 @@ module CxbRank
         course.sort_key = body[:text_id]
         course.lookup_key = body[:lookup_key]
         course.added_at = Date.today
+        body[:musics].each_with_index do |body_music, i|
+          music = Music.where(:jacket => body_music[:jacket]).first
+          next unless music
+          course_music = CourseMusic.new
+          course_music.music = music
+          course_music.seq = i+1
+          course_music.diff = invert_music_diffs[body_music[:diff]]
+          course.course_musics << course_music
+        end
       end
       return course
     end

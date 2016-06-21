@@ -24,6 +24,7 @@ module CxbRank
         music.unlock_unl = UNLOCK_UNL_TYPE_FC
         music.added_at = Date.today
       end
+      music.jacket = body[:jacket]
       MUSIC_DIFF_PREFIXES.values.each do |prefix|
         next unless body[prefix.to_sym]
         music.send("#{prefix}_level=", body[prefix.to_sym][:level])
@@ -52,6 +53,9 @@ module CxbRank
 
     def self.find_actives(date=nil)
       actives = self.where(:display => true)
+      if SiteSettings.cxb_mode?
+        actives = actives.where(:limited => false)
+      end
       if date.present?
         actives = actives.where('added_at <= ?', date)
         actives.each do |music| music.date = date end
@@ -233,6 +237,7 @@ module CxbRank
       if SiteSettings.cxb_mode?
         @hash = {
           MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
+          MUSIC_TYPE_DELETED => [],
         }
       else
         @hash = {
@@ -247,9 +252,11 @@ module CxbRank
       musics = Music.find_actives(@date).sort
       if SiteSettings.cxb_mode?
         musics.each do |music|
-          if music.monthly?
+          if music.deleted?
+            @hash[MUSIC_TYPE_DELETED] << music
+          elsif music.monthly?
             @hash[MUSIC_TYPE_SPECIAL] << music
-          else
+          elsif !music.limited?
             @hash[MUSIC_TYPE_NORMAL] << music
           end
         end
