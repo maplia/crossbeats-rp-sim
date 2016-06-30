@@ -445,7 +445,6 @@ module CxbRank
       end
     end
 
-=begin
     get SCORE_RANK_URI do
       settings.views << SiteSettings.join_comrank_path('views/rank_score')
       music_set = MusicSet.new(settings.site_mode)
@@ -471,7 +470,6 @@ module CxbRank
           :music => music, :diff => diff, :skills => skills, :fixed_title => fixed_title}
       end
     end
-=end
 
     get RANK_CALC_URI do
       last_modified Music.last_modified

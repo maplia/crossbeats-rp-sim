@@ -60,7 +60,7 @@ module CxbRank
         actives = actives.where('added_at <= ?', date)
         actives.each do |music| music.date = date end
       end
-      return actives
+      return actives.order(:number, :sort_key)
     end
 
     def date=(date)

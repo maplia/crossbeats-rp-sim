@@ -186,6 +186,10 @@ ste	184	S.T.E		ste			30	248	58	363	87	678			FALSE	TRUE	FALSE	TRUE	2016/5/3	第32
 flameup	185	Flame Up		flame up			18	111	36	232	57	359			FALSE	FALSE	FALSE	TRUE	2016/5/23	SUNRISE 稼働記念杯
 harmony	186	Harmony		harmony			20	115	36	187	49	293			FALSE	FALSE	FALSE	TRUE	2016/5/23	SUNRISE 稼働記念杯
 codeparadiso	187	Code Paradiso		code paradiso			29	160	55	327	70	508			FALSE	TRUE	FALSE	TRUE	2016/5/27	第33回ランダムセレクト祭
-brave	190	BRAVE		brave			20	160	35	261	60	360			TRUE	TRUE	FALSE	TRUE	2016/6/8	EARLY SUMMER杯 2016
+brave	190	BRAVE		brave			35	261	60	360	82	647			FALSE	TRUE	FALSE	TRUE	2016/6/24	第34回ランダムセレクト祭
 free	189	Free		free			19	145	39	268	69	479			FALSE	FALSE	FALSE	TRUE	2016/6/16	EARLY SUMMER杯 2016
 indigoisle	188	Indigo Isle		indigo isle			17	99	33	195	50	292			FALSE	FALSE	FALSE	TRUE	2016/6/16	EARLY SUMMER杯 2016
+miiro	191	海色		ミイロ			12	61	24	138	58	343			FALSE	FALSE	FALSE	TRUE	2016/6/21	
+killykillyjoker	192	killy killy JOKER		killy killy joker			10	78	23	121	63	429			FALSE	FALSE	FALSE	TRUE	2016/6/21	
+hakuchonomizuumi	193	白鳥の湖	(Short Remix)	ハクチョウノミズウミ			3	25	15	92	35	184			FALSE	FALSE	FALSE	TRUE	2016/6/21	
+turkeykoshinkyoku	194	トルコ行進曲	(Short Remix)	トルココウシンキョク			6	44	20	114	48	244			FALSE	FALSE	FALSE	TRUE	2016/6/21	
