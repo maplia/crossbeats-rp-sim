@@ -1,4 +1,4 @@
-- musics = CxbRank::Music.find(:all, :conditions => ['added_at >= ?', Date.today-28], :order => 'added_at desc, number')
+- musics = CxbRank::Music.where(:limited => false).where('added_at >= ?', [Date.today-28, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at desc, number')
 - if musics.blank?
   %p 最近登録された曲はありません
 - else
@@ -7,21 +7,21 @@
       %thead
         %tr
           %th 追加日
-          - if cxb_mode?
+          - if CxbRank::SiteSettings.cxb_mode?
             %th #
           %th タイトル
-          - music_diffs.keys.sort.each do |diff|
-            %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music_diffs[diff]
+          - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+            %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= CxbRank::SiteSettings.music_diffs[diff]
           %th 追加イベント
       %tbody
         - musics.each do |music|
           %tr
             %th= music.added_at.strftime('%m/%d')
-            - if cxb_mode?
+            - if CxbRank::SiteSettings.cxb_mode?
               %th= music.number
             %td.title
               = haml :music_title, :locals => {:music => music}
-            - music_diffs.keys.sort.each do |diff|
+            - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
               %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music.level_to_s(diff)
             %td= music.event
   - else

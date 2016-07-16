@@ -2,6 +2,7 @@ require 'rubygems'
 require 'active_record'
 require 'chronic'
 require 'cxbrank/const'
+require 'cxbrank/site_settings'
 require 'cxbrank/course'
 
 module CxbRank
@@ -10,31 +11,8 @@ module CxbRank
     has_many :monthlies
     has_many :legacy_charts
 
-    @@mode = nil
-    @@date = nil
-    @@time = nil
-
-    def self.mode=(mode)
-      @@mode = mode
-    end
-
-    def self.date=(date)
-      if date.present?
-        @@date = date
-        @@time = Chronic.parse("#{date.strftime('%Y-%m-%d 27:59:59')}")
-      end
-    end
-
-    def music_diffs
-      return MUSIC_DIFFS[@@mode]
-    end
-
-    def level_format
-      return LEVEL_FORMATS[@@mode]
-    end
-
     def self.create_by_request(body)
-      music = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
+      music = self.where(:lookup_key => body[:lookup_key]).first
       unless music
         music = self.new
         music.number = 0
@@ -43,31 +21,51 @@ module CxbRank
         music.sort_key = body[:sort_key]
         music.lookup_key = body[:lookup_key]
         music.limited = false
-        MUSIC_DIFF_PREFIXES.values.each do |prefix|
-          next unless body[prefix.to_sym]
-          music.send("#{prefix}_level=", body[prefix.to_sym][:level])
-          music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
-        end
+        music.unlock_unl = UNLOCK_UNL_TYPE_FC
+        music.added_at = Date.today
+      end
+      music.jacket = body[:jacket]
+      MUSIC_DIFF_PREFIXES.values.each do |prefix|
+        next unless body[prefix.to_sym]
+        music.send("#{prefix}_level=", body[prefix.to_sym][:level])
+        music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
       end
       return music
     end
 
-    def self.last_modified
-      music = self.find(:first, :order => 'updated_at desc')
-      return (music ? music.updated_at : nil)
-    end
-
-    def self.find_by_param_id(param_id)
-      return self.find(:first, :conditions => {:text_id => param_id})
-    end
-
-    def self.find_actives
-      if @@date.present?
-        conditions = ['display = ? and added_at <= ?', true, @@date]
+    def self.last_modified(text_id=nil)
+      if text_id.present? and (music = self.find_by_param_id(text_id))
+        return [
+          music.updated_at,
+          Monthly.last_modified(music.id), LegacyChart.last_modified(music.id)
+        ].compact.max
       else
-        conditions = {:display => true}
+        return [
+          self.maximum(:updated_at),
+          Monthly.last_modified, LegacyChart.last_modified
+        ].compact.max
       end
-      return self.find(:all, :conditions => conditions)
+    end
+
+    def self.find_by_param_id(text_id)
+      return self.where(:text_id => text_id).first
+    end
+
+    def self.find_actives(date=nil)
+      actives = self.where(:display => true)
+      if SiteSettings.cxb_mode?
+        actives = actives.where(:limited => false)
+      end
+      if date.present?
+        actives = actives.where('added_at <= ?', date)
+        actives.each do |music| music.date = date end
+      end
+      return actives.order(:number, :sort_key)
+    end
+
+    def date=(date)
+      @pivot_date = date
+      @pivot_time = Chronic.parse("#{date.strftime('%Y-%m-%d 27:59:59')}")
     end
 
     def full_title
@@ -75,9 +73,9 @@ module CxbRank
     end
 
     def level(diff)
-      if @@date.present? and legacy_charts.present?
+      if @pivot_date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
-          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@@date)
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@pivot_date)
             return legacy_chart.level(diff)
           end
         end
@@ -94,9 +92,9 @@ module CxbRank
     end
 
     def notes(diff)
-      if @@date.present? and legacy_charts.present?
+      if @pivot_date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
-          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@@date)
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@pivot_date)
             return legacy_chart.notes(diff)
           end
         end
@@ -114,7 +112,7 @@ module CxbRank
 
     def max_notes
       note_data = []
-      music_diffs.keys.each do |diff|
+      SiteSettings.music_diffs.keys.each do |diff|
         note_data << (notes(diff) || 0)
       end
       return note_data.max
@@ -130,7 +128,7 @@ module CxbRank
 
     def monthly?
       monthlies.each do |monthly|
-        if (monthly.span_s..monthly.span_e).include?(@@time || Time.now)
+        if (monthly.span_s..monthly.span_e).include?(@pivot_time || Time.now)
           return true
         end
       end
@@ -141,7 +139,7 @@ module CxbRank
       unless exist?(diff)
         return '-'
       else
-        return (level(diff) == 0) ? '-' : sprintf(level_format, level(diff))
+        return (level(diff) == 0) ? '-' : sprintf(SiteSettings.level_format, level(diff))
       end
     end
 
@@ -149,7 +147,7 @@ module CxbRank
       unless exist_legacy?(diff)
         return '-'
       else
-        return (legacy_level(diff) == 0) ? '-' : sprintf(level_format, legacy_level(diff))
+        return (legacy_level(diff) == 0) ? '-' : sprintf(SiteSettings.level_format, legacy_level(diff))
       end
     end
 
@@ -176,7 +174,7 @@ module CxbRank
         :monthly => monthly?, :limited => limited,
       }
       MUSIC_DIFF_PREFIXES.keys.each do |diff|
-        if exist?(diff)
+        if exist?(diff) and !(diff == MUSIC_DIFF_UNL and unlock_unl == UNLOCK_UNL_TYPE_NEVER)
           hash[MUSIC_DIFF_PREFIXES[diff]] = {
             :level => level(diff), :notes => notes(diff),
             :has_legacy => exist_legacy?(diff),
@@ -201,9 +199,26 @@ module CxbRank
   end
 
   class Monthly < ActiveRecord::Base
+    def self.last_modified(music_id=nil)
+      if music_id.present?
+        monthlies = self.where(:music_id => music_id)
+      else
+        monthlies = self
+      end
+      return monthlies.maximum(:updated_at)
+    end
   end
 
   class LegacyChart < ActiveRecord::Base
+    def self.last_modified(music_id=nil)
+      if music_id.present?
+        legacy_charts = self.where(:music_id => music_id)
+      else
+        legacy_charts = self
+      end
+      return legacy_charts.maximum(:updated_at)
+    end
+
     def level(diff)
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
     end
@@ -213,37 +228,59 @@ module CxbRank
     end
   end
 
-  class MusicSet < Hash
-    attr_accessor :last_modified
+  class MusicSet
+    attr_reader :last_modified
 
-    def self.load(mode)
-      music_set = self.new
-      musics = Music.find_actives.sort
-      if mode == MODE_CXB
-        music_set[MUSIC_TYPE_NORMAL] = []
-        music_set[MUSIC_TYPE_SPECIAL] = []
+    def initialize(mode, date=nil)
+      @mode = mode
+      @date = date
+      if SiteSettings.cxb_mode?
+        @hash = {
+          MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
+          MUSIC_TYPE_DELETED => [],
+        }
+      else
+        @hash = {
+          MUSIC_TYPE_REV_SINGLE => [], MUSIC_TYPE_REV_LIMITED => [],
+          MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
+        }
+      end
+      @last_modified = [Music.last_modified, Course.last_modified].compact.max
+    end
+
+    def load!
+      musics = Music.find_actives(@date).sort
+      if SiteSettings.cxb_mode?
         musics.each do |music|
-          if music.monthly?
-            music_set[MUSIC_TYPE_SPECIAL] << music
-          else
-            music_set[MUSIC_TYPE_NORMAL] << music
+          if music.deleted?
+            @hash[MUSIC_TYPE_DELETED] << music
+          elsif music.monthly?
+            @hash[MUSIC_TYPE_SPECIAL] << music
+          elsif !music.limited?
+            @hash[MUSIC_TYPE_NORMAL] << music
           end
         end
       else
-        music_set[MUSIC_TYPE_REV_SINGLE] = []
-        music_set[MUSIC_TYPE_REV_LIMITED] = []
         musics.each do |music|
           if music.limited?
-            music_set[MUSIC_TYPE_REV_LIMITED] << music
+            @hash[MUSIC_TYPE_REV_LIMITED] << music
           else
-            music_set[MUSIC_TYPE_REV_SINGLE] << music
+            @hash[MUSIC_TYPE_REV_SINGLE] << music
           end
         end
-        courses = Course.find_actives.sort
-        music_set[MUSIC_TYPE_REV_COURSE] = courses
+        courses = Course.find_actives(@date).sort
+        courses.each do |course|
+          if course.limited?
+            @hash[MUSIC_TYPE_REV_COURSE_LIMITED] << course
+          else
+            @hash[MUSIC_TYPE_REV_COURSE] << course
+          end
+        end
       end
-      music_set.last_modified = [Music.last_modified, Course.last_modified].compact.max
-      return music_set
+    end
+
+    def [](key)
+      return @hash[key]
     end
   end
 end

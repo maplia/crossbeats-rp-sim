@@ -1,0 +1,7 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SCORE_RANK_URI]}
+%h1
+  = page_title
+  - if mobile?
+    %br
+  %small= "[#{music.full_title} (#{CxbRank::SiteSettings.music_diffs[diff]})]"
+= haml :skills, :locals => {:skills => skills, :diff => diff}

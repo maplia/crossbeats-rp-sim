@@ -1,0 +1,6 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1
+  = page_title
+- CxbRank::SiteSettings.music_types.keys.sort.each do |type|
+  - next if [CxbRank::MUSIC_TYPE_REV_COURSE, CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED].include?(type)
+  = haml :musics, :locals => {:musics => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}

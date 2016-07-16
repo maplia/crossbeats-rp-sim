@@ -1,0 +1,12 @@
+%tr
+  - if CxbRank::SiteSettings.cxb_mode?
+    %th.number= music.number
+  %td.title
+    = haml :music_title, :locals => {:music => music}
+  - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+    - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
+    %td{:class => "#{diff_class} mark"}
+      - if music.exist?(diff)
+        %a{:href => CxbRank::SiteSettings.join_site_base(File.join(File.join(CxbRank::SCORE_RANK_DETAIL_URI, music.text_id), CxbRank::MUSIC_DIFF_PREFIXES[diff]))} ランキング
+      - else
+        －

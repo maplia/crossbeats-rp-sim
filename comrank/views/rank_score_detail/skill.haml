@@ -1,0 +1,14 @@
+%tr
+  %th.number= rank
+  %td.text
+    %a{:href => skill.user.skill_view_uri}= skill.user.name.truncate(10)
+  %td.score= (skill.score(diff) || 0)
+  %td.score= sprintf("%.2f%%", ((skill.score(diff) || 0) / (skill.music.notes(diff) * 100.0)) * 100.0)
+  %td.rate
+    - if skill.survival?(diff)
+      = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
+    - elsif skill.ultimate?(diff)
+      = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
+    = haml :rate, :locals => {:skill => skill, :diff => diff}
+  %td.mark= (CxbRank::SP_RANK_STATUSES[skill.rank(diff)] || '－')
+  %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]

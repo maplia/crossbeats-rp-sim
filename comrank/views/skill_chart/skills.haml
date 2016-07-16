@@ -2,11 +2,11 @@
   - unless mobile?
     %thead
       %tr
-        - if cxb_mode?
+        - if CxbRank::SiteSettings.cxb_mode?
           %th.number #
         %th.title タイトル
-        - music_diffs.keys.sort.each do |diff|
-          %th{:class => CxbRank::MUSIC_DIFF_CLASSES[diff], :colspan => 2}= music_diffs[diff]
+        - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+          %th{:class => CxbRank::MUSIC_DIFF_CLASSES[diff], :colspan => 2}= CxbRank::SiteSettings.music_diffs[diff]
   %tbody
     - skills.each do |skill|
       = haml :skill, :locals => {:skill => skill}

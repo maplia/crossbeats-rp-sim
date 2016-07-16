@@ -6,7 +6,7 @@
   - css_class = ((ignore_locked or skill.target_diff == skill.best_diff) ? CxbRank::MUSIC_DIFF_CLASSES[target_diff] : 'etc')
 - unless mobile?
   %tr{:class => css_class}
-    - if skill.rp_target?
+    - if skill.rp_target? and !bonus
       %th.number.target= row
     - else
       %th.number= row
@@ -18,17 +18,17 @@
       - if target_diff and skill.legacy(target_diff)
         [旧]
       - if target_diff and skill.locked(target_diff)
-        = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+        = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
       - if target_diff
         - if skill.survival?(target_diff)
-          = image_tag '/images/survival.png', :alt => '[S]', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
         - elsif skill.ultimate?(target_diff)
-          = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
     - if !target_diff or !skill.cleared?(target_diff)
       %td.status{:colspan => 6} 記録なし
     - else
       %td.level
-        = "[#{music_diffs[target_diff]}]"
+        = "[#{CxbRank::SiteSettings.music_diffs[target_diff]}]"
         - if skill.legacy(target_diff)
           = "#{skill.music.legacy_level_to_s(target_diff)}"
         - else
@@ -47,7 +47,7 @@
 - else
   - row_count = (skill.comment.present? ? 3 : 2)
   %tr{:class => css_class}
-    - if skill.rp_target?
+    - if skill.rp_target? and !bonus
       %th.number.target{:rowspan => row_count}= row
     - else
       %th.number{:rowspan => row_count}= row
@@ -59,17 +59,17 @@
       - if target_diff and skill.legacy(target_diff)
         [旧]
       - if target_diff and skill.locked(target_diff)
-        = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+        = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
       - if target_diff
         - if skill.survival?(target_diff)
-          = image_tag '/images/survival.png', :alt => '[S]', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
         - elsif skill.ultimate?(target_diff)
-          = image_tag '/images/ultimate.png', :alt => '[U]', :height => 12
+          = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
   %tr{:class => css_class}
     - if !target_diff or !skill.cleared?(target_diff)
       %td.status{:colspan => 5} 記録なし
     - else
-      %td.level= music_diffs[target_diff]
+      %td.level= CxbRank::SiteSettings.music_diffs[target_diff]
       %td.point
         - if bonus
           = skill.point_bonus_to_s(target_diff)

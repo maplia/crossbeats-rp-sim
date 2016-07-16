@@ -1,0 +1,40 @@
+@charset 'utf-8';
+
+/********
+  colors
+ ********/
+body {
+  color: #6d3d33;
+  background-color: white;
+  background-image: url("/sunrise/images/check.png");
+}
+h1, div.main dl dt {
+  color: white;
+  background-color: #6d3d33;
+}
+
+a:link {
+  color: brown;
+}
+a:visited {
+  color: #b66655;
+}
+a:hover {
+  color: red;
+}
+
+table {
+  background-color: white;
+}
+th, table.skill_list th.number, table.skill_course_list th.number, table.skill_summary td {
+  color: inherit;
+  background-color: #ffde9b;
+  border-color: #6d3d33 !important;
+}
+td {
+  border-color: #6d3d33 !important;
+}
+
+div.sidebar {
+  background-color: white;
+}

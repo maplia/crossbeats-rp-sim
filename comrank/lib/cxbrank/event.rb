@@ -6,9 +6,20 @@ module CxbRank
   class Event < ActiveRecord::Base
     has_many :event_musics
 
-    def self.last_modified
-      event = self.find(:first, :order => 'updated_at desc')
-      return (event ? event.updated_at : nil)
+    def self.last_modified(text_id=nil, section=nil)
+      if text_id.present? and section.present?
+        event = self.where(:text_id => text_id, :section => section).first
+        return [
+          self.where(:text_id => text_id, :section => section).first.updated_at,
+          EventMusic.last_modified(event.id)
+        ].compact.max
+      else
+        return [self.maximum(:updated_at), EventMusic.last_modified].compact.max
+      end
+    end
+
+    def sheet_uri
+      return SiteSettings.join_site_base(File.join(EVENT_SHEET_URI, text_id))
     end
 
     def to_hash
@@ -32,6 +43,14 @@ module CxbRank
   class EventMusic < ActiveRecord::Base
     include Comparable
     belongs_to :music
+
+    def self.last_modified(event_id=nil, section=nil)
+      if event_id.present? and section.present?
+        return self.where(:event_id => event_id).maximum(:updated_at)
+      else
+        return self.maximum(:updated_at)
+      end
+    end
 
     def to_hash
       return {

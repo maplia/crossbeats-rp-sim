@@ -13,26 +13,50 @@ module CxbRank
       :is => GAME_ID_FIGURE, :message => ERRORS[ERROR_GAME_ID_LENGTH_IS_INVALID]
     validates_format_of :point_before_type_cast, :allow_nil => true, :allow_blank => true,
       :with => /\A\d+(\.\d+)?\z/, :message => ERRORS[ERROR_REAL_RP_NOT_NUMERIC]
-    validates_presence_of :point, :if => (lambda do |a| @@mode == MODE_REV and a.id end),
+    validates_presence_of :point, :if => (lambda do |a| SiteSettings.rev_mode? and a.id end),
       :message => ERRORS[ERROR_REAL_RP_IS_UNINPUTED]
 
-    @@mode = nil
-
-    def self.mode=(mode)
-      @@mode = mode
+    before_save do |b|
+      if b.password_changed?
+        b.password = Digest::MD5.hexdigest(b.password)
+      end
     end
 
     def self.last_modified
-      user = self.find(:first, :order => 'updated_at desc')
-      return (user ? user.updated_at : Time.now)
+      return self.maximum(:updated_at)
     end
 
     def self.find_by_param_id(param_id)
       if param_id.size == USER_ID_FIGURE
-        return self.find_by_id(param_id.to_i)
+        return self.where(:id => param_id.to_i).first
       else
-        return self.find(:first,
-          :conditions => {:game_id => param_id}, :order => 'point_updated_at desc')
+        return self.where(:game_id => param_id).order('point_updated_at desc').first
+      end
+    end
+
+    def self.find_actives
+      return self.where(:display => true).where('point_updated_at is not null').order('point_updated_at desc')
+    end
+
+    def self.create_by_params(params)
+      user = self.new
+      user.attributes = params
+      user.comment.gsub!(/\r\n/, "\n") if user.comment.present?
+      return user
+    end
+
+    def update_by_params!(params)
+      if params.present?
+        before_password = password
+        self.attributes = params
+        self.comment.gsub!(/\r\n/, "\n") if comment.present?
+        if password.blank?
+          self.password = before_password
+        end
+        if password_confirmation.blank?
+          self.password_confirmation = before_password
+        end
+        self.point_direct = point_changed?
       end
     end
 
@@ -41,15 +65,15 @@ module CxbRank
     end
 
     def skill_view_uri
-      return "#{SKILL_LIST_VIEW_URI}/#{user_id}"
+      return SiteSettings.join_site_base(File.join(SKILL_LIST_VIEW_URI, user_id))
     end
 
     def skill_ignore_uri
-      return "#{SKILL_LIST_VIEW_IGLOCK_URI}/#{user_id}"
+      return SiteSettings.join_site_base(File.join(SKILL_LIST_VIEW_IGLOCK_URI, user_id))
     end
 
     def skill_chart_uri
-      return "#{CLEAR_LIST_VIEW_URI}/#{user_id}"
+      return SiteSettings.join_site_base(File.join(CLEAR_LIST_VIEW_URI, user_id))
     end
 
     def to_hash

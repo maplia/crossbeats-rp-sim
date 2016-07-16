@@ -17,4 +17,4 @@
   %h2 編集フォーム
   %div.subunit
     %p <em>「未取得/ロック譜面」をチェックすると計算対象外になります</em>
-    = haml :temp_skill, :locals => {:skill => temp_skill}
+    = haml :temp_skill, :locals => {:action => CxbRank::SiteSettings.join_site_base(CxbRank::SKILL_ITEM_EDIT_URI), :skill => temp_skill}

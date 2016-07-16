@@ -20,7 +20,11 @@
       - else
         %td.mark ×
       %td.point= skill.point_to_s
-      %td.rate= skill.rate_to_s
+      - if !CxbRank::SiteSettings.rev_sunrise_mode?
+        %td.rate= skill.rate_to_s
+      - else
+        %td.rate
+          = haml :rate, :locals => {:skill => skill}
       %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
     %td.comment= Rinku.auto_link(escape_html skill.comment)
 - else
@@ -45,7 +49,11 @@
       - else
         %td.mark ×
       %td.point= skill.point_to_s
-      %td.rate= skill.rate_to_s
+      - if !CxbRank::SiteSettings.rev_sunrise_mode?
+        %td.rate= skill.rate_to_s
+      - else
+        %td.rate
+          = haml :rate, :locals => {:skill => skill}
       %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo]
   - if skill.comment.present?
     %tr{:class => css_class}

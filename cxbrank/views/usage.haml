@@ -1,0 +1,51 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= "#{settings.site_name} #{page_title}"
+%div.sidebar
+  %div.unit
+    %h2 目次
+    %div.subunit
+      %ul
+        %li #{link_to '一括登録 @ Googleスプレッド', '#spread'}
+        %li #{link_to 'ランクポイント', '#calc'}
+%div.main
+  %div.unit
+    %h2#spread 一括登録 @ Googleスプレッド
+    %div.subunit
+      %p iOS版「CROSS×BEATS」では、「crossbeats REV.」のようにWebからブックマークレットなどを利用した一括登録はできないため、その代替としてスプレッドシートでの一括入力の機能を実装しました
+      %p 詳しくは、下記リンクのスプレッドシートでの説明を参照してください
+      %ul
+        %li= link_to 'CxB RankPoint Simulator 編集シート', 'https://docs.google.com/spreadsheets/d/13tfrRwrCLgTnGcrzYgS_tqGrs3vMKuDmuWppx1CGUQQ'
+      %p 動作確認はWindows 10のFirefox最新版で行っています。いまのところPCからのみの対応です
+      %dl
+        %dt 注意事項
+        %dd
+          %ul
+            %li Googleスプレッドにシートをコピーして使用する必要があるので、Googleにユーザー登録が必要です
+            %li
+              スクリプトで登録データの取り込みを行うので、初回実行時にスクリプトから実行の許可を求める画面が表示されます。許可しなければこの機能を使うことができません
+              %br
+              = image_tag 'authorize_1.png'
+              = image_tag 'authorize_2.png'
+  %div.unit
+    %h2#calc ランクポイント
+    %div.subunit
+      %dl
+        %dt 合計対象
+        %dd
+          %p ランクポイントは現在以下の項目の合計で算出しています
+          %ol
+            %li
+              <u>期間限定RP対象曲（ボーナスRP曲）のRP合計</u>
+              %ul
+                %li ボーナスRP曲は成績と関係なくすべて合計対象になります
+            %li
+              <u>ボーナスRPを除いたすべての曲のうち、上位20曲のRP合計</u>
+          %p クリアレートからRP算出するまでの処理はこのRPシミュレータでは行っていないので省きます
+        %dt 計算対象外の曲/譜面
+        %dd
+          %p 実機では未解禁楽曲/未アンロック譜面（MUSIC PLAYで通常選択できないもの）、および期間限定として出現している曲のすべての譜面は計算対象外となります
+          %ul
+            %li
+              未解禁のものを合計対象から外す場合は、明示的に未解禁状態を設定してください
+              %br
+              = image_tag 'locked.png'

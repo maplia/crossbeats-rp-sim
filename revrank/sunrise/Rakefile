@@ -1,0 +1,210 @@
+$LOAD_PATH << '../../comrank/lib'
+
+require 'yaml'
+require 'csv'
+require 'active_record'
+require 'sinatra/activerecord'
+require 'sinatra/activerecord/rake'
+require 'cxbrank/const'
+require 'cxbrank/music'
+require 'cxbrank/course'
+require 'cxbrank/event'
+
+CSV_OPTIONS = {:col_sep => "\t", :converters => nil}
+
+MUSICS_COLUMNS = []
+MUSICS_COLUMNS.push(:lookup_key, :text_id, :number, :title, :subtitle, :sort_key, :jacket)
+CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
+  MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
+  MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
+end
+MUSICS_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at, :event)
+LEGACY_CHARTS_COLUMNS = []
+LEGACY_CHARTS_COLUMNS.push(:text_id, :span_s, :span_e)
+CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
+  LEGACY_CHARTS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
+  LEGACY_CHARTS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
+end
+COURSES_COLUMNS = [:lookup_key, :text_id, :title, :sort_key, :level, :limited, :hidden, :display, :added_at]
+COURSE_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id, :diff]
+EVENTS_COLUMNS = [:text_id, :section, :title, :span_s, :span_e]
+EVENT_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id]
+
+def get_music(text_id)
+  return CxbRank::Music.where(:text_id => text_id).first
+end
+
+Time.zone = 'Tokyo'
+ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
+ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['environment'].to_sym)
+ActiveRecord::Base.default_timezone = :local
+
+namespace :revrank do
+  desc 'initialize music master'
+  task :init_master do
+    MUSICS_COLUMNS.delete(:lookup_key)
+    CSV.table('db/master/musics.tsv', CSV_OPTIONS).each do |row|
+      data = CxbRank::Music.where(:lookup_key => row.field(:lookup_key)).first
+      unless data
+        data = CxbRank::Music.new
+        data.lookup_key = row.field(:lookup_key)
+      end
+      MUSICS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
+    end
+
+    CSV.table('db/master/legacy_charts.tsv', CSV_OPTIONS).each do |row|
+      LEGACY_CHARTS_COLUMNS.delete(:text_id)
+      LEGACY_CHARTS_COLUMNS.delete(:span_s)
+      music_id = get_music(row.field(:text_id)).id
+      data = CxbRank::LegacyChart.where(:music_id => music_id, :span_s => row.field(:span_s)).first
+      unless data
+        data = CxbRank::LegacyChart.new
+        data.music_id = music_id
+        data.span_s = row.field(:span_s)
+      end
+      LEGACY_CHARTS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
+    end
+
+    COURSES_COLUMNS.delete(:lookup_key)
+    CSV.table('db/master/courses.tsv', CSV_OPTIONS).each do |row|
+      data = CxbRank::Course.where(:lookup_key => row.field(:lookup_key)).first
+      unless data
+        data = CxbRank::Course.new
+        data.lookup_key = row.field(:lookup_key)
+      end
+      COURSES_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
+    end
+
+    CSV.table('db/master/course_musics.tsv', CSV_OPTIONS).each do |row|
+      course_id = CxbRank::Course.where(:text_id => row.field(:text_id)).first.id
+      data = CxbRank::CourseMusic.where(:course_id => course_id, :seq => row.field(:seq)).first
+      unless data
+        data = CxbRank::CourseMusic.new
+        data.course_id = course_id
+        data.seq = row.field(:seq)
+      end
+      data.music_id = CxbRank::Music.where(:text_id => row.field(:music_text_id)).first.id
+      data.diff = row.field(:diff)
+      data.save!
+    end
+
+    EVENTS_COLUMNS.delete(:text_id)
+    CSV.table('db/master/events.tsv', CSV_OPTIONS).each do |row|
+      data = CxbRank::Event.where(:text_id => row.field(:text_id)).first
+      unless data
+        data = CxbRank::Event.new
+        data.text_id = row.field(:text_id)
+      end
+      EVENTS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.save!
+    end
+
+    CSV.table('db/master/event_musics.tsv', CSV_OPTIONS).each do |row|
+      EVENT_MUSICS_COLUMNS.delete(:text_id)
+      EVENT_MUSICS_COLUMNS.delete(:section)
+      EVENT_MUSICS_COLUMNS.delete(:seq)
+      EVENT_MUSICS_COLUMNS.delete(:music_text_id)
+      event_id = CxbRank::Event.where(:text_id => row.field(:text_id), :section => row.field(:section)).first.id
+      seq = row.field(:seq)
+      music_id = get_music(row.field(:music_text_id)).id
+      data = CxbRank::EventMusic.where(:event_id => event_id, :seq => seq).first
+      unless data
+        data = CxbRank::EventMusic.new
+        data.event_id = event_id
+        data.seq = seq
+      end
+      EVENT_MUSICS_COLUMNS.each do |column|
+        data.send("#{column}=".to_sym, row.field(column))
+      end
+      data.music_id = music_id
+      data.save!
+    end
+  end
+
+  desc 'dump music master'
+  task :dump_master do
+    CSV.open('db/master/musics.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << MUSICS_COLUMNS
+      CxbRank::Music.all.each do |music|
+        data = []
+        MUSICS_COLUMNS.each do |column|
+          data << music.send(column)
+        end
+        csv << data
+      end
+    end
+
+    CSV.open('db/master/legacy_charts.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << LEGACY_CHARTS_COLUMNS
+      LEGACY_CHARTS_COLUMNS.delete(:text_id)
+      CxbRank::LegacyChart.all.each do |chart|
+        data = []
+        data << CxbRank::Music.find(chart.music_id).text_id
+        LEGACY_CHARTS_COLUMNS.each do |column|
+          data << chart.send(column)
+        end
+        csv << data
+      end
+    end
+
+    CSV.open('db/master/courses.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << COURSES_COLUMNS
+      CxbRank::Course.all.each do |course|
+        data = []
+        COURSES_COLUMNS.each do |column|
+          data << course.send(column)
+        end
+        csv << data
+      end
+    end
+
+    CSV.open('db/master/course_musics.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << COURSE_MUSICS_COLUMNS
+      CxbRank::CourseMusic.all.each do |music|
+        data = []
+        data << CxbRank::Course.find(music.course_id).text_id
+        data << music.seq
+        data << CxbRank::Music.find(music.music_id).text_id
+        data << music.diff
+        csv << data
+      end
+    end
+
+    CSV.open('db/master/events.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << EVENTS_COLUMNS
+      CxbRank::Event.all.each do |event|
+        data = []
+        EVENTS_COLUMNS.each do |column|
+          data << event.send(column)
+        end
+        csv << data
+      end
+    end
+
+    CSV.open('db/master/event_musics.tsv', 'w', CSV_OPTIONS) do |csv|
+      csv << EVENT_MUSICS_COLUMNS
+      EVENT_MUSICS_COLUMNS.delete(:text_id)
+      EVENT_MUSICS_COLUMNS.delete(:music_text_id)
+      CxbRank::EventMusic.all.each do |music|
+        data = []
+        data << CxbRank::Event.find(music.event_id).text_id
+        EVENT_MUSICS_COLUMNS.each do |column|
+          data << music.send(column)
+        end
+        data << CxbRank::Music.find(music.music_id).text_id
+        csv << data
+      end
+    end
+  end
+end

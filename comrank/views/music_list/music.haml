@@ -1,33 +1,39 @@
 - unless mobile?
   %tr
-    - if cxb_mode?
+    - if CxbRank::SiteSettings.cxb_mode?
       %th.number= music.number
     %td.title
       = haml :music_title, :locals => {:music => music}
-      - if rev_mode? and music.hidden
-        = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
-    - music_diffs.keys.sort.each do |diff|
+      - if CxbRank::SiteSettings.rev_mode? and music.hidden
+        = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
+    - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
       - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
       %td{:class => "#{diff_class} level"}
-        = music.level_to_s(diff)
+        - if diff == CxbRank::MUSIC_DIFF_UNL and music.exist?(CxbRank::MUSIC_DIFF_UNL)
+          %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= "&nbsp;#{music.level_to_s(diff)}&nbsp;"
+        - else
+          = music.level_to_s(diff)
       %td{:class => "#{diff_class} notes"}
         = music.notes_to_s(diff)
 - else
-  - if music_diffs.size == 3
-    - music_diffs_blocks = [music_diffs.keys.sort[0..2]]
+  - if CxbRank::SiteSettings.music_diffs.size == 3
+    - music_diffs_blocks = [CxbRank::SiteSettings.music_diffs.keys.sort[0..2]]
   - else
-    - music_diffs_blocks = [music_diffs.keys.sort[0..2], music_diffs.keys.sort[3..4]]
+    - music_diffs_blocks = [CxbRank::SiteSettings.music_diffs.keys.sort[0..2], CxbRank::SiteSettings.music_diffs.keys.sort[3..4]]
   %tr
     %td.text{:colspan => 6}
       = haml :music_title, :locals => {:music => music}
-      - if rev_mode? and music.hidden
-        = image_tag '/images/padlock.png', :alt => '&#x1f512;', :height => 12
+      - if CxbRank::SiteSettings.rev_mode? and music.hidden
+        = image_tag CxbRank::SiteSettings.join_site_image_base('padlock.png'), :alt => '&#x1f512;', :height => 12
   - music_diffs_blocks.each do |block|
     %tr
       - block.each do |diff|
         - diff_class = CxbRank::MUSIC_DIFF_CLASSES[diff]
         %td{:class => "#{diff_class} level"}
-          = music.level_to_s(diff)
+          - if diff == CxbRank::MUSIC_DIFF_UNL and music.exist?(CxbRank::MUSIC_DIFF_UNL)
+            %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= "&nbsp;#{music.level_to_s(diff)}&nbsp;"
+          - else
+            = music.level_to_s(diff)
         %td{:class => "#{diff_class} notes"}
           = music.notes_to_s(diff)
       - if block.size < 3

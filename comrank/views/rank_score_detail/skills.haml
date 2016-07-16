@@ -1,0 +1,20 @@
+%div.unit
+  %h2 ランキング
+  %div.subunit
+    - unless skills.present?
+      %p 登録されているスコアデータがありません
+    - else
+      %table.skill_list
+        - unless mobile?
+          %thead
+            %tr
+              %th.number #
+              %th.username ユーザー名
+              %th.score スコア
+              %th.scorerate 得点率
+              %th RATE
+              %th.rank ランク
+              %th.combo コンボ
+        %tbody
+          - skills.each_with_index do |skill, i|
+            = haml :skill, :locals => {:skill => skill, :rank => i+1, :diff => diff}

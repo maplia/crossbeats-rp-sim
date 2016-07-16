@@ -16,6 +16,11 @@
           %ul
             %li #{link_to '【iOS】 CROSS×BEATS クロスビーツ 攻略wiki', 'http://crossxbeats.wiki.fc2.com/'}
             %li #{link_to 'MapWiki - CROSS×BEATS', 'http://wiki.maplia.jp/?CROSS%C3%97BEATS'}
+        %dt ■姉妹サイト
+        %dd
+          %ul
+            %li #{link_to 'REV. RankPoint Simulator SR', 'http://revrank.maplia.jp/sunrise/'}
+            %li #{link_to 'REV. RankPoint Simulator', 'http://revrank.maplia.jp/rev1st/'}
 %div.main
   %div.unit
     %h2 このサイトについて
@@ -24,16 +29,9 @@
         %dt これは何ですか?
         %dd
           %p #{link_to 'カプコン', 'http://www.capcom.co.jp/'}から配信されている「#{link_to 'CROSS&times;BEATS（クロスビーツ）', 'http://www.capcom.co.jp/smartphone/crossbeats/'}」のランクポイント管理Webアプリケーションです。
-          %p RPシステムがV時代のギタドラに似た仕様になっているので、#{link_to 'CSギタドラスキル表', 'http://gfdmmix.maplia.jp/'}を改造して作成しました。使い方もおおむね同じです。
           %p こういう表が作れるということで#{link_to '作者のもの', '/view/00002'}をさらしてみます。
           %p 登録はご自由にどうぞ。
           %p 何か不都合があった場合などの問い合わせは、Twitterのアカウント #{link_to '@maplia', 'https://twitter.com/maplia'}で受けつけますので、お気軽にご連絡いただければと思います。
-        %dt 一括入力スプレッドシート
-        %dd
-          %p iOS版「CROSS&times;BEATS」では、「#{link_to 'crossbeats REV.', 'http://www.capcom.co.jp/arcade/rev/'}」のようにWebからブックマークレットなどを利用した一括登録はできないため、その代替としてスプレッドシートでの一括入力の機能を実装しました。
-          %p 詳しくはスプレッドシートでの説明を参照してください。
-          %p #{link_to 'https://docs.google.com/spreadsheets/d/13tfrRwrCLgTnGcrzYgS_tqGrs3vMKuDmuWppx1CGUQQ', 'https://docs.google.com/spreadsheets/d/13tfrRwrCLgTnGcrzYgS_tqGrs3vMKuDmuWppx1CGUQQ'}
-          %p 動作確認はWindows10のFirefox最新版で行っています。いまのところPCからのみの対応です
   %div.unit
     %h2 最近の登録曲
     %div.subunit
@@ -41,4 +39,4 @@
   %div.unit
     %h2 最新の運営情報
     %div.subunit
-      = yield
+      = haml :index_news

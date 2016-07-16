@@ -6,15 +6,15 @@
         - unless mobile?
           %thead
             %tr
-              - if cxb_mode?
+              - if CxbRank::SiteSettings.cxb_mode?
                 %th.number{:rowspan => 2} #
               %th.title{:rowspan => 2} タイトル
-              - music_diffs.keys.sort.each do |diff|
-                - diff_class = music_diffs[diff].downcase
-                %th{:class => diff_class, :colspan => 2}= music_diffs[diff]
+              - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+                - diff_class = CxbRank::SiteSettings.music_diffs[diff].downcase
+                %th{:class => diff_class, :colspan => 2}= CxbRank::SiteSettings.music_diffs[diff]
             %tr
-              - music_diffs.keys.sort.each do |diff|
-                - diff_class = music_diffs[diff].downcase
+              - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+                - diff_class = CxbRank::SiteSettings.music_diffs[diff].downcase
                 %th{:class => "#{diff_class} level"} Lv
                 %th{:class => "#{diff_class} notes"} Notes
         %tbody

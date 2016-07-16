@@ -4,7 +4,7 @@
       %tr
         %th クリア譜面数
         %td.mark= "#{status[:clear][:count]}譜面"
-        - if rev_mode?
+        - if CxbRank::SiteSettings.rev_mode?
           %th MASTER以上クリア譜面数
         - else
           %th MASTERクリア譜面数
@@ -12,10 +12,15 @@
       %tr
         %th Sランク以上クリア譜面数
         %td.mark= "#{status[:s_rank][:count]}譜面"
+        %th S+ランク以上クリア譜面数
+        %td.mark= "#{status[:sp_rank][:count]}譜面"
+      %tr
+        %th S++ランククリア譜面数
+        %td.mark= "#{status[:spp_rank][:count]}譜面"
         %th 最高クリアレベル
         %td.mark
           - if status[:clear][:max_level] > 0
-            = "Lv.#{sprintf(level_format, status[:clear][:max_level])}"
+            = "Lv.#{sprintf(CxbRank::SiteSettings.level_format, status[:clear][:max_level])}"
           - else
             &ndash;
     - else
@@ -23,7 +28,7 @@
         %th クリア譜面数
         %td.mark= "#{status[:clear][:count]}譜面"
       %tr
-        - if rev_mode?
+        - if CxbRank::SiteSettings.rev_mode?
           %th MASTER以上クリア譜面数
         - else
           %th MASTERクリア譜面数
@@ -32,10 +37,16 @@
         %th Sランク以上クリア譜面数
         %td.mark= "#{status[:s_rank][:count]}譜面"
       %tr
+        %th S+ランク以上クリア譜面数
+        %td.mark= "#{status[:sp_rank][:count]}譜面"
+      %tr
+        %th S++ランク以上クリア譜面数
+        %td.mark= "#{status[:spp_rank][:count]}譜面"
+      %tr
         %th 最高クリアレベル
         %td.mark
           - if status[:clear][:max_level] > 0
-            = "Lv.#{sprintf(level_format, status[:clear][:max_level])}"
+            = "Lv.#{sprintf(CxbRank::SiteSettings.level_format, status[:clear][:max_level])}"
           - else
             &ndash;
     - count_title = 'フルコンボ譜面数'
@@ -44,10 +55,10 @@
     - count_title = '100%クリア譜面数'
     - level_title = '最高100%クリアレベル'
     = haml :status_row, :locals => {:status => status[:rate_100], :count_title => count_title, :level_title => level_title}
-    - count_title = (rev_mode? ? 'MASTER以上ULT譜面数' : 'MASTER ULT譜面数')
+    - count_title = (CxbRank::SiteSettings.rev_mode? ? 'MASTER以上ULT譜面数' : 'MASTER ULT譜面数')
     - count_title = 'ULTIMATE譜面数'
     - level_title = '最高ULTIMATEレベル'
     = haml :status_row, :locals => {:status => status[:ultimate], :count_title => count_title, :level_title => level_title}
-    - count_title = (rev_mode? ? 'MASTER以上ULT譜面数' : 'MASTER ULT譜面数')
-    - level_title = (rev_mode? ? 'MASTER以上最高ULTレベル' : 'MASTER 最高ULTレベル')
+    - count_title = (CxbRank::SiteSettings.rev_mode? ? 'MASTER以上ULT譜面数' : 'MASTER ULT譜面数')
+    - level_title = (CxbRank::SiteSettings.rev_mode? ? 'MASTER以上最高ULTレベル' : 'MASTER 最高ULTレベル')
     = haml :status_row, :locals => {:status => status[:ult_mas], :count_title => count_title, :level_title => level_title}

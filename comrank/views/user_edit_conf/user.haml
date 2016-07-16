@@ -18,17 +18,17 @@
             - else
               （変更なし）
         %tr
-          %th= (cxb_mode? ? (mobile? ? 'C&times;B ID' : 'CROSS&times;BEATS ID') : (mobile? ? 'REV.ID' : 'REV.ユーザーID'))
+          %th= (CxbRank::SiteSettings.cxb_mode? ? (mobile? ? 'C&times;B ID' : 'CROSS&times;BEATS ID') : (mobile? ? 'REV.ID' : 'REV.ユーザーID'))
           %td
             - if user.game_id.blank?
               入力なし
             - else
               = user.game_id
-              - if rev_mode? and !user.game_id_display 
+              - if CxbRank::SiteSettings.rev_mode? and !user.game_id_display 
                 - if mobile?
                   %br
                 （REV.ID非公開）
-        - if user.id and rev_mode?
+        - if user.id and CxbRank::SiteSettings.rev_mode?
           %tr
             %th 実RP
             %td= sprintf('%.2f', user.point)

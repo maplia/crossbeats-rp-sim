@@ -14,32 +14,43 @@ module CxbRank
     end
 
     def self.last_modified
-      course = self.find(:first, :order => 'updated_at desc')
-      return (course ? course.updated_at : nil)
+      return [
+        self.maximum(:updated_at), CourseMusic.last_modified
+      ].compact.max
     end
 
     def self.find_by_param_id(param_id)
-      return self.find(:first, :conditions => {:text_id => param_id})
+      return self.where(:text_id => param_id).first
     end
 
-    def self.find_actives
-      if @@date.present?
-        conditions = ['display = ? and added_at <= ?', true, @@date]
-      else
-        conditions = {:display => true}
+    def self.find_actives(date=nil)
+      actives = self.where(:display => true)
+      if date.present?
+        actives = actives.where('added_at <= ?', date)
       end
-      return self.find(:all, :conditions => conditions)
+      return actives
     end
 
     def self.create_by_request(body)
-      course = self.find(:first, :conditions => {:lookup_key => body[:lookup_key]})
+      invert_music_diffs = MUSIC_DIFF_PREFIXES.invert
+      course = self.where(:lookup_key => body[:lookup_key]).first
       unless course
         course = self.new
-        course.text_id = body[:lookup_key]
-        course.title = body[:lookup_key]
+        course.text_id = body[:text_id]
+        course.title = body[:title]
         course.level = 0
-        course.sort_key = body[:lookup_key]
+        course.sort_key = body[:text_id]
         course.lookup_key = body[:lookup_key]
+        course.added_at = Date.today
+        body[:musics].each_with_index do |body_music, i|
+          music = Music.where(:jacket => body_music[:jacket]).first
+          next unless music
+          course_music = CourseMusic.new
+          course_music.music = music
+          course_music.seq = i+1
+          course_music.diff = invert_music_diffs[body_music[:diff]]
+          course.course_musics << course_music
+        end
       end
       return course
     end
@@ -68,6 +79,10 @@ module CxbRank
   class CourseMusic < ActiveRecord::Base
     include Comparable
     belongs_to :music
+
+    def self.last_modified
+      return self.maximum(:updated_at)
+    end
 
     def title
       return music.title

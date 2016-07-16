@@ -2,6 +2,6 @@
 %th.number= course_music.seq
 %td.text.title
   = haml :music_title, :locals => {:music => course_music.music}
-%td{:class => "#{diff_class} level"}= music_diffs[course_music.diff]
+%td{:class => "#{diff_class} level"}= CxbRank::SiteSettings.music_diffs[course_music.diff]
 %td{:class => "#{diff_class} level"}= course_music.level_to_s
 %td{:class => "#{diff_class} notes"}= course_music.notes_to_s
