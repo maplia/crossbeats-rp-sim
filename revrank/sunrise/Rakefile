@@ -28,7 +28,7 @@ end
 COURSES_COLUMNS = [:lookup_key, :text_id, :title, :sort_key, :level, :limited, :hidden, :display, :added_at]
 COURSE_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id, :diff]
 EVENTS_COLUMNS = [:text_id, :section, :title, :span_s, :span_e]
-EVENT_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id]
+EVENT_MUSICS_COLUMNS = [:text_id, :section, :seq, :music_text_id]
 
 def get_music(text_id)
   return CxbRank::Music.where(:text_id => text_id).first

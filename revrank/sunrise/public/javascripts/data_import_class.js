@@ -36,8 +36,8 @@ $.getScript(COMMON_SCRIPT_URI).done(function () {
     return loginToRpSim(progress, userData);
   }).then(function () {
     return updateClassRps(progress, userData, classList);
-//  }).then(function () {
-//    return updateTotalRp(progress, userData);
+  }).then(function () {
+    return updateTotalRp(progress, userData);
   }).then(function () {
     return logoutFromRpSim(progress, userData);
   }).done(function () {

@@ -217,14 +217,6 @@ class RevRankApp < CxbRank::AppBase
   post '/bml_logout' do
     bookmarklet_session do |session, data|
       begin
-        if SiteSettings.rev_sunrise_mode?
-          skill_set = SkillSet.new(settings.site_mode, session.user)
-          skill_set.load!
-          session.user.point = skill_set.total_point
-          session.user.point_direct = false
-          session.user.point_updated_at = Time.now
-          session.user.save!
-        end
         session.destroy
       rescue
         status 500
