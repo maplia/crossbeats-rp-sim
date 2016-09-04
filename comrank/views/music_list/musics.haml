@@ -18,5 +18,13 @@
                 %th{:class => "#{diff_class} level"} Lv
                 %th{:class => "#{diff_class} notes"} Notes
         %tbody
-          - musics.each do |music|
-            = haml :music, :locals => {:music => music}
+          - if CxbRank::SiteSettings.rev_sunrise_mode?
+            - colspan = 2 + CxbRank::SiteSettings.music_diffs.size * 2
+            - musics.each_with_index do |music, i|
+              - if i == 0 or music.appear != musics[i-1].appear
+                %tr
+                  %th{:class => CxbRank::REV_VERSION_CLASSES[music.appear], :colspan => colspan}= CxbRank::REV_VERSIONS[music.appear]
+              = haml :music, :locals => {:music => music}
+          - else
+            - musics.each do |music|
+              = haml :music, :locals => {:music => music}

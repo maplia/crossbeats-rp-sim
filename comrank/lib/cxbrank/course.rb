@@ -28,7 +28,7 @@ module CxbRank
       if date.present?
         actives = actives.where('added_at <= ?', date)
       end
-      return actives
+      return actives.order(:sort_key)
     end
 
     def self.create_by_request(body)

@@ -22,6 +22,8 @@ module CxbRank
         music.lookup_key = body[:lookup_key]
         music.limited = false
         music.unlock_unl = UNLOCK_UNL_TYPE_FC
+        music.appear = REV_VERSION_SUNRISE
+        music.category = REV_CATEGORY_ORIGINAL
         music.added_at = Date.today
       end
       music.jacket = body[:jacket]
@@ -29,6 +31,9 @@ module CxbRank
         next unless body[prefix.to_sym]
         music.send("#{prefix}_level=", body[prefix.to_sym][:level])
         music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
+      end
+      if music.unl_level_changed?
+        music.added_at_unl = Date.today
       end
       return music
     end
@@ -60,7 +65,12 @@ module CxbRank
         actives = actives.where('added_at <= ?', date)
         actives.each do |music| music.date = date end
       end
-      return actives.order(:number, :sort_key)
+      if SiteSettings.cxb_mode? or SiteSettings.rev_rev1st_mode?
+        actives = actives.order(:number, :sort_key)
+      else
+        actives = actives.order(:appear, :sort_key)
+      end
+      return actives
     end
 
     def date=(date)
@@ -239,9 +249,17 @@ module CxbRank
           MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
           MUSIC_TYPE_DELETED => [],
         }
-      else
+      elsif SiteSettings.rev_rev1st_mode?
         @hash = {
           MUSIC_TYPE_REV_SINGLE => [], MUSIC_TYPE_REV_LIMITED => [],
+          MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
+        }
+      else
+        @hash = {
+          MUSIC_TYPE_REV_SINGLE => {
+            REV_CATEGORY_LICENSE => [], REV_CATEGORY_ORIGINAL => [], REV_CATEGORY_IOSAPP => [],
+          },
+          MUSIC_TYPE_REV_LIMITED => [],
           MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
         }
       end
@@ -249,7 +267,7 @@ module CxbRank
     end
 
     def load!
-      musics = Music.find_actives(@date).sort
+      musics = Music.find_actives(@date)
       if SiteSettings.cxb_mode?
         musics.each do |music|
           if music.deleted?
@@ -265,10 +283,14 @@ module CxbRank
           if music.limited?
             @hash[MUSIC_TYPE_REV_LIMITED] << music
           else
-            @hash[MUSIC_TYPE_REV_SINGLE] << music
+            if SiteSettings.rev_rev1st_mode?
+              @hash[MUSIC_TYPE_REV_SINGLE] << music
+            else
+              @hash[MUSIC_TYPE_REV_SINGLE][music.category] << music
+            end
           end
         end
-        courses = Course.find_actives(@date).sort
+        courses = Course.find_actives(@date)
         courses.each do |course|
           if course.limited?
             @hash[MUSIC_TYPE_REV_COURSE_LIMITED] << course

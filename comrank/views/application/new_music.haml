@@ -1,30 +1,64 @@
-- musics = CxbRank::Music.where(:limited => false).where('added_at >= ?', [Date.today-28, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at desc, number')
-- if musics.blank?
-  %p 最近登録された曲はありません
-- else
-  - unless mobile?
-    %table.music_list
-      %thead
-        %tr
-          %th 追加日
-          - if CxbRank::SiteSettings.cxb_mode?
-            %th #
-          %th タイトル
-          - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
-            %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= CxbRank::SiteSettings.music_diffs[diff]
-          %th 追加イベント
-      %tbody
-        - musics.each do |music|
-          %tr
-            %th= music.added_at.strftime('%m/%d')
-            - if CxbRank::SiteSettings.cxb_mode?
-              %th= music.number
-            %td.title
-              = haml :music_title, :locals => {:music => music}
-            - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
-              %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music.level_to_s(diff)
-            %td= music.event
-  - else
-    %ul
-      - musics.each do |music|
-        %li= "#{music.full_title} (#{music.added_at.strftime('%m/%d')})"
+%div.unit
+  %h2 最近の登録曲
+  %div.subunit
+    - if CxbRank::SiteSettings.rev_mode?
+      %p 新規収録曲のデータは、ブックマークレットによる最初のプレイデータ登録時にあわせて登録します
+    - musics = CxbRank::Music.where(:limited => false).where('added_at >= ?', [Date.today-28, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at desc, number, sort_key')
+    - if musics.blank?
+      %p 最近登録された曲はありません
+    - else
+      - unless mobile?
+        %table.music_list
+          %thead
+            %tr
+              %th 追加日
+              - if CxbRank::SiteSettings.cxb_mode?
+                %th #
+              %th タイトル
+              - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+                %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= CxbRank::SiteSettings.music_diffs[diff]
+              %th 追加イベント
+          %tbody
+            - musics.each do |music|
+              %tr
+                %th= music.added_at.strftime('%m/%d')
+                - if CxbRank::SiteSettings.cxb_mode?
+                  %th= music.number
+                %td.title
+                  = haml :music_title, :locals => {:music => music}
+                - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+                  %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music.level_to_s(diff)
+                %td= music.event
+      - else
+        %ul
+          - musics.each do |music|
+            %li= "#{music.full_title} (#{music.added_at.strftime('%m/%d')})"
+- if CxbRank::SiteSettings.rev_mode? and !CxbRank::SiteSettings.rev_rev1st_mode?
+  %div.unit
+    %h2 最近の登録UNLIMITED譜面
+    %div.subunit
+      - musics = CxbRank::Music.where(:limited => false).where('added_at_unl >= ?', [Date.today-56, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at_unl desc, number, sort_key')
+      - if musics.blank?
+        %p 最近登録されたUNLIMITED譜面はありません
+      - else
+        - unless mobile?
+          %table.music_list
+            %thead
+              %tr
+                %th 追加日
+                %th タイトル
+                %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[CxbRank::MUSIC_DIFF_MAS]}"}= CxbRank::SiteSettings.music_diffs[CxbRank::MUSIC_DIFF_MAS]
+                %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[CxbRank::MUSIC_DIFF_UNL]}"}= CxbRank::SiteSettings.music_diffs[CxbRank::MUSIC_DIFF_UNL]
+            %tbody
+              - musics.each do |music|
+                %tr
+                  %th= music.added_at_unl.strftime('%m/%d')
+                  %td.title
+                    = haml :music_title, :locals => {:music => music}
+                  %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[CxbRank::MUSIC_DIFF_MAS]}"}= music.level_to_s(CxbRank::MUSIC_DIFF_MAS)
+                  %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[CxbRank::MUSIC_DIFF_UNL]}"}
+                    %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= "&nbsp;#{music.level_to_s(CxbRank::MUSIC_DIFF_UNL)}&nbsp;"
+        - else
+          %ul
+            - musics.each do |music|
+              %li= "#{music.full_title} (#{music.added_at_unl.strftime('%m/%d')})"

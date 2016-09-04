@@ -40,6 +40,10 @@ module CxbRank
       return @@settings.site_mode.start_with?(MODE_REV)
     end
 
+    def self.rev_rev1st_mode?
+      return rev_mode? && !rev_sunrise_mode?
+    end
+
     def self.rev_sunrise_mode?
       return @@settings.site_mode == MODE_REV_SUNRISE
     end

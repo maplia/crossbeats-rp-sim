@@ -18,7 +18,7 @@ CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
 end
-MUSICS_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at, :event)
+MUSICS_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at, :appear, :category, :event, :added_at_unl)
 LEGACY_CHARTS_COLUMNS = []
 LEGACY_CHARTS_COLUMNS.push(:text_id, :span_s, :span_e)
 CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
@@ -28,7 +28,7 @@ end
 COURSES_COLUMNS = [:lookup_key, :text_id, :title, :sort_key, :level, :limited, :hidden, :display, :added_at]
 COURSE_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id, :diff]
 EVENTS_COLUMNS = [:text_id, :section, :title, :span_s, :span_e]
-EVENT_MUSICS_COLUMNS = [:text_id, :section, :seq, :music_text_id]
+EVENT_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id]
 
 def get_music(text_id)
   return CxbRank::Music.where(:text_id => text_id).first
@@ -115,7 +115,7 @@ namespace :revrank do
       EVENT_MUSICS_COLUMNS.delete(:section)
       EVENT_MUSICS_COLUMNS.delete(:seq)
       EVENT_MUSICS_COLUMNS.delete(:music_text_id)
-      event_id = CxbRank::Event.where(:text_id => row.field(:text_id), :section => row.field(:section)).first.id
+      event_id = CxbRank::Event.where(:text_id => row.field(:text_id)).first.id
       seq = row.field(:seq)
       music_id = get_music(row.field(:music_text_id)).id
       data = CxbRank::EventMusic.where(:event_id => event_id, :seq => seq).first

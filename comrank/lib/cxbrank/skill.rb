@@ -408,12 +408,7 @@ module CxbRank
     def unlimited_bonus
       diff = MUSIC_DIFF_UNL
       if music.exist?(diff) and cleared?(diff)
-        if !SiteSettings.rev_sunrise_mode?
-          return point(diff)
-        else
-          pure_point = music.level(diff) * (rate(diff) / 100.0) * gauge_bonus_rate(diff)
-          return pure_point * BONUS_RATE_UNLIMITED
-        end
+        return point(diff) * BONUS_RATE_UNLIMITED
       else
         return 0.0
       end
