@@ -801,8 +801,16 @@ module CxbRank
           end
         end
       else
-        @music_set[MUSIC_TYPE_REV_SINGLE].each do |music|
-          @hash[MUSIC_TYPE_REV_SINGLE][:skills] << Skill.max(@mode, music, @date)
+        if !SiteSettings.rev_rev1st_mode?
+          @music_set[MUSIC_TYPE_REV_SINGLE].each_value do |musics|
+            musics.each do |music|
+              @hash[MUSIC_TYPE_REV_SINGLE][:skills] << Skill.max(@mode, music, @date)
+            end
+          end
+        else
+          @music_set[MUSIC_TYPE_REV_SINGLE].each do |music|
+            @hash[MUSIC_TYPE_REV_SINGLE][:skills] << Skill.max(@mode, music, @date)
+          end
         end
         @music_set[MUSIC_TYPE_REV_COURSE].each do |course|
           @hash[MUSIC_TYPE_REV_COURSE][:skills] << CourseSkill.max(@mode, course, @date)
