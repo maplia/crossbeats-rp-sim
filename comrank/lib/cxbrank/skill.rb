@@ -416,12 +416,16 @@ module CxbRank
 
     def unlocked_unl?
       case music.unlock_unl
+      when UNLOCK_UNL_TYPE_FREE
+        return true
       when UNLOCK_UNL_TYPE_S
         return [SP_RANK_STATUS_SPP, SP_RANK_STATUS_SP, SP_RANK_STATUS_S].include?(rank(MUSIC_DIFF_MAS))
       when UNLOCK_UNL_TYPE_SP
         return [SP_RANK_STATUS_SPP, SP_RANK_STATUS_SP].include?(rank(MUSIC_DIFF_MAS))
       when UNLOCK_UNL_TYPE_FC
         return fullcombo?(MUSIC_DIFF_MAS)
+      when UNLOCK_UNL_TYPE_NEVER
+        return false
       end
     end
 
