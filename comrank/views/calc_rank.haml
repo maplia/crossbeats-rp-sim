@@ -20,7 +20,7 @@
     %select#select_music{:onKeyUp => 'changeChart();', :onKeyDown => 'changeChart();', :onChange => 'changeChart();'}
   %h2 ランク
   %div.subunit
-    %p 許容されるCool未満の数です
+    %p 許容されるCool未満の数です<br/>ホールドノートを1つ見逃すたびに許容数は1つ減ります
     %table#table_rank_chart.calc
   %h2 クリアレート
   %div.subunit

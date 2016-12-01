@@ -17,7 +17,10 @@
       - bookmarklet_class = %Q[javascript:(function(){if(location.href.indexOf('https://#{settings.mydata_host}/playdatachallenge/')==0){if(confirm('#{settings.site_name}を更新します')){var elem=document.createElement('script');elem.src='https://#{settings.script_host}/javascripts/data_import_class.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('#{settings.mydata_name}のチャレンジデータ詳細ページから実行してください');}})()]
       %p 「REV.」では#{link_to 'Web上のMY DATAページ', "https://#{settings.mydata_host}/weblogin"}でプレイデータの閲覧を行うことができるため、このデータを取り込むことができるようにするためにブックマークレットによる更新方法を用意しています
       %p なお、この機能を使用する際はユーザー情報としてREV.のユーザーIDを登録する必要があります（REV.のユーザーIDはMY DATAで確認できます）
-      %p= image_tag CxbRank::SiteSettings.join_site_image_base('rev_user_id.png')
+      - unless mobile?
+        %p= image_tag CxbRank::SiteSettings.join_site_image_base('rev_user_id.png')
+      -else
+        %p.resizable_image= image_tag CxbRank::SiteSettings.join_site_image_base('rev_user_id.png')
       %dl
         %dt 全データ更新版
         %dd
@@ -45,9 +48,9 @@
           %p ※ChromeおよびFirefox（ともに最新版 @ Windows 10）での動作を確認しています
         %dt ブックマーク登録 (スマートフォン)
         %dd
-          %p スマートフォンの場合は、右記リンクをブックマークとして登録します → #{link_to '全データ更新版', "##{bookmarklet_all}"} / #{link_to '全曲更新版', "##{bookmarklet_all_music}"}  / #{link_to '単曲更新版', "##{bookmarklet_music}"} / #{link_to '単コース更新版', "##{bookmarklet_class}"}
-          %p ブックマークとして登録した後、ブックマークの編集でURLから「javascript:」よりも前の部分を削除してください
-          %p ※iPhone 5S（iOS 8.4搭載）の、Safariでの動作を確認しています
+          %p スマートフォンの場合は、まずどこでもいいので適当なページをブックマークし、そのブックマークのURL欄に使いたい機能に対応したコード（上記の枠線内の部分）をコピー&amp;ペーストすることで登録します
+          %p 具体的な手順はスマートフォン向けの解説サイトなども参照してください（参考: #{link_to '【iPhone】Safariにブックマークレットを追加する方法', 'http://sbapp.net/appnews/app/upinfo/bookmark-3-12379'}）
+          %p ※iPhone 5S（iOS 10.1搭載）の、Safariでの動作を確認しています
   %div.unit
     %h2#calc ランクポイント
     %div.subunit
@@ -78,6 +81,7 @@
               %ul
                 %li
                   未解禁の曲の成績がRP上位20曲に入る場合、UNLIMITED譜面ボーナスの表示値が狂うこと（負の数にもなりえます）がありますが、その曲に未解禁状態を設定して対処をお願いします
-                  %br
-                  = image_tag CxbRank::SiteSettings.join_site_image_base('set_locked.png')
+                  - unless mobile?
+                    %br
+                    = image_tag CxbRank::SiteSettings.join_site_image_base('set_locked.png')
             - # %li 期間限定曲は出現期間が終了するとMY DATAに表示されなくなります。RPシミュレータの表示には残しますが、ブックマークレットからの更新はできなくなります

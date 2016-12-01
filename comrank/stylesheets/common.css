@@ -160,3 +160,7 @@ strong {
 p.top_navi, p.current_user {
   font-size: smaller;
 }
+
+p.resizable_image img {
+  width: 100%;
+}
