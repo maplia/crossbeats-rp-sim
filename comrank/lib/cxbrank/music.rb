@@ -259,7 +259,7 @@ module CxbRank
           MUSIC_TYPE_REV_SINGLE => {
             REV_CATEGORY_LICENSE => [], REV_CATEGORY_ORIGINAL => [], REV_CATEGORY_IOSAPP => [],
           },
-          MUSIC_TYPE_REV_LIMITED => [],
+          MUSIC_TYPE_REV_LIMITED => [], MUSIC_TYPE_REV_DELETED => [],
           MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
         }
       end
@@ -280,7 +280,9 @@ module CxbRank
         end
       else
         musics.each do |music|
-          if music.limited?
+          if music.deleted?
+            @hash[MUSIC_TYPE_REV_DELETED] << music
+          elsif music.limited?
             @hash[MUSIC_TYPE_REV_LIMITED] << music
           else
             if SiteSettings.rev_rev1st_mode?

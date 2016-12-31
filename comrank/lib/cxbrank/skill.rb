@@ -716,11 +716,14 @@ module CxbRank
         course_skills = CourseSkill.find_by_user(@user, @skill_options).sort
         @hash[MUSIC_TYPE_REV_SINGLE] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_LIMITED] = {:skills => [], :point => 0.0}
+        @hash[MUSIC_TYPE_REV_DELETED] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_BONUS] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_COURSE] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_COURSE_LIMITED] = {:skills => [], :point => 0.0}
         music_skills.dup.each do |skill|
-          if skill.music.limited
+          if skill.music.deleted?
+            @hash[MUSIC_TYPE_REV_DELETED][:skills] << skill
+          elsif skill.music.limited
             @hash[MUSIC_TYPE_REV_LIMITED][:skills] << skill
           else
             @hash[MUSIC_TYPE_REV_SINGLE][:skills] << skill
