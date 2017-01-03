@@ -17,5 +17,5 @@
     = haml :course_skills, :locals => {:skills => skill_set[type][:skills], :edit => edit,
       :type_name => CxbRank::SiteSettings.music_types[type]}
   - else
-    = haml :music_skills, :locals => {:skills => skill_set[type][:skills], :edit => edit, :ignore_locked => ignore_locked,
-      :type_name => CxbRank::SiteSettings.music_types[type], :bonus => (type == CxbRank::MUSIC_TYPE_REV_BONUS)}
+    = haml :music_skills, :locals => {:user => user, :skills => skill_set[type][:skills],
+      :edit => edit, :ignore_locked => ignore_locked, :type => type}

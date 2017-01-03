@@ -46,6 +46,14 @@
               公開する
             - else
               公開しない
+        - if defined? user.rank_tops
+          %tr
+            %th 単曲RP表示数
+            %td
+              - if user.rank_tops > 0
+                = "上位#{user.rank_tops}曲"
+              - else
+                全曲表示
   %p 以上のユーザー情報を登録します。よろしいですか?
   %p
     = submit_tag 'はい', :name => 'y'

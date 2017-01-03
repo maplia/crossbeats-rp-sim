@@ -181,7 +181,7 @@ module CxbRank
       hash = {
         :text_id => text_id, :number => number,
         :title => title, :subtitle => subtitle, :full_title => full_title,
-        :monthly => monthly?, :limited => limited,
+        :monthly => monthly?, :limited => limited, :deleted => deleted
       }
       MUSIC_DIFF_PREFIXES.keys.each do |diff|
         if exist?(diff) and !(diff == MUSIC_DIFF_UNL and unlock_unl == UNLOCK_UNL_TYPE_NEVER)

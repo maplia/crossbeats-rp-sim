@@ -46,6 +46,10 @@
       %label
         = f.check_box :display
         RP表を公開する
+    - if defined? user.rank_tops
+      %dt 単曲RPの表示範囲設定
+      %dd
+        = f.select :rank_tops, :options => CxbRank::RANK_TOPS_OPTIONS, :selected => (user.rank_tops || -1)
   %p
     = f.submit '次へ進む'
     = input_tag :reset, :value=> '入力リセット'

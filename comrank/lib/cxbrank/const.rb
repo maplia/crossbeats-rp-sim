@@ -346,6 +346,13 @@ module CxbRank
     [SP_GAUGE_ULTIMATE_REV_NAME,         SP_GAUGE_ULTIMATE_REV],
   ]
 
+  RANK_TOPS_OPTIONS = [
+    ['全曲表示', -1],
+    ['上位20曲', 20],
+    ['上位30曲', 30],
+    ['上位40曲', 40],
+  ]
+
   # ゲージ・難易度によるボーナスレート
   BONUS_RATE_SURVIVAL = BigDecimal.new('1.1')
   BONUS_RATE_ULTIMATE = BigDecimal.new('1.2')
