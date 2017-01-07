@@ -78,7 +78,7 @@ div.sidebar {
 table.music_list th.number {
   width: 2.5em;
 }
-table.music_list th.title {
+table.music_list th.title, table.music_list td.title {
   width: 24.0em;
 }
 table.music_list th.level {
@@ -99,7 +99,8 @@ table.skill_list th.number, table.skill_course_list th.number {
   width: 2.5em;
 }
 
-table.skill_list th.title, table.skill_course_list th.title {
+table.skill_list th.title, table.skill_course_list th.title,
+table.skill_list td.title, table.skill_course_list td.title {
   width: 26.0em;
 }
 table.skill_list th.level {

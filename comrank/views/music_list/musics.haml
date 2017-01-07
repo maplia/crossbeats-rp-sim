@@ -19,7 +19,10 @@
                 %th{:class => "#{diff_class} notes"} Notes
         %tbody
           - if CxbRank::SiteSettings.rev_sunrise_mode?
-            - colspan = 1 + CxbRank::SiteSettings.music_diffs.size * 2
+            - unless mobile?
+              - colspan = 1 + CxbRank::SiteSettings.music_diffs.size * 2
+            - else
+              - colspan = 3 * 2
             - musics.each_with_index do |music, i|
               - if i == 0 or music.appear != musics[i-1].appear
                 %tr

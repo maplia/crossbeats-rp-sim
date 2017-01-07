@@ -57,7 +57,7 @@
                     = haml :music_title, :locals => {:music => music}
                   %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[CxbRank::MUSIC_DIFF_MAS]}"}= music.level_to_s(CxbRank::MUSIC_DIFF_MAS)
                   %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[CxbRank::MUSIC_DIFF_UNL]}"}
-                    %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= "&nbsp;#{music.level_to_s(CxbRank::MUSIC_DIFF_UNL)}&nbsp;"
+                    %span{:class => CxbRank::UNLOCK_UNL_TYPE_COLORS[music.unlock_unl]}= music.level_to_s(CxbRank::MUSIC_DIFF_UNL)
         - else
           %ul
             - musics.each do |music|
