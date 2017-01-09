@@ -55,6 +55,33 @@ module CxbRank
     SCORE_RANK_DETAIL_URI =>      'スコアランキング',
   }
 
+  # ページ使用テンプレート格納パス
+  PAGE_TEMPLATE_PATHS = {
+    SITE_TOP_URI => nil,
+    USAGE_URI => nil,
+    MUSIC_LIST_VIEW_URI => [
+      '#comrank_path/views/music_list',
+    ]
+  }
+
+  # ページ使用テンプレートファイル群
+  PAGE_TEMPLATE_FILES = {
+    SITE_TOP_URI => [
+      'views/index.haml', 'views/index_news.haml',
+    ],
+    USAGE_URI => [
+      'views/usage.haml', 
+    ],
+    MUSIC_LIST_VIEW_URI => [
+      '#{comrank_path}/views/music_list.haml',
+      '#{comrank_path}/views/music_list/*.haml',
+    ],
+    MAX_SKILL_VIEW_URI => [
+      '#{comrank_path}/views/skill_list.haml',
+      '#{comrank_path}/views/skill_list/*.haml',
+    ],
+  }
+
   # 画像ファイルを置いておくディレクトリへのパス
   IMAGE_PATH = 'images/'
 

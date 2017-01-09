@@ -61,6 +61,19 @@ module CxbRank
     helpers Sinatra::Jsonp
 
     helpers do
+      def page_last_modified(templates, data_mtime=nil, user=nil)
+        if user.present?
+          last_modified Time.now
+        else
+          mtimes = templates.map do |template|
+            template.gsub!('#{comrank_path}', SiteSettings.join_comrank_path(''))
+            Dir.glob(template).map do |file| File.mtime(file) end
+          end.flatten
+          mtimes << data_mtime
+          last_modified mtimes.compact.max
+        end
+      end
+
       def jsonx(data, callback=nil)
         cross_origin
         if callback
@@ -160,32 +173,28 @@ module CxbRank
     end
 
     get SITE_TOP_URI do
+      data_mtime = [Music.last_modified, Event.last_modified].compact.max
       user = User.find_by_id(session[:user_id])
-      if user.blank?
-        last_modified [
-          File.mtime('views/index.haml'), File.mtime('views/index_news.haml'),
-          Music.last_modified, Event.last_modified
-        ].compact.max
-      end
+      page_last_modified PAGE_TEMPLATE_FILES[SITE_TOP_URI], data_mtime, user
       haml :index, :layout => true, :locals => {:user => user}
     end
 
     get USAGE_URI do
-      last_modified File.mtime('views/usage.haml')
+      page_last_modified PAGE_TEMPLATE_FILES[USAGE_URI]
       haml :usage, :layout => true
     end
 
     get "#{MUSIC_LIST_VIEW_URI}/?:date_string?" do
       settings.views << SiteSettings.join_comrank_path('views/music_list')
       past_date_page(params[:date_string]) do |date|
-        music_set = MusicSet.new(settings.site_mode, date)
-        last_modified music_set.last_modified
+        music_set = MusicSet.new(date)
         music_set.load!
+        fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
         if date.present?
-          fixed_title = "#{PAGE_TITLES[MUSIC_LIST_VIEW_URI]} [#{date.strftime('%Y-%m-%d')}]"
-        else
-          fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
+          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
         end
+        data_mtime = [Music.last_modified, Course.last_modified].compact.max
+        page_last_modified PAGE_TEMPLATE_FILES[MUSIC_LIST_VIEW_URI], data_mtime
         haml :music_list, :layout => true,
           :locals => {:music_set => music_set, :date => date, :fixed_title => fixed_title}
       end
@@ -206,14 +215,14 @@ module CxbRank
     get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
       settings.views << SiteSettings.join_comrank_path('views/skill_list')
       past_date_page(params[:date_string]) do |date|
-        skill_set = SkillMaxSet.new(settings.site_mode, date)
-        last_modified skill_set.last_modified
+        skill_set = SkillMaxSet.new(date)
         skill_set.load!
+        fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
         if date.present?
-          fixed_title = "#{PAGE_TITLES[MAX_SKILL_VIEW_URI]} [#{date.strftime('%Y-%m-%d')}]"
-        else
-          fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
+          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
         end
+        data_mtime = skill_set.last_modified
+        page_last_modified PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI], data_mtime
         haml :skill_list, :layout => true, :locals => {
           :skill_set => skill_set, :edit => false,
           :date => date, :ignore_locked => false, :fixed_title => fixed_title}

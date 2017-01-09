@@ -3,7 +3,12 @@
   %head
     %meta{:charset => 'utf-8'}
     - if mobile?
-      %meta{:name => "viewport", :content => 'width=device-width, user-scalable=noinitial-scale=1, maximum-scale=1'}
+      %meta{:name => 'viewport', :content => 'width=device-width, user-scalable=noinitial-scale=1, maximum-scale=1'}
+    - if site_top?
+      %meta{:name => 'Cache-Control', :content => 'no-store'}
+    - else
+      %meta{:name => 'Cache-Control', :content => 'no-cache'}
+    %meta{:name => 'Expires', :content => '0'}
     %meta{:name => 'generator', :content => CxbRank::ENGINE_NAME}
     - if site_top?
       %meta{:name => 'robots', :content => 'index, nofollow'}
@@ -46,7 +51,7 @@
         ユーザーID: 
         = link_to session_user.user_id, CxbRank::SiteSettings.join_site_base(CxbRank::SKILL_LIST_EDIT_URI)
         \/
-        = link_to 'ログアウト', CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI) 
+        = link_to 'ログアウト', "#{CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI)}?#{Time.now.to_i}" 
     = yield
     - unless defined? error_no or defined? errors
       %address
