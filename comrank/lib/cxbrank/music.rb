@@ -241,7 +241,8 @@ module CxbRank
   class MusicSet
     attr_reader :last_modified
 
-    def initialize(date=nil)
+    def initialize(mode, date=nil)
+      @mode = mode
       @date = date
       if SiteSettings.cxb_mode?
         @hash = {

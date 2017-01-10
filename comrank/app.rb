@@ -187,7 +187,7 @@ module CxbRank
     get "#{MUSIC_LIST_VIEW_URI}/?:date_string?" do
       settings.views << SiteSettings.join_comrank_path('views/music_list')
       past_date_page(params[:date_string]) do |date|
-        music_set = MusicSet.new(date)
+        music_set = MusicSet.new(settings.site_mode, date)
         music_set.load!
         fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
         if date.present?
@@ -215,7 +215,7 @@ module CxbRank
     get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
       settings.views << SiteSettings.join_comrank_path('views/skill_list')
       past_date_page(params[:date_string]) do |date|
-        skill_set = SkillMaxSet.new(date)
+        skill_set = SkillMaxSet.new(settings.site_mode, date)
         skill_set.load!
         fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
         if date.present?
@@ -224,7 +224,7 @@ module CxbRank
         data_mtime = skill_set.last_modified
         page_last_modified PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI], data_mtime
         haml :skill_list, :layout => true, :locals => {
-          :skill_set => skill_set, :edit => false,
+          :user => nil, :skill_set => skill_set, :edit => false,
           :date => date, :ignore_locked => false, :fixed_title => fixed_title}
       end
     end
