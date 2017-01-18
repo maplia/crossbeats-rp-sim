@@ -12,7 +12,7 @@
   %div.subunit
     = haml :points, :locals => {:skill_set => skill_set}
 - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
-  - next if CxbRank::MUSIC_TYPE_ST_COUNTS[type] == 0 or skill_set[type].nil? or skill_set[type][:skills].empty?
+  - next if CxbRank::MUSIC_TYPE_ST_COUNTS[type] == 0 and (skill_set[type].nil? or skill_set[type][:skills].empty?)
   - if [CxbRank::MUSIC_TYPE_REV_COURSE, CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED].include?(type)
     = haml :course_skills, :locals => {:skills => skill_set[type][:skills], :edit => edit,
       :type_name => CxbRank::SiteSettings.music_types[type]}

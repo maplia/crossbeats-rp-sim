@@ -87,6 +87,12 @@ table.music_list th.level {
 table.music_list th.notes {
   width: 3.0em;
 }
+span.unlock_unl_s, span.unlock_unl_sp,
+span.unlock_unl_fc, span.unlock_unl_never {
+  font-weight: bold;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
+}
 
 table.skill_summary td {
   width: 9.0em;

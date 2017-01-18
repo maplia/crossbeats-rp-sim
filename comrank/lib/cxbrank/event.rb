@@ -19,7 +19,7 @@ module CxbRank
     end
 
     def sheet_uri
-      return SiteSettings.join_site_base(File.join(EVENT_SHEET_URI, text_id))
+      return SiteSettings.join_site_base(File.join(EVENT_SHEET_VIEW_URI, text_id))
     end
 
     def to_hash

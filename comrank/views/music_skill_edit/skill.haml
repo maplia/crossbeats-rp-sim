@@ -83,8 +83,6 @@
               - if skill.ultimate?(diff)
                 = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
               = haml :rate, :locals => {:skill => skill, :diff => diff}
-              - if (skill.u_rate(diff) || 0.0) > 0.0
-                = "(U: #{skill.u_rate_to_s(diff)})"
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %td.score
             = skill.score(diff)

@@ -23,14 +23,15 @@ module CxbRank
   MAX_SKILL_VIEW_URI = '/max_view'                  # 理論値スキル表
   MAX_SKILL_VIEW_IGLOCK_URI = '/max_iglock'         # 理論値スキル表（ロック無視版）
 
-  SCORE_RANK_URI = '/scores'                        # スコアランキング（一覧）
-  SCORE_RANK_DETAIL_URI = '/score_detail'           # スコアランキング（詳細）
+  SCORE_RANK_URI = '/score_list'                    # スコアランキング（一覧）
+  SCORE_RANK_DETAIL_URI = '/score'                  # スコアランキング（詳細）
   POINT_RANK_URI = '/rank_rp'                       # RPランキング
 
   MUSIC_LIST_VIEW_URI = '/musics'                   # 登録曲リスト
   RANK_CALC_URI = '/rankcalc'                       # 許容ミス数計算機
   RATE_CALC_URI = '/scorerate'                      # 得点率計算機
-  EVENT_SHEET_URI = '/sheet'                        # イベントスコアシート
+  EVENT_SHEET_LIST_URI = '/sheet_list'              # イベントスコアシート（一覧）
+  EVENT_SHEET_VIEW_URI = '/sheet'                   # イベントスコアシート（個別）
 
   # ページ名
   PAGE_TITLES = {
@@ -50,7 +51,8 @@ module CxbRank
     SKILL_COURSE_ITEM_EDIT_URI => 'ランクポイント編集',
     RANK_CALC_URI =>              'ランク/レート別許容ミス数計算機',
     RATE_CALC_URI =>              '得点率計算ツール',
-    EVENT_SHEET_URI =>            'イベントスコアシート',
+    EVENT_SHEET_LIST_URI =>       'イベントスコアシート',
+    EVENT_SHEET_VIEW_URI =>       'イベントスコアシート',
     SCORE_RANK_URI =>             'スコアランキング一覧',
     SCORE_RANK_DETAIL_URI =>      'スコアランキング',
   }
@@ -61,7 +63,13 @@ module CxbRank
     USAGE_URI => nil,
     MUSIC_LIST_VIEW_URI => [
       '#comrank_path/views/music_list',
-    ]
+    ],
+    MAX_SKILL_VIEW_URI => [
+      '#comrank_path/views/skill_list',
+    ],
+    USER_LIST_URI => [
+      '#comrank_path/views/user_list',
+    ],
   }
 
   # ページ使用テンプレートファイル群
@@ -73,14 +81,55 @@ module CxbRank
       'views/usage.haml', 
     ],
     MUSIC_LIST_VIEW_URI => [
+      '#{comrank_path}/views/layout.haml',
       '#{comrank_path}/views/music_list.haml',
       '#{comrank_path}/views/music_list/*.haml',
     ],
-    MAX_SKILL_VIEW_URI => [
+    SKILL_LIST_VIEW_URI => [
+      '#{comrank_path}/views/layout.haml',
       '#{comrank_path}/views/skill_list.haml',
       '#{comrank_path}/views/skill_list/*.haml',
     ],
+    CLEAR_LIST_VIEW_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/skill_chart.haml',
+      '#{comrank_path}/views/skill_chart/*.haml',
+      '#{comrank_path}/views/skill_list/user.haml',
+    ],
+    USER_LIST_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/user_list.haml',
+      '#{comrank_path}/views/user_list/*.haml',
+    ],
+    EVENT_SHEET_LIST_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/event_list.haml',
+      '#{comrank_path}/views/event_list/*.haml',
+    ],
+    EVENT_SHEET_VIEW_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/event_sheet.haml',
+    ],
+    RANK_CALC_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/calc_rank.haml',
+    ],
+    RATE_CALC_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/calc_rate.haml',
+    ],
+    SCORE_RANK_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/rank_score.haml',
+      '#{comrank_path}/views/rank_score/*.haml',
+    ],
+    SCORE_RANK_DETAIL_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/rank_score_detail.haml',
+      '#{comrank_path}/views/rank_score_detail/*.haml',
+    ],
   }
+  PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI] = PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI]
 
   # 画像ファイルを置いておくディレクトリへのパス
   IMAGE_PATH = 'images/'

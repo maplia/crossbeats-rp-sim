@@ -128,11 +128,12 @@ module CxbRank
       def skill_list_page(user, edit, skill_options={})
         settings.views << SiteSettings.join_comrank_path('views/skill_list')
         skill_set = SkillSet.new(settings.site_mode, user, skill_options)
-        unless edit
-          last_modified skill_set.last_modified
-        end
         skill_set.load!
         fixed_title = "#{user.name}さんの#{PAGE_TITLES[SKILL_LIST_VIEW_URI]}"
+        unless edit
+          data_mtime = skill_set.last_modified
+          page_last_modified PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI], data_mtime
+        end
         haml :skill_list, :layout => true, :locals => {
           :user => user, :skill_set => skill_set,
           :edit => edit, :ignore_locked => skill_options[:ignore_locked], :fixed_title => fixed_title}
@@ -193,7 +194,7 @@ module CxbRank
         if date.present?
           fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
         end
-        data_mtime = [Music.last_modified, Course.last_modified].compact.max
+        data_mtime = music_set.last_modified
         page_last_modified PAGE_TEMPLATE_FILES[MUSIC_LIST_VIEW_URI], data_mtime
         haml :music_list, :layout => true,
           :locals => {:music_set => music_set, :date => date, :fixed_title => fixed_title}
@@ -277,8 +278,9 @@ module CxbRank
 
     get USER_LIST_URI do
       settings.views << SiteSettings.join_comrank_path('views/user_list')
-      last_modified User.last_modified
       users = User.find_actives
+      data_mtime = User.last_modified
+      page_last_modified PAGE_TEMPLATE_FILES[USER_LIST_URI], data_mtime
       haml :user_list, :layout => true, :locals => {:users => users}
     end
 
@@ -363,8 +365,9 @@ module CxbRank
         settings.views << SiteSettings.join_comrank_path('views/skill_chart')
         settings.views << SiteSettings.join_comrank_path('views/skill_list')
         skill_chart = CxbRank::SkillChart.load(settings.site_mode, user)
-        last_modified skill_chart.last_modified
         fixed_title = "#{user.name}さんの#{PAGE_TITLES[CLEAR_LIST_VIEW_URI]}"
+        data_mtime = skill_chart.last_modified
+        page_last_modified PAGE_TEMPLATE_FILES[CLEAR_LIST_VIEW_URI], data_mtime
         haml :skill_chart, :layout => true, :locals => {
           :user => user, :skill_chart => skill_chart, :fixed_title => fixed_title}
       end
@@ -457,12 +460,13 @@ module CxbRank
     get SCORE_RANK_URI do
       settings.views << SiteSettings.join_comrank_path('views/rank_score')
       music_set = MusicSet.new(settings.site_mode)
-      last_modified music_set.last_modified
       music_set.load!
+      data_mtime = music_set.last_modified
+      page_last_modified PAGE_TEMPLATE_FILES[SCORE_RANK_URI], data_mtime
       haml :rank_score, :layout => true, :locals => {:music_set => music_set}
     end
 
-    get "#{SCORE_RANK_DETAIL_URI}/?:music_text_id?/?:diff?" do
+    get "#{SCORE_RANK_DETAIL_URI}/:music_text_id?/?:diff?" do
       if params[:music_text_id].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
       elsif (music = Music.find_by_param_id(params[:music_text_id])).nil?
@@ -481,7 +485,6 @@ module CxbRank
     end
 
     get RANK_CALC_URI do
-      last_modified Music.last_modified
       musics = Music.where(:limited => false)
       music_hashes = []
       musics.sort.each do |music|
@@ -491,28 +494,34 @@ module CxbRank
       SiteSettings.music_diffs.keys.sort.each do |diff|
         diffs << MUSIC_DIFF_PREFIXES[diff]
       end
-      haml :calc_rank, :layout => true, :locals => {:data => music_hashes, :diffs => diffs}
+      data_mtime = Music.last_modified
+      page_last_modified PAGE_TEMPLATE_FILES[RANK_CALC_URI], data_mtime
+      haml :calc_rank, :layout => true, :locals => {
+        :data => music_hashes, :diffs => diffs}
     end
 
     get RATE_CALC_URI do
-      last_modified Music.last_modified
       musics = Music.where(:limited => false)
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
       end
-      haml :calc_rate, :layout => true, :locals => {:data => music_hashes, :diffs => SiteSettings.music_diffs}
+      data_mtime = Music.last_modified
+      page_last_modified PAGE_TEMPLATE_FILES[RATE_CALC_URI], data_mtime
+      haml :calc_rate, :layout => true, :locals => {
+        :data => music_hashes, :diffs => SiteSettings.music_diffs}
     end
 
-    get EVENT_SHEET_URI do
+    get EVENT_SHEET_LIST_URI do
       settings.views << SiteSettings.join_comrank_path('views/event_list')
-      last_modified Event.last_modified
       events = Event.all.order('span_s desc')
-      fixed_title = "#{PAGE_TITLES[EVENT_SHEET_URI]}一覧"
+      fixed_title = "#{PAGE_TITLES[EVENT_SHEET_LIST_URI]}一覧"
+      data_mtime = Event.last_modified
+      page_last_modified PAGE_TEMPLATE_FILES[EVENT_SHEET_LIST_URI], data_mtime
       haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
     end
 
-    get "#{EVENT_SHEET_URI}/:event_text_id?/?:section?" do
+    get "#{EVENT_SHEET_VIEW_URI}/:event_text_id?/?:section?" do
       if params[:event_text_id].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_IS_UNDECIDED}
       elsif !(events = Event.where(:text_id => params[:event_text_id])).exists?
@@ -520,9 +529,10 @@ module CxbRank
       elsif (event = events.where(:section => (params[:section] || 0)).first).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_SECTION_NOT_EXIST}
       else
-        last_modified event.updated_at
         request.env['X_MOBILE_DEVICE'] = nil
-        fixed_title = "#{PAGE_TITLES[EVENT_SHEET_URI]} [#{event.title}]"
+        fixed_title = "#{PAGE_TITLES[EVENT_SHEET_VIEW_URI]} [#{event.title}]"
+        data_mtime = event.updated_at
+        page_last_modified PAGE_TEMPLATE_FILES[EVENT_SHEET_VIEW_URI], data_mtime
         haml :event_sheet, :layout => true, :locals => {:event => event, :fixed_title => fixed_title}
       end
     end

@@ -56,12 +56,6 @@ td.etc, tr.etc td {
   background-color: white;
 }
 
-span.unlock_unl_s, span.unlock_unl_sp,
-span.unlock_unl_fc, span.unlock_unl_never {
-  font-weight: bold;
-  padding-left: 0.4em;
-  padding-right: 0.4em;
-}
 span.unlock_unl_s {
   color: white;
   background-color: blue;
