@@ -1,6 +1,4 @@
-require 'rubygems'
 require 'active_record'
-require 'chronic'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
 require 'cxbrank/course'
@@ -8,7 +6,8 @@ require 'cxbrank/course'
 module CxbRank
   class Music < ActiveRecord::Base
     include Comparable
-    has_many :monthlies
+    has_one :monthly, -> {where 'span_s <= ? and span_e >= ?',
+      (SiteSettings.pivot_time || Time.now), (SiteSettings.pivot_time || Time.now)}
     has_many :legacy_charts
 
     def self.create_by_request(body)
@@ -63,7 +62,6 @@ module CxbRank
       end
       if date.present?
         actives = actives.where('added_at <= ?', date)
-        actives.each do |music| music.date = date end
       end
       if SiteSettings.cxb_mode? or SiteSettings.rev_rev1st_mode?
         actives = actives.order(:number, :sort_key)
@@ -73,19 +71,14 @@ module CxbRank
       return actives
     end
 
-    def date=(date)
-      @pivot_date = date
-      @pivot_time = Chronic.parse("#{date.strftime('%Y-%m-%d 27:59:59')}")
-    end
-
     def full_title
       return subtitle ? "#{title} #{subtitle}" : title
     end
 
     def level(diff)
-      if @pivot_date.present? and legacy_charts.present?
+      if SiteSettings.pivot_date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
-          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@pivot_date)
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(SiteSettings.pivot_date)
             return legacy_chart.level(diff)
           end
         end
@@ -102,9 +95,9 @@ module CxbRank
     end
 
     def notes(diff)
-      if @pivot_date.present? and legacy_charts.present?
+      if SiteSettings.pivot_date.present? and legacy_charts.present?
         legacy_charts.each do |legacy_chart|
-          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(@pivot_date)
+          if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(SiteSettings.pivot_date)
             return legacy_chart.notes(diff)
           end
         end
@@ -137,12 +130,7 @@ module CxbRank
     end
 
     def monthly?
-      monthlies.each do |monthly|
-        if (monthly.span_s..monthly.span_e).include?(@pivot_time || Time.now)
-          return true
-        end
-      end
-      return false
+      return monthly.present?
     end
 
     def level_to_s(diff)
@@ -175,6 +163,10 @@ module CxbRank
       else
         return (legacy_notes(diff) == 0) ? '???' : sprintf('%d', legacy_notes(diff))
       end
+    end
+
+    def max_diff
+      return exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS
     end
 
     def to_hash

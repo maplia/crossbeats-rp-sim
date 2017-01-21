@@ -87,6 +87,7 @@ module CxbRank
         begin
           if date_string.present?
             date = Date.strptime(date_string, '%Y%m%d')
+            SiteSettings.pivot_date = date
           else
             date = nil
           end

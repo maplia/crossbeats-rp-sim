@@ -1,11 +1,27 @@
+require 'chronic'
 require 'cxbrank/const'
 
 module CxbRank
   class SiteSettings
     @@settings = nil
+    @@pivot_date = nil
+    @@pivot_time = nil
 
     def self.settings=(settings)
       @@settings = settings
+    end
+
+    def self.pivot_date=(date)
+      @@pivot_date = date
+      @@pivot_time = Chronic.parse(date.strftime('%Y-%m-%d 27:59:59'))
+    end
+
+    def self.pivot_date
+      return @@pivot_date
+    end
+
+    def self.pivot_time
+      return @@pivot_time
     end
 
     def self.join_site_base(uri)

@@ -1,8 +1,6 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
 %h1
-  = page_title
-  - if date.present?
-    %small= "[#{date.strftime('%Y-%m-%d')}]"
+  = page_title.gsub(/(\[\d+\-\d+\-\d+\])/, '<small>\1</small>')
 - if music_set.last_modified
   %p.last_modified 最終更新時刻: #{music_set.last_modified.strftime('%Y-%m-%d %H:%M:%S')}
 %p 間違いがあれば、ご指摘ください。確認の上、修正を行います。
