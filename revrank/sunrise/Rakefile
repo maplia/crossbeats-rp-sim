@@ -18,14 +18,14 @@ CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
   MUSICS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
 end
-MUSICS_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at, :appear, :category, :event, :added_at_unl)
+MUSICS_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at, :appear, :category, :event, :added_at_unl, :deleted_at)
 LEGACY_CHARTS_COLUMNS = []
 LEGACY_CHARTS_COLUMNS.push(:text_id, :span_s, :span_e)
 CxbRank::MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
   LEGACY_CHARTS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
   LEGACY_CHARTS_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
 end
-COURSES_COLUMNS = [:lookup_key, :text_id, :title, :sort_key, :level, :limited, :hidden, :display, :added_at]
+COURSES_COLUMNS = [:lookup_key, :text_id, :title, :sort_key, :level, :limited, :hidden, :deleted, :display, :added_at, :deleted_at]
 COURSE_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id, :diff]
 EVENTS_COLUMNS = [:text_id, :section, :title, :span_s, :span_e]
 EVENT_MUSICS_COLUMNS = [:text_id, :seq, :music_text_id]

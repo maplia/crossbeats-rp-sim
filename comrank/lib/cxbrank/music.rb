@@ -1,10 +1,10 @@
-require 'active_record'
+require 'cxbrank/master_base'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
 require 'cxbrank/course'
 
 module CxbRank
-  class Music < ActiveRecord::Base
+  class Music < MasterBase
     include Comparable
     has_one :monthly, -> {where 'span_s <= ? and span_e >= ?',
       (SiteSettings.pivot_time || Time.now), (SiteSettings.pivot_time || Time.now)}
@@ -37,38 +37,16 @@ module CxbRank
       return music
     end
 
-    def self.last_modified(text_id=nil)
-      if text_id.present? and (music = self.find_by_param_id(text_id))
-        return [
-          music.updated_at,
-          Monthly.last_modified(music.id), LegacyChart.last_modified(music.id)
-        ].compact.max
-      else
-        return [
-          self.maximum(:updated_at),
-          Monthly.last_modified, LegacyChart.last_modified
-        ].compact.max
-      end
-    end
-
     def self.find_by_param_id(text_id)
       return self.where(:text_id => text_id).first
     end
 
-    def self.find_actives(date=nil)
-      actives = self.where(:display => true)
-      if SiteSettings.cxb_mode?
-        actives = actives.where(:limited => false)
-      end
-      if date.present?
-        actives = actives.where('added_at <= ?', date)
-      end
-      if SiteSettings.cxb_mode? or SiteSettings.rev_rev1st_mode?
-        actives = actives.order(:number, :sort_key)
+    def self.find_actives
+      if SiteSettings.rev2nd_or_later_mode?
+        return super.order(:appear, :sort_key)
       else
-        actives = actives.order(:appear, :sort_key)
+        return super.order(:number, :sort_key)
       end
-      return actives
     end
 
     def full_title
@@ -131,6 +109,10 @@ module CxbRank
 
     def monthly?
       return monthly.present?
+    end
+
+    def deleted?
+      return deleted && deleted_at <= (SiteSettings.pivot_date || Date.today)
     end
 
     def level_to_s(diff)
@@ -234,8 +216,6 @@ module CxbRank
     attr_reader :last_modified
 
     def initialize(mode, date=nil)
-      @mode = mode
-      @date = date
       if SiteSettings.cxb_mode?
         @hash = {
           MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
@@ -259,7 +239,7 @@ module CxbRank
     end
 
     def load!
-      musics = Music.find_actives(@date)
+      musics = Music.find_actives
       if SiteSettings.cxb_mode?
         musics.each do |music|
           if music.deleted?

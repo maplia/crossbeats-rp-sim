@@ -1,4 +1,4 @@
-require 'rubygems'
+require 'digest/md5'
 require 'active_record'
 require 'cxbrank/const'
 
@@ -18,8 +18,16 @@ module CxbRank
 
     before_save do |b|
       if b.password_changed?
-        b.password = Digest::MD5.hexdigest(b.password)
+        b.password = User.crypt(b.password)
       end
+    end
+
+    def self.authenticate(user_id, password)
+      return self.where(:id => user_id.to_i, :password => self.crypt(password)).exists?
+    end
+
+    def self.crypt(string)
+      return Digest::MD5.hexdigest(string)
     end
 
     def self.last_modified
