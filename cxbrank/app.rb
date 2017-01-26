@@ -5,7 +5,7 @@ class CxbRankApp < CxbRank::AppBase
 
   post '/api/authorize' do
     data = JSON.parse(request.body.read, {:symbolize_names => true})
-    error_no = Authenticator.authenticate({:user_id => data[:user_id], :password => data[:password]})
+    error_no = User.authenticate(data[:user_id], data[:password])
     jsonx error_no == NO_ERROR
   end
 
@@ -23,7 +23,7 @@ class CxbRankApp < CxbRank::AppBase
 
   post '/api/edit' do
     data = JSON.parse(request.body.read, {:symbolize_names => true})
-    error_no = Authenticator.authenticate({:user_id => data[:user_id], :password => data[:password]})
+    error_no = User.authenticate(data[:user_id], data[:password])
     if error_no != NO_ERROR
       jsonx false
     else
@@ -58,7 +58,7 @@ class CxbRankApp < CxbRank::AppBase
 
   post '/api/edit_fix' do
     data = JSON.parse(request.body.read, {:symbolize_names => true})
-    error_no = Authenticator.authenticate({:user_id => data[:user_id], :password => data[:password]})
+    error_no = User.authenticate(data[:user_id], data[:password])
     if error_no != NO_ERROR
       jsonx false
     else

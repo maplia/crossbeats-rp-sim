@@ -4,7 +4,7 @@ require 'cxbrank/site_settings'
 module CxbRank
   class MasterBase < ActiveRecord::Base
     self.abstract_class = true
-  
+
     def self.last_modified(text_id=nil)
       if text_id.present? and (item = self.find_by_param_id(text_id))
         return item.updated_at
@@ -12,7 +12,7 @@ module CxbRank
         return self.maximum(:updated_at)
       end
     end
-  
+
     def self.find_actives
       actives = self.where(:display => true)
       if SiteSettings.pivot_date.present?

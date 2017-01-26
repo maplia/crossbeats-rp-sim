@@ -23,7 +23,17 @@ module CxbRank
     end
 
     def self.authenticate(user_id, password)
-      return self.where(:id => user_id.to_i, :password => self.crypt(password)).exists?
+      if user_id.blank?
+        return ERROR_USERID_IS_UNINPUTED
+      elsif password.blank?
+        return ERROR_PASSWORD1_IS_UNINPUTED
+      elsif user_id.size != USER_ID_FIGURE
+        return ERROR_USERID_OR_PASS_IS_WRONG
+      elsif !self.where(:id => user_id.to_i, :password => self.crypt(password)).exists?
+        return ERROR_USERID_OR_PASS_IS_WRONG
+      else
+        return NO_ERROR
+      end
     end
 
     def self.crypt(string)

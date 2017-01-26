@@ -287,7 +287,7 @@ module CxbRank
 
     post USER_LOGIN_URI do
       session[:user_id] = nil
-      error_no = Authenticator.authenticate(params)
+      error_no = User.authenticate(params[:user_id], params[:password])
       if error_no != NO_ERROR
         haml :error, :layout => true,
           :locals => {:error_no => error_no, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
