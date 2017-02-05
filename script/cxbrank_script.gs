@@ -1,4 +1,4 @@
-var VERSION = '20160604';
+var VERSION = '20170205';
 
 var HOSTNAME = 'http://cxbrank.maplia.jp';
 var AUTHORIZE_URI = HOSTNAME + '/api/authorize';
@@ -144,6 +144,7 @@ function getData() {
     var updateFocusRows = (Math.min(UNIT_SIZE, skillData.length-i));
 
     var inputSheetValues = INPUT_SHEET.getRange(inputFocusTopRow, 1, inputFocusRows, INPUT_FOCUS_COLS).getValues();
+    var inputSheetFormats = INPUT_SHEET.getRange(inputFocusTopRow, 1, inputFocusRows, INPUT_FOCUS_COLS).getNumberFormats();
     var currentSheetValues = CURRENT_SHEET.getRange(updateFocusTopRow, 1, updateFocusRows, CURRENT_FOCUS_COLS).getValues();
     var updateSheetFormulas = UPDATE_SHEET.getRange(updateFocusTopRow, 1, updateFocusRows, UPDATE_FOCUS_COLS).getFormulas();
 
@@ -222,6 +223,7 @@ function getData() {
       var common_data_col_min = 2+INPUT_DIFF_COLS*MUSIC_DIFFS.length;
       // コメント
       inputSheetValues[j*5+4][2] = skillData[index].comment;
+      inputSheetFormats[j*5+4][2] = '@';
       currentSheetValues[j][common_data_col_min] = skillData[index].comment;
       updateSheetFormulas[j][common_data_col_min] = getA1Notation(INPUT_SHEET.getRange(1+index*5+4+1, 3));
       
@@ -235,6 +237,7 @@ function getData() {
     }
 
     INPUT_SHEET.getRange(inputFocusTopRow, 1, inputFocusRows, INPUT_FOCUS_COLS).setValues(inputSheetValues);
+    INPUT_SHEET.getRange(inputFocusTopRow, 1, inputFocusRows, INPUT_FOCUS_COLS).setNumberFormats(inputSheetFormats);
     CURRENT_SHEET.getRange(updateFocusTopRow, 1, updateFocusRows, CURRENT_FOCUS_COLS).setValues(currentSheetValues);
     UPDATE_SHEET.getRange(updateFocusTopRow, 1, updateFocusRows, UPDATE_FOCUS_COLS).setFormulas(updateSheetFormulas);
 
