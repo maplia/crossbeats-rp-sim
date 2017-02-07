@@ -17,6 +17,7 @@ require 'cxbrank/helpers'
 require 'cxbrank/const'
 require 'cxbrank/authenticate'
 require 'cxbrank/music'
+require 'cxbrank/music_set'
 require 'cxbrank/course'
 require 'cxbrank/user'
 require 'cxbrank/skill'
@@ -189,7 +190,7 @@ module CxbRank
     get "#{MUSIC_LIST_VIEW_URI}/?:date_string?" do
       settings.views << SiteSettings.join_comrank_path('views/music_list')
       past_date_page(params[:date_string]) do |date|
-        music_set = MusicSet.new(settings.site_mode, date)
+        music_set = MusicSet.new
         music_set.load!
         fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
         if date.present?
@@ -460,7 +461,7 @@ module CxbRank
 
     get SCORE_RANK_URI do
       settings.views << SiteSettings.join_comrank_path('views/rank_score')
-      music_set = MusicSet.new(settings.site_mode)
+      music_set = MusicSet.new
       music_set.load!
       data_mtime = music_set.last_modified
       page_last_modified PAGE_TEMPLATE_FILES[SCORE_RANK_URI], data_mtime

@@ -3,4 +3,8 @@
   = page_title
 - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
   - next if [CxbRank::MUSIC_TYPE_REV_COURSE, CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED].include?(type)
-  = haml :musics, :locals => {:musics => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}
+  - if !CxbRank::SiteSettings.rev1st_mode? and [CxbRank::MUSIC_TYPE_REV_SINGLE].include?(type)
+    - CxbRank::REV_CATEGORIES.keys.sort.each do |category|
+      = haml :musics, :locals => {:musics => music_set[type][category], :type_name => CxbRank::REV_CATEGORIES[category]}
+  - else
+    = haml :musics, :locals => {:musics => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}

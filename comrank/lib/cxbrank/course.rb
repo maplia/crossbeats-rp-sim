@@ -42,6 +42,7 @@ module CxbRank
         course.sort_key = body[:text_id]
         course.lookup_key = body[:lookup_key]
         course.added_at = Date.today
+        course.limited = true
         body[:musics].each_with_index do |body_music, i|
           music = Music.where(:jacket => body_music[:jacket]).first
           next unless music

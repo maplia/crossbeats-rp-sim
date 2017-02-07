@@ -1,6 +1,7 @@
 require 'cxbrank/master_base'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
+require 'cxbrank/monthly'
 require 'cxbrank/course'
 
 module CxbRank
@@ -20,7 +21,7 @@ module CxbRank
         music.sort_key = body[:sort_key]
         music.lookup_key = body[:lookup_key]
         music.limited = false
-        music.unlock_unl = UNLOCK_UNL_TYPE_FC
+        music.unlock_unl = UNLOCK_UNL_TYPE_SP
         music.appear = REV_VERSION_SUNRISE
         music.category = REV_CATEGORY_ORIGINAL
         music.added_at = Date.today
@@ -42,7 +43,7 @@ module CxbRank
     end
 
     def self.find_actives
-      if SiteSettings.rev2nd_or_later_mode?
+      if SiteSettings.sunrise_or_later_mode?
         return super.order(:appear, :sort_key)
       else
         return super.order(:number, :sort_key)
@@ -182,17 +183,6 @@ module CxbRank
     end
   end
 
-  class Monthly < ActiveRecord::Base
-    def self.last_modified(music_id=nil)
-      if music_id.present?
-        monthlies = self.where(:music_id => music_id)
-      else
-        monthlies = self
-      end
-      return monthlies.maximum(:updated_at)
-    end
-  end
-
   class LegacyChart < ActiveRecord::Base
     def self.last_modified(music_id=nil)
       if music_id.present?
@@ -209,74 +199,6 @@ module CxbRank
 
     def notes(diff)
       return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
-    end
-  end
-
-  class MusicSet
-    attr_reader :last_modified
-
-    def initialize(mode, date=nil)
-      if SiteSettings.cxb_mode?
-        @hash = {
-          MUSIC_TYPE_NORMAL => [], MUSIC_TYPE_SPECIAL => [],
-          MUSIC_TYPE_DELETED => [],
-        }
-      elsif SiteSettings.rev_rev1st_mode?
-        @hash = {
-          MUSIC_TYPE_REV_SINGLE => [], MUSIC_TYPE_REV_LIMITED => [],
-          MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
-        }
-      else
-        @hash = {
-          MUSIC_TYPE_REV_SINGLE => {
-            REV_CATEGORY_LICENSE => [], REV_CATEGORY_ORIGINAL => [], REV_CATEGORY_IOSAPP => [],
-          },
-          MUSIC_TYPE_REV_LIMITED => [], MUSIC_TYPE_REV_DELETED => [],
-          MUSIC_TYPE_REV_COURSE => [], MUSIC_TYPE_REV_COURSE_LIMITED => [],
-        }
-      end
-      @last_modified = [Music.last_modified, Course.last_modified].compact.max
-    end
-
-    def load!
-      musics = Music.find_actives
-      if SiteSettings.cxb_mode?
-        musics.each do |music|
-          if music.deleted?
-            @hash[MUSIC_TYPE_DELETED] << music
-          elsif music.monthly?
-            @hash[MUSIC_TYPE_SPECIAL] << music
-          elsif !music.limited?
-            @hash[MUSIC_TYPE_NORMAL] << music
-          end
-        end
-      else
-        musics.each do |music|
-          if music.deleted?
-            @hash[MUSIC_TYPE_REV_DELETED] << music
-          elsif music.limited?
-            @hash[MUSIC_TYPE_REV_LIMITED] << music
-          else
-            if SiteSettings.rev_rev1st_mode?
-              @hash[MUSIC_TYPE_REV_SINGLE] << music
-            else
-              @hash[MUSIC_TYPE_REV_SINGLE][music.category] << music
-            end
-          end
-        end
-        courses = Course.find_actives(@date)
-        courses.each do |course|
-          if course.limited?
-            @hash[MUSIC_TYPE_REV_COURSE_LIMITED] << course
-          else
-            @hash[MUSIC_TYPE_REV_COURSE] << course
-          end
-        end
-      end
-    end
-
-    def [](key)
-      return @hash[key]
     end
   end
 end
