@@ -21,6 +21,7 @@ module CxbRank
         music.sort_key = body[:sort_key]
         music.lookup_key = body[:lookup_key]
         music.limited = false
+        music.hidden = true
         music.unlock_unl = UNLOCK_UNL_TYPE_SP
         music.appear = REV_VERSION_SUNRISE
         music.category = REV_CATEGORY_ORIGINAL
@@ -33,6 +34,7 @@ module CxbRank
         music.send("#{prefix}_notes=", body[prefix.to_sym][:notes])
       end
       if music.unl_level_changed?
+        music.unlock_unl = UNLOCK_UNL_TYPE_SP
         music.added_at_unl = Date.today
       end
       return music

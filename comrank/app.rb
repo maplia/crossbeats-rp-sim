@@ -413,12 +413,14 @@ module CxbRank
             begin
               temp_skill.calc!
               temp_skill.save!
-              skill_set = SkillSet.new(settings.site_mode, user)
-              skill_set.load!
-              user.point = skill_set.total_point
-              user.point_direct = false
-              user.point_updated_at = Time.now
-              user.save!
+              if SiteSettings.cxb_mode? or !user.point_direct
+                skill_set = SkillSet.new
+                skill_set.load!
+                user.point = skill_set.total_point
+                user.point_direct = false
+                user.point_updated_at = Time.now
+                user.save!
+              end
               session[:music_text_id] = nil
               session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)

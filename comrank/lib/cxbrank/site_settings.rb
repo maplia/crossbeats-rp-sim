@@ -59,7 +59,7 @@ module CxbRank
     def self.rev1st_mode?
       return rev_mode? && !rev_sunrise_mode?
     end
-    
+
     def self.sunrise_or_later_mode?
       return !cxb_mode? && !rev1st_mode?
     end
@@ -71,7 +71,7 @@ module CxbRank
     def self.rev_rev1st_mode?
       return rev1st_mode?
     end
-    
+
     def self.rev2nd_or_later_mode?
       return sunrise_or_later_mode?
     end
