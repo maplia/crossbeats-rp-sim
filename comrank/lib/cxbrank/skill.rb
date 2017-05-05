@@ -102,7 +102,7 @@ module CxbRank
       end
       if options[:fill_empty]
         omit_music_ids = (skills.pluck(:music_id).empty? ? [0] : skills.pluck(:music_id))
-        empty_musics = Master::Music.find_actives.where('id not in (?)', omit_music_ids)
+        empty_musics = Master::Music.find_actives(false).where('id not in (?)', omit_music_ids)
         empty_musics.each do |music|
           skill = Skill.new
           skill.user_id = user.id
@@ -517,7 +517,7 @@ module CxbRank
     def self.find_by_user(user, options={})
       skills = self.where(:user_id => user.id)
       if options[:fill_empty]
-        courses = Course.where(:display => true)
+        courses = Master::Course.where(:display => true)
         courses.each do |course|
           unless CourseSkill.exists?(:user_id => user.id, :course_id => course.id)
             skill = CourseSkill.new

@@ -202,14 +202,14 @@ module CxbRank
     end
 
     get '/api/music/:music_text_id' do
-      last_modified Music.last_modified(params[:music_text_id])
-      music = Music.find_by_param_id(params[:music_text_id])
+      last_modified Master::Music.last_modified
+      music = Master::Music.find_by_param_id(params[:music_text_id])
       jsonx((music ? music.to_hash : {}), params[:callback])
     end
 
     get '/api/musics' do
-      last_modified Music.last_modified
-      music_hashes = Music.find_actives.to_a.map! do |music| music.to_hash end
+      last_modified Master::Music.last_modified
+      music_hashes = Master::Music.find_actives(true).to_a.map! do |music| music.to_hash end
       jsonx music_hashes, params[:callback]
     end
 
@@ -408,7 +408,7 @@ module CxbRank
       private_page do |user|
         if params[:y].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
-#            begin
+            begin
               temp_skill.calc!
               temp_skill.save!
               if SiteSettings.cxb_mode? or !user.point_direct
@@ -422,10 +422,10 @@ module CxbRank
               session[:music_text_id] = nil
               session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
-#            rescue
-#               haml :error, :layout => true,
-#                 :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
-#            end
+            rescue
+               haml :error, :layout => true,
+                 :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
+            end
           end
         else
           redirect SiteSettings.join_site_base(SKILL_ITEM_EDIT_URI)
@@ -437,7 +437,7 @@ module CxbRank
       private_page do |user|
         if params['y'].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
-#            begin
+            begin
               temp_skill.destroy
               skill_set = SkillSet.new(settings.site_mode, user)
               skill_set.load!
@@ -448,10 +448,10 @@ module CxbRank
               session[:music_text_id] = nil
               session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
-#            rescue
-#              haml :error, :layout => true,
-#                :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
-#            end
+            rescue
+              haml :error, :layout => true,
+                :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
+            end
           end
         else
           redirect SiteSettings.join_site_base(SKILL_ITEM_EDIT_URI)
@@ -487,7 +487,7 @@ module CxbRank
     end
 
     get RANK_CALC_URI do
-      musics = Master::Music.find_actives
+      musics = Master::Music.find_actives(true)
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
@@ -503,7 +503,7 @@ module CxbRank
     end
 
     get RATE_CALC_URI do
-      musics = Master::Music.find_actives
+      musics = Master::Music.find_actives(true)
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash

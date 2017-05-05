@@ -15,7 +15,7 @@ class RevRankApp < CxbRank::AppBase
       end
       if session[:course_text_id].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_IS_UNDECIDED}
-      elsif (course = Course.find_by_param_id(session[:course_text_id])).nil?
+      elsif (course = Master::Course.find_by_param_id(session[:course_text_id])).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_NOT_EXIST}
       else
         curr_skill = CourseSkill.find_by_user_and_course(user, course)
@@ -154,10 +154,10 @@ class RevRankApp < CxbRank::AppBase
       begin
         case data[:type]
         when 'music'
-          item = CxbRank::Music.create_by_request(data[:body])
+          item = CxbRank::Master::Music.create_by_request(data[:body])
           item.save!
         when 'course'
-          item = CxbRank::Course.create_by_request(data[:body])
+          item = CxbRank::Master::Course.create_by_request(data[:body])
           item.save!
         else
           jsonx :status => 400, :message => "TypeError: #{data[:type]}"
@@ -174,7 +174,7 @@ class RevRankApp < CxbRank::AppBase
       begin
         case data[:type]
         when 'music'
-          if (music = CxbRank::Music.find_by_lookup_key(data[:lookup_key])).nil?
+          if (music = CxbRank::Master::Music.find_by_lookup_key(data[:lookup_key])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           elsif (skill = CxbRank::Skill.create_by_request(session.user, music, data[:body])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
@@ -182,7 +182,7 @@ class RevRankApp < CxbRank::AppBase
             skill.save!
           end
         when 'course'
-          unless (course = CxbRank::Course.find_by_lookup_key(data[:lookup_key]))
+          unless (course = CxbRank::Master::Course.find_by_lookup_key(data[:lookup_key]))
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
             skill = CxbRank::CourseSkill.create_by_request(session.user, course, data[:body])

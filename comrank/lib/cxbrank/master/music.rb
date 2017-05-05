@@ -48,24 +48,28 @@ module CxbRank
         return self.where(:text_id => text_id).first
       end
 
-      def self.find_actives
+      def self.find_by_lookup_key(lookup_key)
+        return self.where(:lookup_key => lookup_key).first
+      end
+
+      def self.find_actives(without_deleted)
         if SiteSettings.sunrise_or_later_mode?
-          return super(:appear, :sort_key)
+          return super(without_deleted, :appear, :sort_key)
         else
-          return super(:number, :sort_key)
+          return super(without_deleted, :number, :sort_key)
         end
       end
 
       def self.find_recents
-        return self.find_actives.where(:limited => false)
-          .where('added_at >= ?', Date.today - (4*7))
-          .order('added_at desc, number, sort_key')
+        return self.public_method(:find_actives)
+          .super_method.call(true, 'added_at desc', :number, :sort_key)
+          .where(:limited => false).where('added_at >= ?', Date.today - (4*7))
       end
 
       def self.find_recents_unl
-        return self.find_actives.where(:limited => false)
-          .where('added_at_unl >= ?', Date.today - (8*7))
-          .order('added_at_unl desc, number, sort_key')
+        return self.public_method(:find_actives)
+          .super_method.call(true, 'added_at desc', :number, :sort_key)
+          .where(:limited => false).where('added_at_unl >= ?', Date.today - (8*7))
       end
 
       def full_title

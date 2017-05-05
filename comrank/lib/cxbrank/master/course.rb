@@ -21,6 +21,10 @@ module CxbRank
         return self.where(:text_id => param_id).first
       end
 
+      def self.find_by_lookup_key(lookup_key)
+        return self.where(:lookup_key => lookup_key).first
+      end
+
       def self.find_actives
         return super(:sort_key)
       end
