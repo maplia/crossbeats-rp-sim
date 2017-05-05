@@ -1,15 +1,15 @@
-require 'rubygems'
 require 'active_record'
 require 'bigdecimal'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
 require 'cxbrank/user'
-require 'cxbrank/music'
+require 'cxbrank/master/music'
+require 'cxbrank/master/course'
 
 module CxbRank
   class Skill < ActiveRecord::Base
     include Comparable
-    belongs_to :music
+    belongs_to :music, :class_name => 'Master::Music'
     belongs_to :user
 
     MUSIC_DIFF_PREFIXES.each do |diff, diff_prefix|
@@ -102,7 +102,7 @@ module CxbRank
       end
       if options[:fill_empty]
         omit_music_ids = (skills.pluck(:music_id).empty? ? [0] : skills.pluck(:music_id))
-        empty_musics = Music.find_actives.where('id not in (?)', omit_music_ids)
+        empty_musics = Master::Music.find_actives.where('id not in (?)', omit_music_ids)
         empty_musics.each do |music|
           skill = Skill.new
           skill.user_id = user.id
@@ -481,7 +481,7 @@ module CxbRank
 
   class CourseSkill < ActiveRecord::Base
     include Comparable
-    belongs_to :course
+    belongs_to :course, :class_name => 'Master::Course'
 
     validates_format_of :point_before_type_cast,
       :allow_nil => true, :allow_blank => true,
@@ -694,7 +694,7 @@ module CxbRank
           Skill.last_modified(@user), CourseSkill.last_modified(@user)
         ].compact.max
       else
-        @music_set = MusicSet.new(@mode, @date)
+        @music_set = MusicSet.new
         @last_modified = @music_set.last_modified
       end
     end

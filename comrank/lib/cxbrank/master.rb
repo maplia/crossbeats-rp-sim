@@ -1,0 +1,7 @@
+require 'cxbrank/master/music'
+require 'cxbrank/master/monthly'
+require 'cxbrank/master/legacy_chart'
+require 'cxbrank/master/course'
+require 'cxbrank/master/course_music'
+require 'cxbrank/master/event'
+require 'cxbrank/master/event_music'

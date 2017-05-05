@@ -1,13 +1,13 @@
-require 'cxbrank/music'
-require 'cxbrank/course'
-require 'cxbrank/monthly'
+require 'cxbrank/master/music'
+require 'cxbrank/master/course'
+require 'cxbrank/master/monthly'
 
 module CxbRank
   class MusicSet
     attr_reader :last_modified
-    
+
     def self.last_modified
-      return [Music.last_modified, Course.last_modified, Monthly.last_modified].compact.max
+      return [Master::Music.last_modified, Master::Course.last_modified, Master::Monthly.last_modified].compact.max
     end
 
     def initialize
@@ -34,7 +34,7 @@ module CxbRank
     end
 
     def load!
-      musics = Music.find_actives
+      musics = Master::Music.find_actives
       if SiteSettings.cxb_mode?
         musics.each do |music|
           if music.deleted?
@@ -59,7 +59,7 @@ module CxbRank
             end
           end
         end
-        courses = Course.find_actives(@date)
+        courses = Master::Course.find_actives
         courses.each do |course|
           if course.limited?
             @hash[MUSIC_TYPE_REV_COURSE_LIMITED] << course

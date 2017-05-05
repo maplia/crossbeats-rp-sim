@@ -3,7 +3,7 @@
   %div.subunit
     - if CxbRank::SiteSettings.rev_mode?
       %p 新規収録曲のデータは、ブックマークレットによる最初のプレイデータ登録時にあわせて登録します
-    - musics = CxbRank::Music.where(:limited => false).where('added_at >= ?', [Date.today-28, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at desc, number, sort_key')
+    - musics = CxbRank::Master::Music.find_recents
     - if musics.blank?
       %p 最近登録された曲はありません
     - else
@@ -37,7 +37,7 @@
   %div.unit
     %h2 最近の登録UNLIMITED譜面
     %div.subunit
-      - musics = CxbRank::Music.where(:limited => false).where('added_at_unl >= ?', [Date.today-56, CxbRank::SiteSettings.date_low_limit+1].max).order('added_at_unl desc, number, sort_key')
+      - musics = CxbRank::Master::Music.find_recents_unl
       - if musics.blank?
         %p 最近登録されたUNLIMITED譜面はありません
       - else

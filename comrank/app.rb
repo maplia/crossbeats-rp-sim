@@ -16,12 +16,10 @@ require 'cxbrank/site_settings'
 require 'cxbrank/helpers'
 require 'cxbrank/const'
 require 'cxbrank/authenticate'
-require 'cxbrank/music'
+require 'cxbrank/master'
 require 'cxbrank/music_set'
-require 'cxbrank/course'
 require 'cxbrank/user'
 require 'cxbrank/skill'
-require 'cxbrank/event'
 
 module CxbRank
   class AppBase < Sinatra::Base
@@ -147,7 +145,7 @@ module CxbRank
         end
         if session[:music_text_id].blank?
           haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
-        elsif (music = Music.find_by_param_id(session[:music_text_id])).nil?
+        elsif (music = Master::Music.find_by_param_id(session[:music_text_id])).nil?
           haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
         else
           curr_skill = Skill.find_by_user_and_music(user, music)
@@ -176,7 +174,7 @@ module CxbRank
     end
 
     get SITE_TOP_URI do
-      data_mtime = [Music.last_modified, Event.last_modified].compact.max
+      data_mtime = [Master::Music.last_modified, Master::Event.last_modified].compact.max
       user = User.find_by_id(session[:user_id])
       page_last_modified PAGE_TEMPLATE_FILES[SITE_TOP_URI], data_mtime, user
       haml :index, :layout => true, :locals => {:user => user}
@@ -410,11 +408,11 @@ module CxbRank
       private_page do |user|
         if params[:y].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
-            begin
+#            begin
               temp_skill.calc!
               temp_skill.save!
               if SiteSettings.cxb_mode? or !user.point_direct
-                skill_set = SkillSet.new
+                skill_set = SkillSet.new(settings.site_mode, user)
                 skill_set.load!
                 user.point = skill_set.total_point
                 user.point_direct = false
@@ -424,10 +422,10 @@ module CxbRank
               session[:music_text_id] = nil
               session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
-            rescue
-               haml :error, :layout => true,
-                 :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
-            end
+#            rescue
+#               haml :error, :layout => true,
+#                 :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
+#            end
           end
         else
           redirect SiteSettings.join_site_base(SKILL_ITEM_EDIT_URI)
@@ -439,7 +437,7 @@ module CxbRank
       private_page do |user|
         if params['y'].present?
           music_skill_edit_page(user) do |curr_skill, temp_skill|
-            begin
+#            begin
               temp_skill.destroy
               skill_set = SkillSet.new(settings.site_mode, user)
               skill_set.load!
@@ -450,10 +448,10 @@ module CxbRank
               session[:music_text_id] = nil
               session[underscore(CxbRank::Skill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
-            rescue
-              haml :error, :layout => true,
-                :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
-            end
+#            rescue
+#              haml :error, :layout => true,
+#                :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
+#            end
           end
         else
           redirect SiteSettings.join_site_base(SKILL_ITEM_EDIT_URI)
@@ -489,7 +487,7 @@ module CxbRank
     end
 
     get RANK_CALC_URI do
-      musics = Music.where(:limited => false)
+      musics = Master::Music.find_actives
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
@@ -498,19 +496,19 @@ module CxbRank
       SiteSettings.music_diffs.keys.sort.each do |diff|
         diffs << MUSIC_DIFF_PREFIXES[diff]
       end
-      data_mtime = Music.last_modified
+      data_mtime = Master::Music.last_modified
       page_last_modified PAGE_TEMPLATE_FILES[RANK_CALC_URI], data_mtime
       haml :calc_rank, :layout => true, :locals => {
         :data => music_hashes, :diffs => diffs}
     end
 
     get RATE_CALC_URI do
-      musics = Music.where(:limited => false)
+      musics = Master::Music.find_actives
       music_hashes = []
       musics.sort.each do |music|
         music_hashes << music.to_hash
       end
-      data_mtime = Music.last_modified
+      data_mtime = Master::Music.last_modified
       page_last_modified PAGE_TEMPLATE_FILES[RATE_CALC_URI], data_mtime
       haml :calc_rate, :layout => true, :locals => {
         :data => music_hashes, :diffs => SiteSettings.music_diffs}
@@ -518,9 +516,9 @@ module CxbRank
 
     get EVENT_SHEET_LIST_URI do
       settings.views << SiteSettings.join_comrank_path('views/event_list')
-      events = Event.all.order('span_s desc')
+      events = Master::Event.all.order('span_s desc')
       fixed_title = "#{PAGE_TITLES[EVENT_SHEET_LIST_URI]}一覧"
-      data_mtime = Event.last_modified
+      data_mtime = Master::Event.last_modified
       page_last_modified PAGE_TEMPLATE_FILES[EVENT_SHEET_LIST_URI], data_mtime
       haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
     end
@@ -528,7 +526,7 @@ module CxbRank
     get "#{EVENT_SHEET_VIEW_URI}/:event_text_id?/?:section?" do
       if params[:event_text_id].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_IS_UNDECIDED}
-      elsif !(events = Event.where(:text_id => params[:event_text_id])).exists?
+      elsif !(events = Master::Event.where(:text_id => params[:event_text_id])).exists?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_NOT_EXIST}
       elsif (event = events.where(:section => (params[:section] || 0)).first).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_SECTION_NOT_EXIST}

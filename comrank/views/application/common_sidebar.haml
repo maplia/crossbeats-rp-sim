@@ -51,6 +51,6 @@
       %li
         #{link_to CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_LIST_URI], CxbRank::SiteSettings.join_site_base(CxbRank::EVENT_SHEET_LIST_URI)}
         %ul
-          - events = CxbRank::Event.where('span_s <= ? and span_e >= ?', Time.now, Time.now)
+          - events = CxbRank::Master::Event.where('span_s <= ? and span_e >= ?', Time.now, Time.now)
           - events.each do |event|
             %li #{link_to event.title, File.join(CxbRank::SiteSettings.join_site_base(CxbRank::EVENT_SHEET_VIEW_URI), event.text_id)}

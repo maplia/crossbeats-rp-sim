@@ -1,10 +1,8 @@
 $LOAD_PATH << '../../comrank/lib'
 require '../../comrank/app'
-require 'rubygems'
 require 'json'
 require 'cxbrank/const'
-require 'cxbrank/music'
-require 'cxbrank/course'
+require 'cxbrank/master'
 require 'cxbrank/skill'
 require 'cxbrank/bookmarklet'
 
