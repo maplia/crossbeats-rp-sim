@@ -17,11 +17,11 @@ module CxbRank
     end
 
     def self.pivot_date
-      return @@pivot_date
+      return @@pivot_date || Time.now
     end
 
     def self.pivot_time
-      return @@pivot_time
+      return @@pivot_time || Chronic.parse(Time.now.strftime('%Y-%m-%d 27:59:59'))
     end
 
     def self.join_site_base(uri)
@@ -94,6 +94,10 @@ module CxbRank
 
     def self.date_low_limit
       return DATE_LOW_LIMITS[@@settings.site_mode]
+    end
+
+    def self.ultimate_enabled?
+      return pivot_date >= ULTIMATE_START_DATE[@@settings.site_mode]
     end
 
     def self.legacy_chart_enabled?

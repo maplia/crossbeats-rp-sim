@@ -12,7 +12,7 @@ module CxbRank
       include Comparable
       include Master::Format
       has_one :monthly, -> {where 'span_s <= ? and span_e >= ?',
-        (SiteSettings.pivot_time || Time.now), (SiteSettings.pivot_time || Time.now)}
+        SiteSettings.pivot_time, SiteSettings.pivot_time}
       has_many :legacy_charts
 
       def self.create_by_request(body)
