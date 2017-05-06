@@ -128,7 +128,8 @@ module CxbRank
         skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_rank=", SP_RANK_STATUS_SPP)
         skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_combo=", SP_COMBO_STATUS_EX)
         if SiteSettings.ultimate_enabled?
-          skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=", (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
+          skill.send("#{MUSIC_DIFF_PREFIXES[max_diff]}_gauge=",
+            (SiteSettings.cxb_mode? ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV))
         end
         if max_diff == MUSIC_DIFF_UNL and music.unlock_unl == UNLOCK_UNL_TYPE_NEVER
           skill.unl_locked = true
@@ -138,7 +139,7 @@ module CxbRank
           skill.mas_rank = SP_RANK_STATUS_SPP
           skill.mas_combo = SP_COMBO_STATUS_EX
           if SiteSettings.ultimate_enabled?
-            skill.mas_gauge = (mode == MODE_CXB ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV)
+            skill.mas_gauge = (SiteSettings.cxb_mode? ? SP_GAUGE_ULTIMATE_CXB : SP_GAUGE_ULTIMATE_REV)
           end
         end
         skill.calc!

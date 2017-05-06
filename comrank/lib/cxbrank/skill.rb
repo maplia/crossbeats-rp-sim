@@ -3,6 +3,7 @@ require 'bigdecimal'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
 require 'cxbrank/user'
+require 'cxbrank/master/music_set'
 require 'cxbrank/master/music'
 require 'cxbrank/master/course'
 require 'cxbrank/playdata/music_skill'
@@ -45,7 +46,7 @@ module CxbRank
           Skill.last_modified(@user), CourseSkill.last_modified(@user)
         ].compact.max
       else
-        @music_set = MusicSet.new
+        @music_set = Master::MusicSet.new
         @last_modified = @music_set.last_modified
       end
     end
