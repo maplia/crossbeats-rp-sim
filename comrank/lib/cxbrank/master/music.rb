@@ -16,7 +16,7 @@ module CxbRank
       has_many :legacy_charts
 
       def self.create_by_request(body)
-        music = self.where(:lookup_key => body[:lookup_key]).first
+        music = self.find_by(:lookup_key => body[:lookup_key])
         unless music
           music = self.new
           music.number = 0
@@ -42,14 +42,6 @@ module CxbRank
           music.added_at_unl = Date.today
         end
         return music
-      end
-
-      def self.find_by_param_id(text_id)
-        return self.where(:text_id => text_id).first
-      end
-
-      def self.find_by_lookup_key(lookup_key)
-        return self.where(:lookup_key => lookup_key).first
       end
 
       def self.find_actives(without_deleted)
@@ -218,7 +210,7 @@ module CxbRank
 
         csv.read.each do |row|
           lookup_key = (row.field(:lookup_key) || row.field(:text_id))
-          data = self.where(:lookup_key => lookup_key).first
+          data = self.find_by(:lookup_key => lookup_key)
           unless data
             data = self.new
             data.lookup_key = lookup_key

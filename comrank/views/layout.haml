@@ -44,10 +44,10 @@
     - if !mobile? and session[:user_id].present?
       - session_user = CxbRank::User.find_by_id(session[:user_id])
       %p.current_user
-        ユーザーID: 
+        ユーザーID:
         = link_to session_user.user_id, CxbRank::SiteSettings.join_site_base(CxbRank::SKILL_LIST_EDIT_URI)
         \/
-        = link_to 'ログアウト', "#{CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI)}?#{Time.now.to_i}" 
+        = link_to 'ログアウト', "#{CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI)}?#{Time.now.to_i}"
     = yield
     - unless defined? error_no or defined? errors
       %address

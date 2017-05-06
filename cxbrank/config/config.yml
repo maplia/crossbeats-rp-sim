@@ -7,9 +7,9 @@ common_style_base: /common/stylesheets
 common_script_base: /common/javascripts
 description: 「CROSS×BEATS」のランクポイント表作成Webツールを公開しているサイトです。
 session_key: cxbrank
-secret: 
+secret:
 environment: development
 comrank_path: ../comrank
 legacy_chart: true
-#tracker_id: 
-#domain: 
+#tracker_id:
+#domain:

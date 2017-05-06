@@ -46,7 +46,7 @@ module CxbRank
 
     def self.find_by_param_id(param_id)
       if param_id.size == USER_ID_FIGURE
-        return self.where(:id => param_id.to_i).first
+        return self.find_by(:id => param_id.to_i)
       else
         return self.where(:game_id => param_id).order('point_updated_at desc').first
       end

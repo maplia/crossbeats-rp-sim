@@ -204,7 +204,7 @@ function updateMusicRp(progress, userData, musicItem) {
       postData.key = userData.key;
       postData.lookup_key = /playdatamusic\/(.+)/.exec(musicItem.uri)[1];
       musicItem = parseMusicItem(document);
-      musicItem.lookup_key = postData.lookup_key; 
+      musicItem.lookup_key = postData.lookup_key;
       updateRp(progress, postData, musicItem).done(function () {
         deferred.resolve();
       }).fail(function (e) {
@@ -243,7 +243,7 @@ function parseMusicRp(document, lookupKey) {
       var rate = parseFloat($(element).find('.pdResultList dd')[1].textContent);
       bodyDiff.rate = rate;
       // ゲージタイプ
-      var gaugeSrc = ($(element).find('.clear p').length == 1 ? $(element).find('.clear p img')[0].src : 'bnr_dummy_CLEAR.png'); 
+      var gaugeSrc = ($(element).find('.clear p').length == 1 ? $(element).find('.clear p img')[0].src : 'bnr_dummy_CLEAR.png');
       var gauge = /bnr_(\w+)_CLEAR.png/.exec(gaugeSrc)[1];
       if (gauge == 'SURVIVAL') {
         bodyDiff.gauge = 1;   // SURVIVAL

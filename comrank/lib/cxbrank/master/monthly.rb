@@ -20,8 +20,8 @@ module CxbRank
         columns.delete(:span_s)
 
         csv.read.each do |row|
-          music_id = Music.where(:text_id => row.field(:text_id)).first.id
-          data = self.where(:music_id => music_id, :span_s => row.field(:span_s)).first
+          music_id = Music.find_by(:text_id => row.field(:text_id)).id
+          data = self.find_by(:music_id => music_id, :span_s => row.field(:span_s))
           unless data
             data = self.new
             data.music_id = music_id

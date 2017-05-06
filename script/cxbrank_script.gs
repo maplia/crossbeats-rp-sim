@@ -116,7 +116,7 @@ function getData() {
     skillData[i].music.full_title = skillData[i].music.full_title.replace(/&infin;/g, '∞');
     skillData[i].music.full_title = skillData[i].music.full_title.replace(/&#x2661;/g, '♡');
   }
-  
+
   // -----------------------------
   // 入力シート作成/隠しシート準備
   // -----------------------------
@@ -226,12 +226,12 @@ function getData() {
       inputSheetFormats[j*5+4][2] = '@';
       currentSheetValues[j][common_data_col_min] = skillData[index].comment;
       updateSheetFormulas[j][common_data_col_min] = getA1Notation(INPUT_SHEET.getRange(1+index*5+4+1, 3));
-      
+
       // 変更検出用
       updateSheetFormulas[j][common_data_col_min+1] = 'JOIN(",",' + getA1Notation(CURRENT_SHEET.getRange(index+1, 1, 1, common_data_col_min+1)) + ')';
       updateSheetFormulas[j][common_data_col_min+2] = 'JOIN(",",' + getA1Notation(UPDATE_SHEET.getRange(index+1, 1, 1, common_data_col_min+1)) + ')';
       updateSheetFormulas[j][common_data_col_min+3] = getA1Notation(UPDATE_SHEET.getRange(index+1, common_data_col_min+1+1)) + '<>' + getA1Notation(UPDATE_SHEET.getRange(index+1, common_data_col_min+2+1));
-      
+
       musicCount++;
       skillData[index] = null;
     }

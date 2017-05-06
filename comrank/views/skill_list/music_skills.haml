@@ -1,7 +1,7 @@
 %div.unit
   %h2
     = CxbRank::SiteSettings.music_types[type]
-    - if [CxbRank::MUSIC_TYPE_NORMAL, CxbRank::MUSIC_TYPE_REV_SINGLE].include?(type) and !edit and defined? user.rank_tops and (user.rank_tops || -1) > 0 
+    - if [CxbRank::MUSIC_TYPE_NORMAL, CxbRank::MUSIC_TYPE_REV_SINGLE].include?(type) and !edit and defined? user.rank_tops and (user.rank_tops || -1) > 0
       %small= "[上位#{user.rank_tops}曲]"
   %div.subunit
     - unless skills.present?

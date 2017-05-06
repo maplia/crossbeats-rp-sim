@@ -117,7 +117,7 @@ module CxbRank
     end
 
     def self.find_by_user_and_music(user, music)
-      skill = self.where(:user_id => user.id, :music_id => music.id).first
+      skill = self.find_by(:user_id => user.id, :music_id => music.id)
       unless skill
         skill = self.new
         skill.user_id = user.id
@@ -155,12 +155,7 @@ module CxbRank
 
     def self.create_by_request(user, music, body)
       invert_music_diffs = MUSIC_DIFF_PREFIXES.invert
-      skill = self.where(:user_id => user.id, :music_id => music.id).first
-      unless skill
-        skill = Skill.new
-        skill.user_id = user.id
-        skill.music = music
-      end
+      skill = self.find_by_user_and_music(user, music)
       body.keys.each do |prefix|
         return nil unless music.exist?(invert_music_diffs[prefix.to_s])
         skill.send("#{prefix}_stat=", body[prefix.to_sym][:stat])
@@ -533,7 +528,7 @@ module CxbRank
     end
 
     def self.find_by_user_and_course(user, course)
-      skill = self.where(:user_id => user.id, :course_id => course.id).first
+      skill = self.find_by(:user_id => user.id, :course_id => course.id)
       unless skill
         skill = self.new
         skill.user_id = user.id
@@ -543,12 +538,7 @@ module CxbRank
     end
 
     def self.create_by_request(user, course, body)
-      skill = self.where(:user_id => user.id, :course_id => course.id).first
-      unless skill
-        skill = self.new
-        skill.user_id = user.id
-        skill.course = course
-      end
+      skill = self.find_by_user_and_course(user, course)
       skill.stat = body[:stat]
       skill.point = body[:point]
       skill.rate = body[:rate]

@@ -24,7 +24,7 @@
               入力なし
             - else
               = user.game_id
-              - if CxbRank::SiteSettings.rev_mode? and !user.game_id_display 
+              - if CxbRank::SiteSettings.rev_mode? and !user.game_id_display
                 - if mobile?
                   %br
                 （REV.ID非公開）

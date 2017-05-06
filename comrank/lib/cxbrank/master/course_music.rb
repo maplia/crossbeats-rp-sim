@@ -15,7 +15,7 @@ module CxbRank
       def_delegators :music, :title, :subtitle
 
       def self.create_by_request(body, seq)
-        music = Music.where(:jacket => body[:jacket]).first
+        music = Music.find_by(:jacket => body[:jacket])
         unless music
           return nil
         end
@@ -50,14 +50,14 @@ module CxbRank
 
       def self.restore_from_csv(csv)
         csv.read.each do |row|
-          course_id = Course.where(:text_id => row.field(:text_id)).first.id
-          data = self.where(:course_id => course_id, :seq => row.field(:seq)).first
+          course_id = Course.find_by(:text_id => row.field(:text_id)).id
+          data = self.find_by(:course_id => course_id, :seq => row.field(:seq))
           unless data
             data = self.new
             data.course_id = course_id
             data.seq = row.field(:seq)
           end
-          data.music_id = Music.where(:text_id => row.field(:music_text_id)).first.id
+          data.music_id = Music.find_by(:text_id => row.field(:music_text_id)).id
           data.diff = row.field(:diff)
           data.save!
         end

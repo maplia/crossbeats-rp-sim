@@ -25,7 +25,7 @@ module CxbRank
           end
 
           def underscore(klass)
-            return klass.to_s.underscore.gsub(/\//, '-') 
+            return klass.to_s.underscore.gsub(/\//, '-')
           end
 
           def multiline(text, autolink=false)

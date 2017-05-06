@@ -10,9 +10,9 @@ module CxbRank
 
       def self.last_modified(text_id=nil, section=nil)
         if text_id.present? and section.present?
-          event = self.where(:text_id => text_id, :section => section).first
+          event = self.find_by(:text_id => text_id, :section => section)
           return [
-            self.where(:text_id => text_id, :section => section).first.updated_at,
+            self.find_by(:text_id => text_id, :section => section).updated_at,
             EventMusic.last_modified(event.id)
           ].compact.max
         else
@@ -48,7 +48,7 @@ module CxbRank
         columns.delete(:text_id)
 
         csv.read.each do |row|
-          data = self.where(:text_id => row.field(:text_id)).first
+          data = self.find_by(:text_id => row.field(:text_id))
           unless data
             data = self.new
             data.text_id = row.field(:text_id)

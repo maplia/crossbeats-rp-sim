@@ -15,7 +15,7 @@ class RevRankApp < CxbRank::AppBase
       end
       if session[:course_text_id].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_IS_UNDECIDED}
-      elsif (course = Master::Course.find_by_param_id(session[:course_text_id])).nil?
+      elsif (course = Master::Course.find_by(:text_id => session[:course_text_id])).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_NOT_EXIST}
       else
         curr_skill = CourseSkill.find_by_user_and_course(user, course)
@@ -34,7 +34,7 @@ class RevRankApp < CxbRank::AppBase
         jsonx :status => 401, :message => 'MY PAGEからのアクセスではありません'
       elsif (data = JSON.parse(request.body.read, {:symbolize_names => true}))[:key].blank?
         jsonx :status => 401, :message => 'セッションキーが指定されていません'
-      elsif (session = CxbRank::BookmarkletSession.where(:key => data[:key]).first).nil?
+      elsif (session = BookmarkletSession.find_by(:key => data[:key])).nil?
         jsonx :status => 401, :message => 'セッションキーが間違っています'
       else
         begin
@@ -174,18 +174,19 @@ class RevRankApp < CxbRank::AppBase
       begin
         case data[:type]
         when 'music'
-          if (music = CxbRank::Master::Music.find_by_lookup_key(data[:lookup_key])).nil?
+          if (music = Master::Music.find_by(:lookup_key => data[:lookup_key])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
-          elsif (skill = CxbRank::Skill.create_by_request(session.user, music, data[:body])).nil?
+          elsif (skill = Skill.create_by_request(session.user, music, data[:body])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
             skill.save!
           end
         when 'course'
-          unless (course = CxbRank::Master::Course.find_by_lookup_key(data[:lookup_key]))
+          if (course = Master::Course.find_by(:lookup_key => data[:lookup_key])).nil?
+            jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
+          elsif (skill = CourseSkill.create_by_request(session.user, course, data[:body])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
-            skill = CxbRank::CourseSkill.create_by_request(session.user, course, data[:body])
             skill.save!
           end
         else

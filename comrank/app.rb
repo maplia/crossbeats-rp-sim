@@ -145,7 +145,7 @@ module CxbRank
         end
         if session[:music_text_id].blank?
           haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
-        elsif (music = Master::Music.find_by_param_id(session[:music_text_id])).nil?
+        elsif (music = Master::Music.find_by(:text_id => session[:music_text_id])).nil?
           haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
         else
           curr_skill = Skill.find_by_user_and_music(user, music)
@@ -203,7 +203,7 @@ module CxbRank
 
     get '/api/music/:music_text_id' do
       last_modified Master::Music.last_modified
-      music = Master::Music.find_by_param_id(params[:music_text_id])
+      music = Master::Music.find_by(:text_id => params[:music_text_id])
       jsonx((music ? music.to_hash : {}), params[:callback])
     end
 
@@ -471,7 +471,7 @@ module CxbRank
     get "#{SCORE_RANK_DETAIL_URI}/:music_text_id?/?:diff?" do
       if params[:music_text_id].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
-      elsif (music = Music.find_by_param_id(params[:music_text_id])).nil?
+      elsif (music = Music.find_by(:text_id => params[:music_text_id])).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
       elsif params[:diff].blank?
         haml :error, :layout => true, :locals => {:error_no => ERROR_DIFF_IS_UNDECIDED}
@@ -528,7 +528,7 @@ module CxbRank
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_IS_UNDECIDED}
       elsif !(events = Master::Event.where(:text_id => params[:event_text_id])).exists?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_NOT_EXIST}
-      elsif (event = events.where(:section => (params[:section] || 0)).first).nil?
+      elsif (event = events.find_by(:section => (params[:section] || 0))).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_SECTION_NOT_EXIST}
       else
         request.env['X_MOBILE_DEVICE'] = nil

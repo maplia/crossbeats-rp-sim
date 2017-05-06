@@ -17,20 +17,12 @@ module CxbRank
         ].compact.max
       end
 
-      def self.find_by_param_id(param_id)
-        return self.where(:text_id => param_id).first
-      end
-
-      def self.find_by_lookup_key(lookup_key)
-        return self.where(:lookup_key => lookup_key).first
-      end
-
       def self.find_actives
         return super(:sort_key)
       end
 
       def self.create_by_request(body)
-        course = self.where(:lookup_key => body[:lookup_key]).first
+        course = self.find_by(:lookup_key => body[:lookup_key])
         unless course
           course = self.new
           course.text_id = body[:text_id]
@@ -77,7 +69,7 @@ module CxbRank
         columns.delete(:lookup_key)
 
         csv.read.each do |row|
-          data = self.where(:lookup_key => row.field(:lookup_key)).first
+          data = self.find_by(:lookup_key => row.field(:lookup_key))
           unless data
             data = self.new
             data.lookup_key = row.field(:lookup_key)

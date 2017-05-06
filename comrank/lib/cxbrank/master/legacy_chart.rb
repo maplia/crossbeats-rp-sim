@@ -37,9 +37,9 @@ module CxbRank
         columns.delete(:span_s)
 
         csv.read.each do |row|
-          music_id = Music.where(:text_id => row.field(:text_id)).first.id
+          music_id = Music.find_by(:text_id => row.field(:text_id)).id
           span_s = row.field(:span_s)
-          data = self.where(:music_id => music_id, :span_s => span_s).first
+          data = self.find_by(:music_id => music_id, :span_s => span_s)
           unless data
             data = self.new
             data.music_id = music_id

@@ -27,10 +27,10 @@ module CxbRank
 
       def self.restore_from_csv(csv)
         csv.read.each do |row|
-          event_id = Event.where(:text_id => row.field(:text_id)).first.id
+          event_id = Event.find_by(:text_id => row.field(:text_id)).id
           seq = row.field(:seq)
-          music_id = Music.where(:text_id => row.field(:music_text_id)).first.id
-          data = self.where(:event_id => event_id, :seq => seq).first
+          music_id = Music.find_by(:text_id => row.field(:music_text_id)).id
+          data = self.find_by(:event_id => event_id, :seq => seq)
           unless data
             data = self.new
             data.event_id = event_id

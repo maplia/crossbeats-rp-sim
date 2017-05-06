@@ -29,7 +29,7 @@ class CxbRankApp < CxbRank::AppBase
     else
       begin
         user = User.find_by_param_id(data[:user_id])
-        music = Master::Music.where(:text_id => data[:text_id]).first
+        music = Master::Music.find_by(:text_id => data[:text_id])
         skill = Skill.find_by_user_and_music(user, music)
         skill.user_id = user.id
         skill.music = music

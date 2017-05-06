@@ -73,12 +73,12 @@
                 - if skill.music.exist_legacy?(diff)
                   %label<
                     = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
-                    = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
+                    = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル')
                 - else
                   %label<
                     = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
                     %del<>
-                      = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
+                      = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル')
               - if CxbRank::SiteSettings.cxb_mode?
                 %label
                   スコア:
@@ -108,12 +108,12 @@
                 - if skill.music.exist_legacy?(diff)
                   %label<
                     = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => false
-                    = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
+                    = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル')
                 - else
                   %label<
                     = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
                     %del<>
-                      = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル') 
+                      = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル')
               - if CxbRank::SiteSettings.cxb_mode?
                 %br
                 %label

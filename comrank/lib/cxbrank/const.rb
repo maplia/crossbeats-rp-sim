@@ -82,7 +82,7 @@ module CxbRank
       'views/index.haml', 'views/index_news.haml',
     ],
     USAGE_URI => [
-      'views/usage.haml', 
+      'views/usage.haml',
     ],
     MUSIC_LIST_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
@@ -276,7 +276,7 @@ module CxbRank
       MUSIC_TYPE_REV_COURSE         => MUSIC_TYPE_REV_COURSE_NAME,
       MUSIC_TYPE_REV_DELETED        => MUSIC_TYPE_REV_DELETED_NAME,
       MUSIC_TYPE_REV_LIMITED        => MUSIC_TYPE_REV_LIMITED_NAME,
-      MUSIC_TYPE_REV_COURSE_LIMITED => MUSIC_TYPE_REV_COURSE_LIMITED_NAME, 
+      MUSIC_TYPE_REV_COURSE_LIMITED => MUSIC_TYPE_REV_COURSE_LIMITED_NAME,
     }
   }
   MUSIC_TYPES[MODE_REV_SUNRISE] = MUSIC_TYPES[MODE_REV]
