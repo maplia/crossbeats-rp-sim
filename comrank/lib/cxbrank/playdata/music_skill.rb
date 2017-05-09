@@ -118,7 +118,7 @@ module CxbRank
         return skill
       end
 
-      def self.max(mode, music, date=nil)
+      def self.max(music)
         max_diff = (music.exist?(MUSIC_DIFF_UNL) ? MUSIC_DIFF_UNL : MUSIC_DIFF_MAS)
         skill = self.new
         skill.music = music

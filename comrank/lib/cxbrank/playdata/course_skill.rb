@@ -81,7 +81,7 @@ module CxbRank
         end
       end
 
-      def self.max(mode, course, date=nil)
+      def self.max(course)
         skill = self.new
         skill.course = course
         skill.stat = SP_STATUS_CLEAR
