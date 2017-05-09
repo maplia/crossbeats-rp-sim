@@ -148,10 +148,10 @@ module CxbRank
         elsif (music = Master::Music.find_by(:text_id => session[:music_text_id])).nil?
           haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
         else
-          curr_skill = Skill.find_by_user_and_music(user, music)
-          temp_skill = Skill.find_by_user_and_music(user, music)
-          if session[underscore(CxbRank::Skill)].present?
-            temp_skill.update_by_params!(session[underscore(CxbRank::Skill)])
+          curr_skill = PlayData::MusicSkill.find_by_user_and_music(user, music)
+          temp_skill = PlayData::MusicSkill.find_by_user_and_music(user, music)
+          if session[underscore(CxbRank::PlayData::MusicSkill)].present?
+            temp_skill.update_by_params!(session[underscore(CxbRank::PlayData::MusicSkill)])
           end
           yield curr_skill, temp_skill
         end
@@ -364,7 +364,7 @@ module CxbRank
       public_user_page do |user|
         settings.views << SiteSettings.join_comrank_path('views/skill_chart')
         settings.views << SiteSettings.join_comrank_path('views/skill_list')
-        skill_chart = CxbRank::SkillChart.load(settings.site_mode, user)
+        skill_chart = PlayData::Chart.load(user)
         fixed_title = "#{user.name}さんの#{PAGE_TITLES[CLEAR_LIST_VIEW_URI]}"
         data_mtime = skill_chart.last_modified
         page_last_modified PAGE_TEMPLATE_FILES[CLEAR_LIST_VIEW_URI], data_mtime
@@ -385,7 +385,7 @@ module CxbRank
     end
 
     post SKILL_ITEM_EDIT_URI do
-      session[underscore(CxbRank::Skill)] = Hash[params[underscore(CxbRank::Skill)]]
+      session[underscore(CxbRank::PlayData::MusicSkill)] = Hash[params[underscore(CxbRank::PlayData::MusicSkill)]]
       private_page do |user|
         music_skill_edit_page(user) do |curr_skill, temp_skill|
           settings.views << SiteSettings.join_comrank_path('views/music_skill_edit')

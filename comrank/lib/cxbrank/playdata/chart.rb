@@ -1,15 +1,16 @@
 require 'cxbrank/const'
-require 'cxbrank/skill'
+require 'cxbrank/site_settings'
+require 'cxbrank/playdata/music_skill'
 
 module CxbRank
   module PlayData
     class Chart < Hash
       attr_accessor :last_modified
 
-      def self.load(mode, user)
+      def self.load(user)
         skill_chart = self.new
 
-        skills = Skill.find_by_user(user, :fill_empty => true).to_a
+        skills = MusicSkill.find_by_user(user, :fill_empty => true).to_a
         skills.delete_if do |skill| !skill.music.display end
         if SiteSettings.cxb_mode?
           skills.sort! do |a, b| a.music.number <=> b.music.number end
@@ -17,7 +18,7 @@ module CxbRank
           skills.sort! do |a, b| a.music.sort_key <=> b.music.sort_key end
         end
         skill_chart[:skills] = skills
-        skill_chart.last_modified = Skill.last_modified(user)
+        skill_chart.last_modified = MusicSkill.last_modified(user)
 
         status = {
           :clear     => {:count => 0, :max_level => 0},
@@ -31,7 +32,7 @@ module CxbRank
           :ult_mas   => {:count => 0, :max_level => 0},
         }
         skills.each do |skill|
-          MUSIC_DIFFS[mode].keys.each do |diff|
+          SiteSettings.music_diffs.keys.each do |diff|
             next unless skill.music.exist?(diff)
             level = (skill.legacy(diff) ? skill.music.legacy_level(diff) : skill.music.level(diff))
             if skill.cleared?(diff)
