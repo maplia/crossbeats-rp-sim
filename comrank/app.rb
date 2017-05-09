@@ -298,7 +298,7 @@ module CxbRank
 
     get USER_LOGOUT_URI do
       session[:user_id] = nil
-      redirect SiteSettings.join_site_base(SITE_TOP_URI)
+      redirect SiteSettings.join_site_base("#{SITE_TOP_URI}?#{Time.now.to_i}")
     end
 
     get USER_EDIT_URI do

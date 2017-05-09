@@ -26,8 +26,8 @@
       %title= "エラー - #{settings.site_name}"
     - else
       %title= "#{page_title} - #{settings.site_name}"
-    %script{:src => 'http://maplia.jp/script/jquery-2.1.0.min.js'}
-    %script{:src => 'http://maplia.jp/script/jquery.disableOnSubmit.js'}
+    %script{:src => 'https://secure508.sakura.ne.jp/maplia.jp/script/jquery-2.1.0.min.js'}
+    %script{:src => 'https://secure508.sakura.ne.jp/maplia.jp/script/jquery.disableOnSubmit.js'}
     :javascript
       $(function() {
         $('form').disableOnSubmit();
@@ -47,7 +47,7 @@
         ユーザーID:
         = link_to session_user.user_id, CxbRank::SiteSettings.join_site_base(CxbRank::SKILL_LIST_EDIT_URI)
         \/
-        = link_to 'ログアウト', "#{CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI)}?#{Time.now.to_i}"
+        = link_to 'ログアウト', CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI)
     = yield
     - unless defined? error_no or defined? errors
       %address

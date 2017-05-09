@@ -115,7 +115,11 @@ module CxbRank
       end
 
       def exist?(diff)
-        return level(diff).present?
+        exist = level(diff).present?
+        if diff == MUSIC_DIFF_UNL
+          exist &&= (SiteSettings.pivot_date >= (added_at_unl || SiteSettings.date_low_limit))
+        end
+        return exist
       end
 
       def exist_legacy?(diff)

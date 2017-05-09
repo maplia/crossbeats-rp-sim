@@ -1,4 +1,4 @@
-- if skill.instance_of?(CxbRank::Skill)
+- if skill.is_a?(CxbRank::PlayData::MusicSkill)
   - cleared = skill.cleared?(diff)
   - rate = skill.rate(diff)
   - rate_f = skill.rate_f(diff)
@@ -6,7 +6,7 @@
   - cleared = skill.cleared?
   - rate = skill.rate
   - rate_f = skill.rate_f
-- if cleared or (skill.instance_of?(CxbRank::CourseSkill) and skill.played?)
+- if cleared or (skill.is_a?(CxbRank::PlayData::CourseSkill) and skill.played?)
   - if rate_f
     = sprintf('%d<small>.%02d</small>%%', rate.to_i, (rate * 100).to_i % 100)
   - else
