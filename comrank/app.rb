@@ -127,7 +127,7 @@ module CxbRank
 
       def skill_list_page(user, edit, skill_options={})
         settings.views << SiteSettings.join_comrank_path('views/skill_list')
-        skill_set = SkillSet.new(settings.site_mode, user, skill_options)
+        skill_set = SkillSet.new(user, skill_options)
         skill_set.load!
         fixed_title = "#{user.name}さんの#{PAGE_TITLES[SKILL_LIST_VIEW_URI]}"
         unless edit
@@ -191,13 +191,13 @@ module CxbRank
         music_set = Master::MusicSet.new
         music_set.load!
         fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
-        if date.present?
+        if date
           fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
         end
         data_mtime = music_set.last_modified
         page_last_modified PAGE_TEMPLATE_FILES[MUSIC_LIST_VIEW_URI], data_mtime
         haml :music_list, :layout => true,
-          :locals => {:music_set => music_set, :date => date, :fixed_title => fixed_title}
+          :locals => {:music_set => music_set, :fixed_title => fixed_title}
       end
     end
 
@@ -216,17 +216,17 @@ module CxbRank
     get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
       settings.views << SiteSettings.join_comrank_path('views/skill_list')
       past_date_page(params[:date_string]) do |date|
-        skill_set = SkillMaxSet.new(settings.site_mode, date)
+        skill_set = SkillMaxSet.new
         skill_set.load!
         fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
-        if date.present?
+        if date
           fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
         end
         data_mtime = skill_set.last_modified
         page_last_modified PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI], data_mtime
         haml :skill_list, :layout => true, :locals => {
           :user => nil, :skill_set => skill_set, :edit => false,
-          :date => date, :ignore_locked => false, :fixed_title => fixed_title}
+          :ignore_locked => false, :fixed_title => fixed_title}
       end
     end
 
@@ -412,7 +412,7 @@ module CxbRank
               temp_skill.calc!
               temp_skill.save!
               if SiteSettings.cxb_mode? or !user.point_direct
-                skill_set = SkillSet.new(settings.site_mode, user)
+                skill_set = SkillSet.new(user)
                 skill_set.load!
                 user.point = skill_set.total_point
                 user.point_direct = false
@@ -439,7 +439,7 @@ module CxbRank
           music_skill_edit_page(user) do |curr_skill, temp_skill|
             begin
               temp_skill.destroy
-              skill_set = SkillSet.new(settings.site_mode, user)
+              skill_set = SkillSet.new(user)
               skill_set.load!
               user.point = skill_set.total_point
               user.point_direct = false

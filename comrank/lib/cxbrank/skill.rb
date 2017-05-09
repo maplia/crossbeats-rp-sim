@@ -20,10 +20,8 @@ module CxbRank
   class SkillSet
     attr_accessor :last_modified, :total_point
 
-    def initialize(mode, user, skill_options={})
-      @mode = mode
+    def initialize(user, skill_options={})
       @user = user
-      @date = skill_options[:date]
       @skill_options = skill_options
       if SiteSettings.cxb_mode?
         @hash = {
@@ -43,7 +41,7 @@ module CxbRank
       if @user
         @music_set = nil
         @last_modified = [
-          Skill.last_modified(@user), CourseSkill.last_modified(@user)
+          PlayData::MusicSkill.last_modified(@user), PlayData::CourseSkill.last_modified(@user)
         ].compact.max
       else
         @music_set = Master::MusicSet.new
@@ -52,9 +50,9 @@ module CxbRank
     end
 
     def load!
-      Skill.ignore_locked = @skill_options[:ignore_locked]
+      PlayData::MusicSkill.ignore_locked = @skill_options[:ignore_locked]
 
-      music_skills = Skill.find_by_user(@user, @skill_options).sort
+      music_skills = PlayData::MusicSkill.find_by_user(@user, @skill_options).sort
       if SiteSettings.cxb_mode?
         @hash[MUSIC_TYPE_NORMAL] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_SPECIAL] = {:skills => [], :point => 0.0}
@@ -69,7 +67,7 @@ module CxbRank
           end
         end
       else
-        course_skills = CourseSkill.find_by_user(@user, @skill_options).sort
+        course_skills = PlayData::CourseSkill.find_by_user(@user, @skill_options).sort
         @hash[MUSIC_TYPE_REV_SINGLE] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_LIMITED] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_DELETED] = {:skills => [], :point => 0.0}
@@ -131,7 +129,7 @@ module CxbRank
             @user.point - @hash[MUSIC_TYPE_REV_SINGLE][:point] - @hash[MUSIC_TYPE_REV_COURSE][:point]
         else
           @hash[MUSIC_TYPE_REV_BONUS][:skills].each do |skill|
-            if Skill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
+            if PlayData::MusicSkill.ignore_locked or !skill.locked(MUSIC_DIFF_UNL)
               if !SiteSettings.rev_sunrise_mode?
                 @hash[MUSIC_TYPE_REV_BONUS][:point] += skill.point(MUSIC_DIFF_UNL) * BONUS_RATE_UNLIMITED
               else
@@ -151,8 +149,8 @@ module CxbRank
   end
 
   class SkillMaxSet < SkillSet
-    def initialize(mode, date=nil)
-      super(mode, nil, :date => date)
+    def initialize
+      super(nil)
     end
 
     def load!

@@ -68,12 +68,7 @@ module CxbRank
         end
       end
 
-      @@date = nil
       @@ignore_locked = false
-
-      def self.date=(date)
-        @@date = date
-      end
 
       def self.ignore_locked=(ignore_locked)
         @@ignore_locked = ignore_locked

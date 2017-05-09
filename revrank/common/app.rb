@@ -2,8 +2,10 @@ $LOAD_PATH << '../../comrank/lib'
 require '../../comrank/app'
 require 'json'
 require 'cxbrank/const'
-require 'cxbrank/master'
-require 'cxbrank/skill'
+require 'cxbrank/master/music'
+require 'cxbrank/master/course'
+require 'cxbrank/playdata/music_skill'
+require 'cxbrank/playdata/course_skill'
 require 'cxbrank/bookmarklet'
 
 class RevRankApp < CxbRank::AppBase
@@ -18,9 +20,9 @@ class RevRankApp < CxbRank::AppBase
       elsif (course = Master::Course.find_by(:text_id => session[:course_text_id])).nil?
         haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_NOT_EXIST}
       else
-        curr_skill = CourseSkill.find_by_user_and_course(user, course)
-        temp_skill = CourseSkill.find_by_user_and_course(user, course)
-        temp_skill.update_by_params!(session[underscore(CxbRank::CourseSkill)])
+        curr_skill = PlayData::CourseSkill.find_by_user_and_course(user, course)
+        temp_skill = PlayData::CourseSkill.find_by_user_and_course(user, course)
+        temp_skill.update_by_params!(session[underscore(CxbRank::PlayData::CourseSkill)])
         yield curr_skill, temp_skill
       end
     end
@@ -60,7 +62,7 @@ class RevRankApp < CxbRank::AppBase
   end
 
   post SKILL_COURSE_ITEM_EDIT_URI do
-    session[underscore(CxbRank::CourseSkill)] = Hash[params[underscore(CxbRank::CourseSkill)]]
+    session[underscore(CxbRank::PlayData::CourseSkill)] = Hash[params[underscore(CxbRank::PlayData::CourseSkill)]]
     private_page do |user|
       course_skill_edit_page(user) do |curr_skill, temp_skill|
         settings.views << SiteSettings.join_comrank_path('views/course_skill_edit')
@@ -85,7 +87,7 @@ class RevRankApp < CxbRank::AppBase
           begin
             temp_skill.calc!
             temp_skill.save!
-            skill_set = SkillSet.new(settings.site_mode, user)
+            skill_set = SkillSet.new(user)
             skill_set.calc!
             user.point = skill_set.total_point
             user.point_direct = false
@@ -111,7 +113,7 @@ class RevRankApp < CxbRank::AppBase
         course_skill_edit_page(user) do |curr_skill, temp_skill|
           begin
             temp_skill.destroy
-            skill_set = SkillSet.new(settings.site_mode, user)
+            skill_set = SkillSet.new(user)
             skill_set.calc!
             user.point = skill_set.total_point
             user.point_direct = false
@@ -154,10 +156,10 @@ class RevRankApp < CxbRank::AppBase
       begin
         case data[:type]
         when 'music'
-          item = CxbRank::Master::Music.create_by_request(data[:body])
+          item = Master::Music.create_by_request(data[:body])
           item.save!
         when 'course'
-          item = CxbRank::Master::Course.create_by_request(data[:body])
+          item = Master::Course.create_by_request(data[:body])
           item.save!
         else
           jsonx :status => 400, :message => "TypeError: #{data[:type]}"
@@ -176,7 +178,7 @@ class RevRankApp < CxbRank::AppBase
         when 'music'
           if (music = Master::Music.find_by(:lookup_key => data[:lookup_key])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
-          elsif (skill = Skill.create_by_request(session.user, music, data[:body])).nil?
+          elsif (skill = PlayData::MusicSkill.create_by_request(session.user, music, data[:body])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
             skill.save!
@@ -184,7 +186,7 @@ class RevRankApp < CxbRank::AppBase
         when 'course'
           if (course = Master::Course.find_by(:lookup_key => data[:lookup_key])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
-          elsif (skill = CourseSkill.create_by_request(session.user, course, data[:body])).nil?
+          elsif (skill = PlayData::CourseSkill.create_by_request(session.user, course, data[:body])).nil?
             jsonx :status => 400, :message => "Lookup_key [#{data[:lookup_key]}] is not found"
           else
             skill.save!
