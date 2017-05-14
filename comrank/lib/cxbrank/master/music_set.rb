@@ -37,7 +37,7 @@ module CxbRank
       end
 
       def load!
-        musics = Master::Music.find_actives(true)
+        musics = Master::Music.find_actives(false)
         if SiteSettings.cxb_mode?
           musics.each do |music|
             if music.deleted?

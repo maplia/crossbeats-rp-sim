@@ -1,3 +1,4 @@
+require 'date'
 require 'chronic'
 require 'cxbrank/const'
 
@@ -17,7 +18,7 @@ module CxbRank
     end
 
     def self.pivot_date
-      return @@pivot_date || Time.now
+      return @@pivot_date || Date.today
     end
 
     def self.pivot_time

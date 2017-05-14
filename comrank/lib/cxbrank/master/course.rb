@@ -1,14 +1,10 @@
-require 'csv'
 require 'cxbrank/const'
-require 'cxbrank/master/base'
-require 'cxbrank/master/format'
+require 'cxbrank/master/playable'
 require 'cxbrank/master/course_music'
 
 module CxbRank
   module Master
-    class Course < Base
-      include Comparable
-      include Master::Format
+    class Course < Playable
       has_many :course_musics
 
       def self.last_modified
@@ -62,36 +58,19 @@ module CxbRank
         return sort_key <=> other.sort_key
       end
 
-      CSV_COLUMNS = [:lookup_key, :text_id, :title, :sort_key, :level, :limited, :hidden, :deleted, :display, :added_at, :deleted_at]
-
-      def self.restore_from_csv(csv)
-        columns = CSV_COLUMNS.dup
-        columns.delete(:lookup_key)
-
-        csv.read.each do |row|
-          data = self.find_by(:lookup_key => row.field(:lookup_key))
-          unless data
-            data = self.new
-            data.lookup_key = row.field(:lookup_key)
-          end
-          columns.each do |column|
-            data.send("#{column}=".to_sym, row.field(column))
-          end
-          data.save!
-        end
-      end
-
-      def self.dump_to_csv(csv, omit_columns=[])
-        output_columns = CSV_COLUMNS - omit_columns
-        csv << output_columns
-
-        self.all.each do |course|
-          row = CSV::Row.new(output_columns, [])
-          output_columns.each do |column|
-            row[column] = course.send(column)
-          end
-          csv << row
-        end
+      def self.get_csv_columns
+        return [
+          {:name => :lookup_key, :unique => true, :dump => true},
+          {:name => :title,                       :dump => true},
+          {:name => :sort_key,                    :dump => true},
+          {:name => :level,                       :dump => true},
+          {:name => :limited,                     :dump => true},
+          {:name => :hidden,                      :dump => true},
+          {:name => :deleted,                     :dump => true},
+          {:name => :display,                     :dump => true},
+          {:name => :added_at,                    :dump => true},
+          {:name => :deleted_at,                  :dump => true},
+        ]
       end
     end
   end

@@ -1,4 +1,3 @@
-require 'csv'
 require 'forwardable'
 require 'cxbrank/const'
 require 'cxbrank/master/base'
@@ -9,8 +8,8 @@ module CxbRank
   module Master
     class CourseMusic < Base
       extend Forwardable
-      belongs_to :course
       belongs_to :music
+      belongs_to :course
 
       def_delegators :music, :title, :subtitle
 
@@ -46,35 +45,13 @@ module CxbRank
         return seq <=> other.seq
       end
 
-      CSV_COLUMNS = [:text_id, :seq, :music_text_id, :diff]
-
-      def self.restore_from_csv(csv)
-        csv.read.each do |row|
-          course_id = Course.find_by(:text_id => row.field(:text_id)).id
-          data = self.find_by(:course_id => course_id, :seq => row.field(:seq))
-          unless data
-            data = self.new
-            data.course_id = course_id
-            data.seq = row.field(:seq)
-          end
-          data.music_id = Music.find_by(:text_id => row.field(:music_text_id)).id
-          data.diff = row.field(:diff)
-          data.save!
-        end
-      end
-
-      def self.dump_to_csv(csv, omit_columns=[])
-        output_columns = CSV_COLUMNS - omit_columns
-        csv << output_columns
-
-        self.all.joins(:course).joins(:music).each do |course_music|
-          row = CSV::Row.new(output_columns, [])
-          row[:text_id] = course_music.course.text_id
-          row[:seq] = course_music.seq
-          row[:music_text_id] = course_music.music.text_id
-          row[:diff] = course_music.diff
-          csv << row
-        end
+      def self.get_csv_columns
+        return [
+          {:name => :text_id,       :unique => true, :dump => true, :foreign => Course},
+          {:name => :seq,           :unique => true, :dump => true},
+          {:name => :music_text_id,                  :dump => true, :foreign => Music},
+          {:name => :diff,                           :dump => true},
+        ]
       end
     end
   end

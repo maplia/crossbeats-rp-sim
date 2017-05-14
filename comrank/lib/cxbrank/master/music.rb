@@ -1,19 +1,17 @@
-require 'csv'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
-require 'cxbrank/master/base'
+require 'cxbrank/master/playable'
 require 'cxbrank/master/legacy_chart'
 require 'cxbrank/master/monthly'
-require 'cxbrank/master/format'
 
 module CxbRank
   module Master
-    class Music < Base
+    class Music < Playable
       include Comparable
-      include Master::Format
       has_one :monthly, -> {where 'span_s <= ? and span_e >= ?',
         SiteSettings.pivot_time, SiteSettings.pivot_time}
-      has_many :legacy_charts
+      has_one :legacy_chart, -> {where 'span_s <= ? and span_e >= ?',
+        SiteSettings.pivot_date, SiteSettings.pivot_date}
 
       def self.create_by_request(body)
         music = self.find_by(:lookup_key => body[:lookup_key])
@@ -69,49 +67,23 @@ module CxbRank
       end
 
       def level(diff)
-        if SiteSettings.pivot_date.present? and legacy_charts.present?
-          legacy_charts.each do |legacy_chart|
-            if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(SiteSettings.pivot_date)
-              return legacy_chart.level(diff)
-            end
-          end
-        end
-        return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
-      end
-
-      def legacy_level(diff)
-        if legacy_charts.blank?
-          return nil
+        if legacy_chart.present?
+          return legacy_chart.level(diff)
         else
-          return legacy_charts[0].level(diff)
+          return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
         end
       end
 
       def notes(diff)
-        if SiteSettings.pivot_date.present? and legacy_charts.present?
-          legacy_charts.each do |legacy_chart|
-            if (legacy_chart.span_s..(legacy_chart.span_e-1)).include?(SiteSettings.pivot_date)
-              return legacy_chart.notes(diff)
-            end
-          end
-        end
-        return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
-      end
-
-      def legacy_notes(diff)
-        if legacy_charts.blank?
-          return nil
+        if legacy_chart.present?
+          return legacy_chart.notes(diff)
         else
-          return legacy_charts[0].notes(diff)
+          return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
         end
       end
 
       def max_notes
-        note_data = []
-        SiteSettings.music_diffs.keys.each do |diff|
-          note_data << (notes(diff) || 0)
-        end
-        return note_data.max
+        return notes(max_diff)
       end
 
       def exist?(diff)
@@ -122,16 +94,8 @@ module CxbRank
         return exist
       end
 
-      def exist_legacy?(diff)
-        return legacy_level(diff).present?
-      end
-
       def monthly?
         return monthly.present?
-      end
-
-      def deleted?
-        return deleted && deleted_at <= (SiteSettings.pivot_date || Date.today)
       end
 
       def level_to_s(diff)
@@ -142,27 +106,11 @@ module CxbRank
         end
       end
 
-      def legacy_level_to_s(diff)
-        unless exist_legacy?(diff)
-          return '-'
-        else
-          return sprintf_for_level(legacy_level(diff))
-        end
-      end
-
       def notes_to_s(diff)
         unless exist?(diff)
           return '-'
         else
           return sprintf_for_notes(notes(diff))
-        end
-      end
-
-      def legacy_notes_to_s(diff)
-        unless exist_legacy?(diff)
-          return '-'
-        else
-          return sprintf_for_notes(legacy_notes(diff))
         end
       end
 
@@ -200,43 +148,35 @@ module CxbRank
         end
       end
 
-      CSV_COLUMNS = [:lookup_key, :text_id, :number, :title, :subtitle, :sort_key, :jacket]
-      MUSIC_DIFF_PREFIXES.keys.sort.each do |diff|
-        CSV_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_level".to_sym)
-        CSV_COLUMNS.push("#{CxbRank::MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym)
-      end
-      CSV_COLUMNS.push(:limited, :hidden, :deleted, :display, :unlock_unl, :added_at,)
-      CSV_COLUMNS.push(:appear, :category, :event, :hidden_type, :added_at_unl, :deleted_at)
-
-      def self.restore_from_csv(csv)
-        columns = CSV_COLUMNS.dup
-        columns.delete(:lookup_key)
-
-        csv.read.each do |row|
-          lookup_key = (row.field(:lookup_key) || row.field(:text_id))
-          data = self.find_by(:lookup_key => lookup_key)
-          unless data
-            data = self.new
-            data.lookup_key = lookup_key
-          end
-          columns.each do |column|
-            data.send("#{column}=".to_sym, row.field(column))
-          end
-          data.save!
+      def self.get_csv_columns
+        columns = [
+          {:name => :lookup_key, :unique => true, :dump => true},
+          {:name => :text_id,                     :dump => true},
+          {:name => :number,                      :dump => true},
+          {:name => :title,                       :dump => true},
+          {:name => :subtitle,                    :dump => true},
+          {:name => :sort_key,                    :dump => true},
+          {:name => :jacket,                      :dump => true},
+        ]
+        MUSIC_DIFF_PREFIXES.keys.each do |diff|
+          columns << {:name => "#{MUSIC_DIFF_PREFIXES[diff]}_level".to_sym, :dump => true}
+          columns << {:name => "#{MUSIC_DIFF_PREFIXES[diff]}_notes".to_sym, :dump => true}
         end
-      end
-
-      def self.dump_to_csv(csv, omit_columns=[])
-        output_columns = CSV_COLUMNS - omit_columns
-        csv << output_columns
-
-        self.all.each do |music|
-          row = CSV::Row.new(output_columns, [])
-          output_columns.each do |column|
-            row[column] = music.send(column)
-          end
-          csv << row
-        end
+        columns.concat [
+          {:name => :limited,                     :dump => true},
+          {:name => :hidden,                      :dump => true},
+          {:name => :hidden_type,                 :dump => true},
+          {:name => :deleted,                     :dump => true},
+          {:name => :display,                     :dump => true},
+          {:name => :unlock_unl,                  :dump => true},
+          {:name => :appear,                      :dump => true},
+          {:name => :category,                    :dump => true},
+          {:name => :event,                       :dump => true},
+          {:name => :added_at,                    :dump => true},
+          {:name => :added_at_unl,                :dump => true},
+          {:name => :deleted_at,                  :dump => true},
+        ]
+        return columns
       end
     end
   end

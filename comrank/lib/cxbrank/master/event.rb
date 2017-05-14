@@ -1,11 +1,10 @@
-require 'csv'
 require 'cxbrank/const'
-require 'cxbrank/master/base'
+require 'cxbrank/master/playable'
 require 'cxbrank/master/event_music'
 
 module CxbRank
   module Master
-    class Event < Base
+    class Event < Playable
       has_many :event_musics
 
       def self.last_modified(text_id=nil, section=nil)
@@ -41,36 +40,14 @@ module CxbRank
         return -(span_s <=> other.span_s)
       end
 
-      CSV_COLUMNS = [:text_id, :section, :title, :span_s, :span_e]
-
-      def self.restore_from_csv(csv)
-        columns = CSV_COLUMNS.dup
-        columns.delete(:text_id)
-
-        csv.read.each do |row|
-          data = self.find_by(:text_id => row.field(:text_id))
-          unless data
-            data = self.new
-            data.text_id = row.field(:text_id)
-          end
-          columns.each do |column|
-            data.send("#{column}=".to_sym, row.field(column))
-          end
-          data.save!
-        end
-      end
-
-      def self.dump_to_csv(csv, omit_columns=[])
-        output_columns = CSV_COLUMNS - omit_columns
-        csv << output_columns
-
-        self.all.each do |event|
-          row = CSV::Row.new(output_columns, [])
-          output_columns.each do |column|
-            row[column] = event.send(column)
-          end
-          csv << row
-        end
+      def self.get_csv_columns
+        return [
+          {:name => :text_id, :unique => true, :dump => true},
+          {:name => :section,                  :dump => true},
+          {:name => :title,                    :dump => true},
+          {:name => :span_s,                   :dump => true},
+          {:name => :span_e,                   :dump => true},
+        ]
       end
     end
   end
