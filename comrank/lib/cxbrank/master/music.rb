@@ -8,10 +8,14 @@ module CxbRank
   module Master
     class Music < Playable
       include Comparable
-      has_one :monthly, -> {where 'span_s <= ? and span_e >= ?',
-        SiteSettings.pivot_time, SiteSettings.pivot_time}
-      has_one :legacy_chart, -> {where 'span_s <= ? and span_e >= ?',
-        SiteSettings.pivot_date, SiteSettings.pivot_date}
+      has_one :monthly, -> do
+        where 'span_s <= ? and span_e >= ?', SiteSettings.pivot_time, SiteSettings.pivot_time
+      end
+      has_one :legacy_chart, ->(music) do
+        SiteSettings.past_date? ?
+          (where 'span_s <= ? and span_e >= ?', SiteSettings.pivot_date, SiteSettings.pivot_date) :
+          (where 'span_e = ?', LegacyChart.where(:music_id => music.id).maximum(:span_e))
+      end
 
       def self.create_by_request(body)
         music = self.find_by(:lookup_key => body[:lookup_key])
@@ -58,7 +62,7 @@ module CxbRank
 
       def self.find_recents_unl
         return self.public_method(:find_actives)
-          .super_method.call(true, 'added_at desc', :number, :sort_key)
+          .super_method.call(true, 'added_at_unl desc', :number, :sort_key)
           .where(:limited => false).where('added_at_unl >= ?', Date.today - (8*7))
       end
 
@@ -66,20 +70,36 @@ module CxbRank
         return subtitle ? "#{title} #{subtitle}" : title
       end
 
-      def level(diff)
-        if legacy_chart.present?
-          return legacy_chart.level(diff)
+      def level(diff, course=false)
+        if SiteSettings.past_date?
+          if !course and diff == MUSIC_DIFF_UNL and !exist?(diff)
+            return nil
+          else
+            return legacy_level(diff) || send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
+          end
         else
           return send("#{MUSIC_DIFF_PREFIXES[diff]}_level")
         end
       end
 
-      def notes(diff)
-        if legacy_chart.present?
-          return legacy_chart.notes(diff)
+      def legacy_level(diff)
+        return legacy_chart.try(:level, diff)
+      end
+
+      def notes(diff, course=false)
+        if SiteSettings.past_date?
+          if !course and diff == MUSIC_DIFF_UNL and !exist?(diff)
+            return nil
+          else
+            return legacy_notes(diff) || send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
+          end
         else
           return send("#{MUSIC_DIFF_PREFIXES[diff]}_notes")
         end
+      end
+
+      def legacy_notes(diff)
+        return legacy_chart.try(:notes, diff)
       end
 
       def max_notes
@@ -87,31 +107,31 @@ module CxbRank
       end
 
       def exist?(diff)
-        exist = level(diff).present?
         if diff == MUSIC_DIFF_UNL
-          exist &&= (SiteSettings.pivot_date >= (added_at_unl || SiteSettings.date_low_limit))
+          return added_at_unl.present? && SiteSettings.pivot_date >= added_at_unl
+        else
+          return level(diff).present?
         end
-        return exist
+      end
+
+      def exist_legacy?(diff)
+        return legacy_level(diff).present?
       end
 
       def monthly?
         return monthly.present?
       end
 
-      def level_to_s(diff)
-        unless exist?(diff)
-          return '-'
-        else
-          return sprintf_for_level(level(diff))
-        end
+      def level_to_s(diff, course=false)
+        return sprintf_for_level(level(diff, course))
       end
 
-      def notes_to_s(diff)
-        unless exist?(diff)
-          return '-'
-        else
-          return sprintf_for_notes(notes(diff))
-        end
+      def legacy_level_to_s(diff)
+        return sprintf_for_level(legacy_level(diff))
+      end
+
+      def notes_to_s(diff, course=false)
+        return sprintf_for_notes(notes(diff, course))
       end
 
       def max_diff
@@ -128,7 +148,6 @@ module CxbRank
           if exist?(diff) and !(diff == MUSIC_DIFF_UNL and unlock_unl == UNLOCK_UNL_TYPE_NEVER)
             hash[MUSIC_DIFF_PREFIXES[diff]] = {
               :level => level_to_s(diff), :notes => notes(diff),
-              :has_legacy => exist_legacy?(diff),
             }
           else
             hash[MUSIC_DIFF_PREFIXES[diff]] = {

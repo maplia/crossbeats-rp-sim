@@ -26,19 +26,19 @@ module CxbRank
       end
 
       def level
-        return music.level(diff)
+        return music.level(diff, true)
       end
 
       def level_to_s
-        return music.level_to_s(diff)
+        return music.level_to_s(diff, true)
       end
 
       def notes
-        return music.notes(diff)
+        return music.notes(diff, true)
       end
 
       def notes_to_s
-        return music.notes_to_s(diff)
+        return music.notes_to_s(diff, true)
       end
 
       def <=>(other)

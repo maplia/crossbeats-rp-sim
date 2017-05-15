@@ -25,6 +25,10 @@ module CxbRank
       return @@pivot_time || Chronic.parse(Time.now.strftime('%Y-%m-%d 27:59:59'))
     end
 
+    def self.past_date?
+      return @@pivot_date.present?
+    end
+
     def self.join_site_base(uri)
       return File.join(@@settings.site_base || '', uri)
     end

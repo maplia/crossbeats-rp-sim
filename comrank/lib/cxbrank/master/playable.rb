@@ -11,13 +11,12 @@ module CxbRank
       end
 
       def self.find_actives(without_deleted, *order)
-        actives = self.where(:display => true)
+        actives = self.where(:display => true).where('added_at <= ?', SiteSettings.pivot_date)
         if SiteSettings.cxb_mode?
           actives = actives.where(:limited => false)
         end
         if without_deleted
-          actives = actives.where('added_at <= ? and (deleted_at is null or deleted_at > ?)',
-            SiteSettings.pivot_date, SiteSettings.pivot_date)
+          actives = actives.where('deleted_at is null or deleted_at > ?', SiteSettings.pivot_date)
         end
         return actives.order(order)
       end
@@ -27,11 +26,11 @@ module CxbRank
       end
 
       def sprintf_for_level(level)
-        return level == 0 ? '&ndash;' : sprintf(SiteSettings.level_format, level)
+        return (level || 0) == 0 ? '&ndash;' : sprintf(SiteSettings.level_format, level)
       end
 
       def sprintf_for_notes(notes)
-        return notes == 0 ? '???' : sprintf('%d', notes)
+        return notes.blank? ? '&ndash;' : (notes == 0 ? '???' : notes.to_s)
       end
     end
   end
