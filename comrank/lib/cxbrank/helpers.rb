@@ -2,12 +2,22 @@ require 'uri'
 require 'rinku'
 require 'action_view/helpers'
 require 'cxbrank/const'
+require 'cxbrank/site_settings'
 
 module CxbRank
   module Helpers
     class << self
       def registered app
         app.helpers do
+          def expand_view_path(path)
+            path.gsub('#{comrank_path}', SiteSettings.join_comrank_path(''))
+          end
+
+          def add_template_paths(templates)
+            paths = templates.collect do |template| File.dirname(expand_view_path(template)) end
+            settings.views.concat paths
+          end
+
           def site_top?
             return request.path_info.blank? || (request.path_info == SITE_TOP_URI)
           end

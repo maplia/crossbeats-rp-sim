@@ -86,8 +86,8 @@ module CxbRank
     ],
     MUSIC_LIST_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/music_list.haml',
-      '#{comrank_path}/views/music_list/*.haml',
+      '#{comrank_path}/views/master/music_list.haml',
+      '#{comrank_path}/views/master/music_list/*.haml',
     ],
     SKILL_LIST_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
@@ -107,20 +107,20 @@ module CxbRank
     ],
     EVENT_SHEET_LIST_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/event_list.haml',
-      '#{comrank_path}/views/event_list/*.haml',
+      '#{comrank_path}/views/master/event_list.haml',
+      '#{comrank_path}/views/master/event_list/*.haml',
     ],
     EVENT_SHEET_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/event_sheet.haml',
+      '#{comrank_path}/views/master/event_sheet.haml',
     ],
     RANK_CALC_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/calc_rank.haml',
+      '#{comrank_path}/views/master/calc_rank.haml',
     ],
     RATE_CALC_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/calc_rate.haml',
+      '#{comrank_path}/views/master/calc_rate.haml',
     ],
     SCORE_RANK_URI => [
       '#{comrank_path}/views/layout.haml',

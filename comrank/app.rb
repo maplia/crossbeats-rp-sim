@@ -20,6 +20,7 @@ require 'cxbrank/master'
 require 'cxbrank/master/music_set'
 require 'cxbrank/user'
 require 'cxbrank/skill'
+require 'cxbrank/master/app'
 
 module CxbRank
   class AppBase < Sinatra::Base
@@ -29,6 +30,7 @@ module CxbRank
     register Sinatra::MultiRoute
     register SinatraMore::MarkupPlugin
     register CxbRank::Helpers
+    register CxbRank::Master
 
     config_file File.expand_path(CONFIG_FILE, Dir.pwd)
 
@@ -183,34 +185,6 @@ module CxbRank
     get USAGE_URI do
       page_last_modified PAGE_TEMPLATE_FILES[USAGE_URI]
       haml :usage, :layout => true
-    end
-
-    get "#{MUSIC_LIST_VIEW_URI}/?:date_string?" do
-      settings.views << SiteSettings.join_comrank_path('views/music_list')
-      past_date_page(params[:date_string]) do |date|
-        music_set = Master::MusicSet.new
-        music_set.load!
-        fixed_title = PAGE_TITLES[MUSIC_LIST_VIEW_URI]
-        if date
-          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
-        end
-        data_mtime = music_set.last_modified
-        page_last_modified PAGE_TEMPLATE_FILES[MUSIC_LIST_VIEW_URI], data_mtime
-        haml :music_list, :layout => true,
-          :locals => {:music_set => music_set, :fixed_title => fixed_title}
-      end
-    end
-
-    get '/api/music/:music_text_id' do
-      last_modified Master::Music.last_modified
-      music = Master::Music.find_by(:text_id => params[:music_text_id])
-      jsonx((music ? music.to_hash : {}), params[:callback])
-    end
-
-    get '/api/musics' do
-      last_modified Master::Music.last_modified
-      music_hashes = Master::Music.find_actives(true).to_a.map! do |music| music.to_hash end
-      jsonx music_hashes, params[:callback]
     end
 
     get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
@@ -483,59 +457,6 @@ module CxbRank
         skills = Skill.get_rank_data(music, diff)
         haml :rank_score_detail, :layout => true, :locals => {
           :music => music, :diff => diff, :skills => skills, :fixed_title => fixed_title}
-      end
-    end
-
-    get RANK_CALC_URI do
-      musics = Master::Music.find_actives(true)
-      music_hashes = []
-      musics.sort.each do |music|
-        music_hashes << music.to_hash
-      end
-      diffs = []
-      SiteSettings.music_diffs.keys.sort.each do |diff|
-        diffs << MUSIC_DIFF_PREFIXES[diff]
-      end
-      data_mtime = Master::Music.last_modified
-      page_last_modified PAGE_TEMPLATE_FILES[RANK_CALC_URI], data_mtime
-      haml :calc_rank, :layout => true, :locals => {
-        :data => music_hashes, :diffs => diffs}
-    end
-
-    get RATE_CALC_URI do
-      musics = Master::Music.find_actives(true)
-      music_hashes = []
-      musics.sort.each do |music|
-        music_hashes << music.to_hash
-      end
-      data_mtime = Master::Music.last_modified
-      page_last_modified PAGE_TEMPLATE_FILES[RATE_CALC_URI], data_mtime
-      haml :calc_rate, :layout => true, :locals => {
-        :data => music_hashes, :diffs => SiteSettings.music_diffs}
-    end
-
-    get EVENT_SHEET_LIST_URI do
-      settings.views << SiteSettings.join_comrank_path('views/event_list')
-      events = Master::Event.all.order('span_s desc')
-      fixed_title = "#{PAGE_TITLES[EVENT_SHEET_LIST_URI]}一覧"
-      data_mtime = Master::Event.last_modified
-      page_last_modified PAGE_TEMPLATE_FILES[EVENT_SHEET_LIST_URI], data_mtime
-      haml :event_list, :layout => true, :locals => {:events => events, :fixed_title => fixed_title}
-    end
-
-    get "#{EVENT_SHEET_VIEW_URI}/:event_text_id?/?:section?" do
-      if params[:event_text_id].blank?
-        haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_IS_UNDECIDED}
-      elsif !(events = Master::Event.where(:text_id => params[:event_text_id])).exists?
-        haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_ID_NOT_EXIST}
-      elsif (event = events.find_by(:section => (params[:section] || 0))).nil?
-        haml :error, :layout => true, :locals => {:error_no => ERROR_EVENT_SECTION_NOT_EXIST}
-      else
-        request.env['X_MOBILE_DEVICE'] = nil
-        fixed_title = "#{PAGE_TITLES[EVENT_SHEET_VIEW_URI]} [#{event.title}]"
-        data_mtime = event.updated_at
-        page_last_modified PAGE_TEMPLATE_FILES[EVENT_SHEET_VIEW_URI], data_mtime
-        haml :event_sheet, :layout => true, :locals => {:event => event, :fixed_title => fixed_title}
       end
     end
   end
