@@ -420,7 +420,7 @@ module CxbRank
                 user.save!
               end
               session[:music_text_id] = nil
-              session[underscore(CxbRank::Skill)] = nil
+              session[underscore(CxbRank::PlayData::MusicSkill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
             rescue
                haml :error, :layout => true,
@@ -446,7 +446,7 @@ module CxbRank
               user.point_updated_at = Time.now
               user.save!
               session[:music_text_id] = nil
-              session[underscore(CxbRank::Skill)] = nil
+              session[underscore(CxbRank::PlayData::MusicSkill)] = nil
               redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
             rescue
               haml :error, :layout => true,

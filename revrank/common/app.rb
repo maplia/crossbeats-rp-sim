@@ -120,6 +120,7 @@ class RevRankApp < CxbRank::AppBase
             user.point_updated_at = Time.now
             user.save!
             session[:course_text_id] = nil
+            session[underscore(CxbRank::PlayData::CourseSkill)] = nil
             redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
           rescue
             haml :error, :layout => true,
