@@ -398,7 +398,7 @@ module CxbRank
       end
 
       def unlocked_unl?
-        if mas_locked || unl_locked
+        if mas_locked
           return false
         else
           case music.unlock_unl
