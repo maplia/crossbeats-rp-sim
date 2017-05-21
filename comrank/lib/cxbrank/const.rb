@@ -94,6 +94,16 @@ module CxbRank
       '#{comrank_path}/views/skill_list.haml',
       '#{comrank_path}/views/skill_list/*.haml',
     ],
+    SKILL_ITEM_EDIT_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/music_skill_edit.haml',
+      '#{comrank_path}/views/music_skill_edit/*.haml',
+    ],
+    SKILL_COURSE_ITEM_EDIT_URI => [
+      '#{comrank_path}/views/layout.haml',
+      '#{comrank_path}/views/playdata/course_skill_edit.haml',
+      '#{comrank_path}/views/playdata/course_skill_edit/*.haml',
+    ],
     CLEAR_LIST_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
       '#{comrank_path}/views/skill_chart.haml',

@@ -21,6 +21,7 @@ require 'cxbrank/master/music_set'
 require 'cxbrank/user'
 require 'cxbrank/skill'
 require 'cxbrank/master/app'
+require 'cxbrank/playdata/app'
 
 module CxbRank
   class AppBase < Sinatra::Base
@@ -31,6 +32,7 @@ module CxbRank
     register SinatraMore::MarkupPlugin
     register CxbRank::Helpers
     register CxbRank::Master
+    register CxbRank::PlayData
 
     config_file File.expand_path(CONFIG_FILE, Dir.pwd)
 

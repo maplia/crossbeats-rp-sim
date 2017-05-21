@@ -11,27 +11,6 @@ require 'cxbrank/bookmarklet'
 class RevRankApp < CxbRank::AppBase
   include CxbRank
   helpers do
-    def course_skill_edit_page(user, &block)
-      if params[:course_text_id]
-        session[:course_text_id] = params[:course_text_id]
-      end
-      if session[:course_text_id].blank?
-        haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_IS_UNDECIDED}
-      elsif (course = Master::Course.find_by(:text_id => session[:course_text_id])).nil?
-        haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_NOT_EXIST}
-      else
-        curr_skill = PlayData::CourseSkill.find_by_user_and_course(user, course)
-        temp_skill = PlayData::CourseSkill.find_by_user_and_course(user, course)
-        if params[:course_text_id]
-          session[underscore(CxbRank::PlayData::CourseSkill)] = nil
-        end
-        if session[underscore(CxbRank::PlayData::CourseSkill)].present?
-          temp_skill.update_by_params!(session[underscore(CxbRank::PlayData::CourseSkill)])
-        end
-        yield curr_skill, temp_skill
-      end
-    end
-
     def valid_referrer?
       return (request.referrer || '').include?(settings.mydata_host)
     end
@@ -51,89 +30,6 @@ class RevRankApp < CxbRank::AppBase
         rescue
           jsonx :status => 400, :message => $!.message
         end
-      end
-    end
-  end
-
-  get "#{SKILL_COURSE_ITEM_EDIT_URI}/?:course_text_id?" do
-    private_page do |user|
-      course_skill_edit_page(user) do |curr_skill, temp_skill|
-        settings.views << SiteSettings.join_comrank_path('views/course_skill_edit')
-        fixed_title = "#{PAGE_TITLES[SKILL_COURSE_ITEM_EDIT_URI]} [#{curr_skill.course.title}]"
-        haml :course_skill_edit, :layout => true, :locals => {
-          :user => user, :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title}
-      end
-    end
-  end
-
-  post SKILL_COURSE_ITEM_EDIT_URI do
-    session[underscore(CxbRank::PlayData::CourseSkill)] = Hash[params[underscore(CxbRank::PlayData::CourseSkill)]]
-    private_page do |user|
-      course_skill_edit_page(user) do |curr_skill, temp_skill|
-        settings.views << SiteSettings.join_comrank_path('views/course_skill_edit')
-        unless temp_skill.valid?
-          haml :error, :layout => true,
-            :locals => {:errors => temp_skill.errors, :back_uri => request.path_info}
-        else
-          temp_skill.calc!
-          method = (params[:update].present? ? 'put' : 'delete')
-          fixed_title = "#{PAGE_TITLES[SKILL_COURSE_ITEM_EDIT_URI]} [#{curr_skill.course.title}]"
-          haml :course_skill_edit_conf, :layout => true, :locals => {
-            :user => user, :curr_skill => curr_skill, :temp_skill => temp_skill, :fixed_title => fixed_title, :method => method}
-        end
-      end
-    end
-  end
-
-  put SKILL_COURSE_ITEM_EDIT_URI do
-    private_page do |user|
-      if params['y'].present?
-        course_skill_edit_page(user) do |curr_skill, temp_skill|
-          begin
-            temp_skill.calc!
-            temp_skill.save!
-            skill_set = SkillSet.new(user)
-            skill_set.calc!
-            user.point = skill_set.total_point
-            user.point_direct = false
-            user.point_updated_at = Time.now
-            user.save!
-            session[:course_text_id] = nil
-            session[underscore(CxbRank::PlayData::CourseSkill)] = nil
-            redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
-          rescue
-            haml :error, :layout => true,
-              :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
-          end
-        end
-      else
-        redirect SiteSettings.join_site_base(SKILL_COURSE_ITEM_EDIT_URI)
-      end
-    end
-  end
-
-  delete SKILL_COURSE_ITEM_EDIT_URI do
-    private_page do |user|
-      if params['y'].present?
-        course_skill_edit_page(user) do |curr_skill, temp_skill|
-          begin
-            temp_skill.destroy
-            skill_set = SkillSet.new(user)
-            skill_set.calc!
-            user.point = skill_set.total_point
-            user.point_direct = false
-            user.point_updated_at = Time.now
-            user.save!
-            session[:course_text_id] = nil
-            session[underscore(CxbRank::PlayData::CourseSkill)] = nil
-            redirect SiteSettings.join_site_base(SKILL_LIST_EDIT_URI)
-          rescue
-            haml :error, :layout => true,
-              :locals => {:error_no => ERROR_DATABASE_SAVE_FAILED, :back_uri => SiteSettings.join_site_base(request.path_info)}
-          end
-        end
-      else
-        redirect SiteSettings.join_site_base(SKILL_COURSE_ITEM_EDIT_URI)
       end
     end
   end
