@@ -22,7 +22,12 @@ class RevRankApp < CxbRank::AppBase
       else
         curr_skill = PlayData::CourseSkill.find_by_user_and_course(user, course)
         temp_skill = PlayData::CourseSkill.find_by_user_and_course(user, course)
-        temp_skill.update_by_params!(session[underscore(CxbRank::PlayData::CourseSkill)])
+        if params[:course_text_id]
+          session[underscore(CxbRank::PlayData::CourseSkill)] = nil
+        end
+        if session[underscore(CxbRank::PlayData::CourseSkill)].present?
+          temp_skill.update_by_params!(session[underscore(CxbRank::PlayData::CourseSkill)])
+        end
         yield curr_skill, temp_skill
       end
     end

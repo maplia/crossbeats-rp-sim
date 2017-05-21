@@ -152,6 +152,9 @@ module CxbRank
         else
           curr_skill = PlayData::MusicSkill.find_by_user_and_music(user, music)
           temp_skill = PlayData::MusicSkill.find_by_user_and_music(user, music)
+          if params[:music_text_id]
+            session[underscore(CxbRank::PlayData::MusicSkill)] = nil
+          end
           if session[underscore(CxbRank::PlayData::MusicSkill)].present?
             temp_skill.update_by_params!(session[underscore(CxbRank::PlayData::MusicSkill)])
           end
