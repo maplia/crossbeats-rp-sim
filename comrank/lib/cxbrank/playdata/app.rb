@@ -1,6 +1,7 @@
 require 'cxbrank/const'
 require 'cxbrank/master/music'
 require 'cxbrank/master/course'
+require 'cxbrank/skill'
 require 'cxbrank/playdata/music_skill'
 require 'cxbrank/playdata/course_skill'
 
@@ -9,6 +10,21 @@ module CxbRank
     class << self
       def registered app
         app.helpers do
+          def skill_list_page(user, edit, skill_options={})
+            skill_set = SkillSet.new(user, skill_options)
+            skill_set.load!
+            fixed_title = "#{user.name}さんの#{PAGE_TITLES[SKILL_LIST_VIEW_URI]}"
+            add_template_paths PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI]
+            unless edit
+              data_mtime = skill_set.last_modified
+              page_last_modified PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI], data_mtime
+            end
+            haml :skill_list, :layout => true, :locals => {
+              :user => user, :skill_set => skill_set,
+              :edit => edit, :ignore_locked => skill_options[:ignore_locked],
+              :fixed_title => fixed_title}
+          end
+
           def music_skill_edit_page(user, &block)
             if params[:text_id]
               session[:text_id] = params[:text_id]
@@ -54,6 +70,36 @@ module CxbRank
           def clear_session_temp_skill(temp_skill)
             session[:text_id] = nil
             session[underscore(temp_skill.class)] = nil
+          end
+        end
+
+        app.get SKILL_LIST_EDIT_URI do
+          private_page do |user|
+            skill_list_page user, true, :fill_empty => true
+          end
+        end
+
+        app.get "#{SKILL_LIST_VIEW_URI}/?:user_id?" do
+          public_user_page do |user|
+            skill_list_page user, false
+          end
+        end
+
+        app.get "#{SKILL_LIST_VIEW_IGLOCK_URI}/?:user_id?" do
+          public_user_page do |user|
+            skill_list_page user, false, :ignore_locked => true
+          end
+        end
+
+        app.get "#{CLEAR_LIST_VIEW_URI}/?:user_id?" do
+          public_user_page do |user|
+            skill_chart = Chart.load(user)
+            fixed_title = "#{user.name}さんの#{PAGE_TITLES[CLEAR_LIST_VIEW_URI]}"
+            data_mtime = skill_chart.last_modified
+            add_template_paths PAGE_TEMPLATE_FILES[CLEAR_LIST_VIEW_URI]
+            page_last_modified PAGE_TEMPLATE_FILES[CLEAR_LIST_VIEW_URI], data_mtime
+            haml :skill_chart, :layout => true, :locals => {
+              :user => user, :skill_chart => skill_chart, :fixed_title => fixed_title}
           end
         end
 
@@ -232,6 +278,23 @@ module CxbRank
             else
               redirect SiteSettings.join_site_base(SKILL_COURSE_ITEM_EDIT_URI)
             end
+          end
+        end
+
+        app.get "#{MAX_SKILL_VIEW_URI}/?:date?" do
+          past_date_page(params[:date]) do |date|
+            skill_set = SkillMaxSet.new
+            skill_set.load!
+            fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
+            if date
+              fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
+            end
+            data_mtime = skill_set.last_modified
+            add_template_paths PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI]
+            page_last_modified PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI], data_mtime
+            haml :skill_list, :layout => true, :locals => {
+              :user => nil, :skill_set => skill_set, :edit => false,
+              :ignore_locked => false, :fixed_title => fixed_title}
           end
         end
       end

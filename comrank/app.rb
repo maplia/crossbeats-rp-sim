@@ -128,20 +128,6 @@ module CxbRank
           yield user
         end
       end
-
-      def skill_list_page(user, edit, skill_options={})
-        settings.views << SiteSettings.join_comrank_path('views/skill_list')
-        skill_set = SkillSet.new(user, skill_options)
-        skill_set.load!
-        fixed_title = "#{user.name}さんの#{PAGE_TITLES[SKILL_LIST_VIEW_URI]}"
-        unless edit
-          data_mtime = skill_set.last_modified
-          page_last_modified PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI], data_mtime
-        end
-        haml :skill_list, :layout => true, :locals => {
-          :user => user, :skill_set => skill_set,
-          :edit => edit, :ignore_locked => skill_options[:ignore_locked], :fixed_title => fixed_title}
-      end
     end
 
     get '/googlee47e6c106efd57d5.html' do
@@ -169,23 +155,6 @@ module CxbRank
     get USAGE_URI do
       page_last_modified PAGE_TEMPLATE_FILES[USAGE_URI]
       haml :usage, :layout => true
-    end
-
-    get "#{MAX_SKILL_VIEW_URI}/?:date_string?" do
-      settings.views << SiteSettings.join_comrank_path('views/skill_list')
-      past_date_page(params[:date_string]) do |date|
-        skill_set = SkillMaxSet.new
-        skill_set.load!
-        fixed_title = PAGE_TITLES[MAX_SKILL_VIEW_URI]
-        if date
-          fixed_title << " [#{date.strftime('%Y-%m-%d')}]"
-        end
-        data_mtime = skill_set.last_modified
-        page_last_modified PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI], data_mtime
-        haml :skill_list, :layout => true, :locals => {
-          :user => nil, :skill_set => skill_set, :edit => false,
-          :ignore_locked => false, :fixed_title => fixed_title}
-      end
     end
 
     get USER_ADD_URI do
@@ -297,37 +266,6 @@ module CxbRank
         end
       else
         redirect SiteSettings.join_site_base(USER_EDIT_URI)
-      end
-    end
-
-    get SKILL_LIST_EDIT_URI do
-      private_page do |user|
-        skill_list_page user, true, :fill_empty => true
-      end
-    end
-
-    get "#{SKILL_LIST_VIEW_URI}/?:user_id?" do
-      public_user_page do |user|
-        skill_list_page user, false
-      end
-    end
-
-    get "#{SKILL_LIST_VIEW_IGLOCK_URI}/?:user_id?" do
-      public_user_page do |user|
-        skill_list_page user, false, :ignore_locked => true
-      end
-    end
-
-    get "#{CLEAR_LIST_VIEW_URI}/?:user_id?" do
-      public_user_page do |user|
-        settings.views << SiteSettings.join_comrank_path('views/skill_chart')
-        settings.views << SiteSettings.join_comrank_path('views/skill_list')
-        skill_chart = PlayData::Chart.load(user)
-        fixed_title = "#{user.name}さんの#{PAGE_TITLES[CLEAR_LIST_VIEW_URI]}"
-        data_mtime = skill_chart.last_modified
-        page_last_modified PAGE_TEMPLATE_FILES[CLEAR_LIST_VIEW_URI], data_mtime
-        haml :skill_chart, :layout => true, :locals => {
-          :user => user, :skill_chart => skill_chart, :fixed_title => fixed_title}
       end
     end
 

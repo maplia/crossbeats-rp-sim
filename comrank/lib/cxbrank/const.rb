@@ -91,13 +91,13 @@ module CxbRank
     ],
     SKILL_LIST_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/skill_list.haml',
-      '#{comrank_path}/views/skill_list/*.haml',
+      '#{comrank_path}/views/playdata/skill_list.haml',
+      '#{comrank_path}/views/playdata/skill_list/*.haml',
     ],
     SKILL_ITEM_EDIT_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/music_skill_edit.haml',
-      '#{comrank_path}/views/music_skill_edit/*.haml',
+      '#{comrank_path}/views/playdata/music_skill_edit.haml',
+      '#{comrank_path}/views/playdata/music_skill_edit/*.haml',
     ],
     SKILL_COURSE_ITEM_EDIT_URI => [
       '#{comrank_path}/views/layout.haml',
@@ -106,9 +106,9 @@ module CxbRank
     ],
     CLEAR_LIST_VIEW_URI => [
       '#{comrank_path}/views/layout.haml',
-      '#{comrank_path}/views/skill_chart.haml',
-      '#{comrank_path}/views/skill_chart/*.haml',
-      '#{comrank_path}/views/skill_list/user.haml',
+      '#{comrank_path}/views/playdata/skill_chart.haml',
+      '#{comrank_path}/views/playdata/skill_chart/*.haml',
+      '#{comrank_path}/views/playdata/skill_list/user.haml',
     ],
     USER_LIST_URI => [
       '#{comrank_path}/views/layout.haml',
