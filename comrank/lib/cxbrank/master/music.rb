@@ -66,6 +66,11 @@ module CxbRank
           .where(:limited => false).where('added_at_unl >= ?', Date.today - (8*7))
       end
 
+      def self.find_monthlies
+        return self.public_method(:find_actives).order('monthlies.seq')
+          .reject! do |music| music.monthly? end
+      end
+
       def full_title
         return subtitle ? "#{title} #{subtitle}" : title
       end

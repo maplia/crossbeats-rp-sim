@@ -28,11 +28,14 @@
       %dl
         %dt これは何ですか?
         %dd
-          %p #{link_to 'カプコン', 'http://www.capcom.co.jp/'}から配信されている「#{link_to 'CROSS&times;BEATS（クロスビーツ）', 'http://www.capcom.co.jp/smartphone/crossbeats/'}」のランクポイント管理Webアプリケーションです。
-          %p こういう表が作れるということで#{link_to '作者のもの', '/view/00002'}をさらしてみます。
-          %p 登録はご自由にどうぞ。
-          %p 何か不都合があった場合などの問い合わせは、Twitterのアカウント #{link_to '@maplia', 'https://twitter.com/maplia'}で受けつけますので、お気軽にご連絡いただければと思います。
+          %p #{link_to 'カプコン', 'http://www.capcom.co.jp/'}から配信されている「#{link_to 'CROSS&times;BEATS（クロスビーツ）', 'http://www.capcom.co.jp/smartphone/crossbeats/'}」のランクポイント管理Webアプリケーションです
+          %p こういう表が作れるということで#{link_to '作者のもの', '/view/00002'}をさらしてみます
+          %p 登録はご自由にどうぞ
+          %del
+            %p 何か不都合があった場合などの問い合わせは、Twitterのアカウント #{link_to '@maplia', 'https://twitter.com/maplia'}で受けつけますので、お気軽にご連絡いただければと思います
+          %p maplia.jp関連の問い合わせ先窓口を独立させたので、 #{link_to '@maplia_jp', 'https://twitter.com/maplia_jp'} のほうへお願いします
   = haml :new_music
+  = haml :monthly_music
   %div.unit
     %h2 最新の運営情報
     %div.subunit
