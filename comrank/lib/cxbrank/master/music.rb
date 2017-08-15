@@ -67,8 +67,9 @@ module CxbRank
       end
 
       def self.find_monthlies
-        return self.public_method(:find_actives).order('monthlies.seq')
-          .reject! do |music| music.monthly? end
+        return self.find_actives(true)
+          .to_a.reject! do |music| not music.monthly? end
+          .sort! do |a, b| a.monthly.id <=> b.monthly.id end
       end
 
       def full_title
@@ -174,8 +175,8 @@ module CxbRank
 
       def self.get_csv_columns
         columns = [
-          {:name => :lookup_key, :unique => true, :dump => true},
           {:name => :text_id,                     :dump => true},
+          {:name => :lookup_key, :unique => true, :dump => true},
           {:name => :number,                      :dump => true},
           {:name => :title,                       :dump => true},
           {:name => :subtitle,                    :dump => true},

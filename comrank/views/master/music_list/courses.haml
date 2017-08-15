@@ -1,6 +1,6 @@
 - if courses.present?
   %div.unit
-    %h2= type_name
+    %h2= (defined?(type) ? CxbRank::SiteSettings.music_types[type] : CxbRank::REV_CATEGORIES[category])
     %div.subunit
       %table.music_list
         - unless mobile?

@@ -1,6 +1,6 @@
 - if musics.present?
   %div.unit
-    %h2= type_name
+    %h2= (defined?(type) ? CxbRank::SiteSettings.music_types[type] : CxbRank::REV_CATEGORIES[category])
     %div.subunit
       %table.music_list
         - unless mobile?
@@ -18,6 +18,8 @@
                 %th{:class => "#{diff_class} level"} Lv
                 %th{:class => "#{diff_class} notes"} Notes
         %tbody
+          - if CxbRank::SiteSettings.cxb_mode? and type == CxbRank::MUSIC_TYPE_SPECIAL
+            - musics = musics.to_a.sort do |a, b| a.monthly.id <=> b.monthly.id end
           - if CxbRank::SiteSettings.rev_sunrise_mode?
             - unless mobile?
               - colspan = 1 + CxbRank::SiteSettings.music_diffs.size * 2

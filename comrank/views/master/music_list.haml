@@ -19,9 +19,9 @@
     ）
 - CxbRank::SiteSettings.music_types.keys.sort.each do |type|
   - if [CxbRank::MUSIC_TYPE_REV_COURSE, CxbRank::MUSIC_TYPE_REV_COURSE_LIMITED].include?(type)
-    = haml :courses, :locals => {:courses => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}
+    = haml :courses, :locals => {:courses => music_set[type], :type => type}
   - elsif !CxbRank::SiteSettings.rev_rev1st_mode? and [CxbRank::MUSIC_TYPE_REV_SINGLE].include?(type)
     - CxbRank::REV_CATEGORIES.keys.sort.each do |category|
-      = haml :musics, :locals => {:musics => music_set[type][category], :type_name => CxbRank::REV_CATEGORIES[category]}
+      = haml :musics, :locals => {:musics => music_set[type][category], :category => category}
   - else
-    = haml :musics, :locals => {:musics => music_set[type], :type_name => CxbRank::SiteSettings.music_types[type]}
+    = haml :musics, :locals => {:musics => music_set[type], :type => type}

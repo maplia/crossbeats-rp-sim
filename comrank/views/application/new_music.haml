@@ -33,6 +33,31 @@
         %ul
           - musics.each do |music|
             %li= "#{music.full_title} (#{music.added_at.strftime('%m/%d')})"
+- if CxbRank::SiteSettings.cxb_mode?
+  - musics = CxbRank::Master::Music.find_monthlies
+  %div.unit
+    %h2= musics.first.monthly.span_s.strftime('%Y年%m月のRPボーナス曲')
+    %div.subunit
+      - unless mobile?
+        %table.music_list
+          %thead
+            %tr
+              %th #
+              %th タイトル
+              - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+                %th{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= CxbRank::SiteSettings.music_diffs[diff]
+          %tbody
+            - musics.each do |music|
+              %tr
+                %th= music.number
+                %td.title
+                  = haml :music_title, :locals => {:music => music}
+                - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
+                  %td{:class => "level #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= music.level_to_s(diff)
+      - else
+        %ul
+          - musics.each do |music|
+            %li= "#{music.full_title}"
 - if CxbRank::SiteSettings.rev_mode? and !CxbRank::SiteSettings.rev_rev1st_mode?
   %div.unit
     %h2 最近の登録UNLIMITED譜面

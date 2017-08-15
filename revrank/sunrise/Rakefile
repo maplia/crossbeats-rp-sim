@@ -13,7 +13,7 @@ ActiveRecord::Base.configurations = YAML.load_file(CxbRank::DATABASE_FILE)
 ActiveRecord::Base.establish_connection(YAML.load_file(CxbRank::CONFIG_FILE)['environment'].to_sym)
 ActiveRecord::Base.default_timezone = :local
 
-namespace :revrank do
+namespace :cxbrank do
   desc 'initialize music master'
   task :init_master do
     CSV.open('db/master/musics.tsv', 'r', CxbRank::CSV_OPTIONS) do |csv|
