@@ -142,4 +142,30 @@
     jQuery('.ui-dialog-titlebar-close').hide();
     return deferred.promise();
   };
+  // 処理中ブロックダイアログ
+  jQuery.block = function (message, options, proc) {
+    options = options || {};
+    jQuery.block.self = this;
+    jQuery.block.self.proc = proc;
+    var deferred = jQuery.Deferred();
+    if (jQuery('body').find('#block-dialog').length == 0) {
+      jQuery('body').append('<div id="block-dialog"><p id="block-indicator"></p><p id="block-message"></p></div>');
+      jQuery('#block-indicator').append('<img src="https://marines.sakura.ne.jp/script/gif-load.gif" width="262" height="30" alt=""/>');
+    }
+    jQuery('#block-dialog').dialog({
+      title: options.title || '', autoOpen: false, modal: true,
+      width: options.width || 'auto', height: options.height || 'auto',
+      draggable: false, resizable: false, closeOnEscape: false
+    });
+    deferred.then(jQuery.block.self.proc(deferred, jQuery('#block-dialog')));
+    jQuery('.ui-dialog').css('z-index', '30000');
+    jQuery('.ui-widget-overlay').css('z-index', '25000');
+    jQuery('.ui-dialog-title').css('font-size', options.font_size);
+    jQuery('.ui-button-text').css('font-size', options.font_size);
+    jQuery('#block-message').css('font-size', options.font_size);
+    jQuery('#block-message').text(message);
+    jQuery('#block-dialog').dialog('open');
+    jQuery('.ui-dialog-titlebar-close').hide();
+    return deferred.promise();
+  };
 })(jQuery);
