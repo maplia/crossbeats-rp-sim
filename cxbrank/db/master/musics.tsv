@@ -254,4 +254,9 @@ thisishdm	252	THIS IS HDM		this is hdm				23.0	142	37.0	278	60.0	476			false	fal
 pyromania	253	Pyromania		pyromania				22.0	90	42.0	276	70.0	460			false	false	-1	false	true		2017-07-15	
 sayonarasaishuressha	254	さよなら最終列車		サヨナラサイシュウレッシャ				20.0	115	34.0	248	53.0	334			false	false	-1	false	true		2017-07-15	
 yukanitout	255	勇敢 i tout		ユウカン i tout				22.0	229	33.0	348	78.0	574			false	true	-1	false	true	第47回ランダムセレクト祭	2017-07-27	
-silburysign	256	Silbury Sign		silbury sign				20	88	35	221	54	311			FALSE	FALSE	-1	FALSE	TRUE		2017/8/10
+silburysign	256	Silbury Sign		silbury sign				20.0	88	35.0	221	54.0	311			false	false	-1	false	true		2017-08-10	
+miraihenoprelude	257	未来へのプレリュード		ミライヘノプレリュード				21	156	35	219	66	473			FALSE	TRUE	-1	FALSE	TRUE	Headphone-Tokyo**特集	2017/8/21	
+counterstop	258	カウンターストップ		カウンターストップ				29	234	34	337	71	485			FALSE	TRUE	-1	FALSE	TRUE	Headphone-Tokyo**特集	2017/8/21	
+silverd	259	Silverd		silverd				28	243	40	389	69	615			FALSE	TRUE	-1	FALSE	TRUE	第48回ランダムセレクト祭	2017/8/24
+orbitalvelocity	260	Orbital velocity		orbital velocity				20	145	38	279	62	471			FALSE	FALSE	-1	FALSE	TRUE		2017/9/1
+regenerationray	261	Regeneration ray		regeneration ray				19	122	38	186	56	305			FALSE	FALSE	-1	FALSE	TRUE		2017/9/1

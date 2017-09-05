@@ -1,3 +1,4 @@
+require 'nokogiri'
 require 'cxbrank/const'
 require 'cxbrank/site_settings'
 require 'cxbrank/master/playable'
@@ -44,6 +45,14 @@ module CxbRank
           music.added_at_unl = Date.today
         end
         return music
+      end
+
+      def self.find_by_search_key(search_key)
+        music = nil
+        if SiteSettings.cxb_mode? and search_key.to_s =~ /\A[1-9][0-9]*\z/
+          music = self.where(:number => search_key.to_i).first
+        end
+        return music || self.where(:text_id => search_key).first
       end
 
       def self.find_actives(without_deleted)
@@ -147,7 +156,9 @@ module CxbRank
       def to_hash
         hash = {
           :text_id => text_id, :number => number,
-          :title => title, :subtitle => subtitle, :full_title => full_title,
+          :title => Nokogiri::HTML.parse(title).text,
+          :subtitle => (subtitle ? Nokogiri::HTML.parse(subtitle).text : nil),
+          :full_title => Nokogiri::HTML.parse(full_title).text,
           :monthly => monthly?, :limited => limited, :deleted => deleted
         }
         MUSIC_DIFF_PREFIXES.keys.each do |diff|

@@ -36,7 +36,7 @@
 - if CxbRank::SiteSettings.cxb_mode?
   - musics = CxbRank::Master::Music.find_monthlies
   %div.unit
-    %h2= musics.first.monthly.span_s.strftime('%Y年%m月のRPボーナス曲')
+    %h2= musics.first.monthly.span_s.strftime('%Y年%-m月のRPボーナス曲')
     %div.subunit
       - unless mobile?
         %table.music_list

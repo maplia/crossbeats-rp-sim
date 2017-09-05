@@ -24,8 +24,8 @@ module CxbRank
           end
         end
 
-        app.get '/api/music/:text_id' do
-          music_hash = Music.find_by(:text_id => params[:text_id]).try(:to_hash) || {}
+        app.get '/api/music/:search_key' do
+          music_hash = Music.find_by_search_key(params[:search_key]).try(:to_hash) || {}
           last_modified Music.last_modified
           jsonx music_hash, params[:callback]
         end
