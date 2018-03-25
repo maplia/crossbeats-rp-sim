@@ -52,7 +52,7 @@ module CxbRank
         if SiteSettings.cxb_mode? and search_key.to_s =~ /\A[1-9][0-9]*\z/
           music = self.where(:number => search_key.to_i).first
         end
-        return music || self.where(:text_id => search_key).first
+        return music || self.where(:text_id => search_key).first || self.where(:lookup_key => search_key).first
       end
 
       def self.find_actives(without_deleted)

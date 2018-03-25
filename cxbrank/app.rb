@@ -64,7 +64,7 @@ class CxbRankApp < CxbRank::AppBase
     else
       begin
         user = User.find_by_param_id(data[:user_id])
-        skill_set = SkillSet.new(settings.site_mode, user)
+        skill_set = SkillSet.new(user)
         skill_set.load!
         user.point = skill_set.total_point
         user.point_direct = false
