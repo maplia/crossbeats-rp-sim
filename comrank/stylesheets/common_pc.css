@@ -56,7 +56,7 @@ p.top_navi {
   text-align: left;
 }
 p.current_user {
-  margin: 0px 0px 2px 0px;
+  margin: 0px 0px 2px 5px;
   padding: 0px;
   float: right;
   text-align: right;

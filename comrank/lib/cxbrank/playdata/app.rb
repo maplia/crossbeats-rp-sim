@@ -22,7 +22,7 @@ module CxbRank
             haml :skill_list, :layout => true, :locals => {
               :user => user, :skill_set => skill_set,
               :edit => edit, :ignore_locked => skill_options[:ignore_locked],
-              :fixed_title => fixed_title}
+              :fixed_title => fixed_title, :tweet => true}
           end
 
           def music_skill_edit_page(user, &block)

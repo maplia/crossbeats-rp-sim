@@ -160,3 +160,10 @@ p.top_navi, p.current_user {
 p.resizable_image img {
   width: 100%;
 }
+
+p.tweet_button {
+  margin: 0px 0px 0px 0px;
+  padding: 0px;
+  float: right;
+  text-align: right;
+}

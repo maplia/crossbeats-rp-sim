@@ -27,7 +27,11 @@
     - else
       %title= "#{page_title} - #{settings.site_name}"
     %script{:src => 'https://code.jquery.com/jquery-2.2.4.min.js', :integrity => 'sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=', :crossorigin => 'anonymous'}
+    %script{:src => 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', :integrity => 'sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=', :crossorigin => 'anonymous'}
     %script{:src => 'https://marines.sakura.ne.jp/script/jquery.disableOnSubmit.js'}
+    %script{:src => 'https://marines.sakura.ne.jp/script/jquery.dialog.js'}
+    %script{:src => 'https://marines.sakura.ne.jp/script/jquery.retryAjax.js'}
+    %link{:rel => 'stylesheet', :href => 'https://code.jquery.com/ui/1.12.1/themes/eggplant/jquery-ui.css'}
     :javascript
       $(function() {
         $('form').disableOnSubmit();
@@ -48,6 +52,11 @@
         = link_to session_user.user_id, CxbRank::SiteSettings.join_site_base(CxbRank::SKILL_LIST_EDIT_URI)
         \/
         = link_to 'ログアウト', CxbRank::SiteSettings.join_site_base(CxbRank::USER_LOGOUT_URI)
+    - if defined? tweet
+      %p.tweet_button
+        %a{:href => 'https://twitter.com/share?ref_src=twsrc%5Etfw', :class => 'twitter-share-button', "data-text" => "#{fixed_title} - #{settings.site_name}", "data-url" => File.join("#{request.scheme}://#{request.host}", user.skill_view_uri), "data-show-count" => 'false'}
+          Tweet
+        %script{:src => 'https://platform.twitter.com/widgets.js', :charset => 'utf-8'}
     = yield
     - unless defined? error_no or defined? errors
       %address
