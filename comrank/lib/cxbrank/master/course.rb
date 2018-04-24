@@ -61,6 +61,7 @@ module CxbRank
       def self.get_csv_columns
         return [
           {:name => :lookup_key, :unique => true, :dump => true},
+          {:name => :text_id,                     :dump => true},
           {:name => :title,                       :dump => true},
           {:name => :sort_key,                    :dump => true},
           {:name => :level,                       :dump => true},
