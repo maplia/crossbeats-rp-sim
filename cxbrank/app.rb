@@ -12,7 +12,7 @@ class CxbRankApp < CxbRank::AppBase
   get '/api/skills/:user_id' do
     user = User.find_by_param_id(params[:user_id])
     last_modified Skill.last_modified(user)
-    skills = Skill.find_by_user(user, {:fill_empty => true}).to_a
+    skills = Skill.find_by_user(user, {:fill_empty => true, :limited => false}).to_a
     skills.sort! do |a, b| a.music.number <=> b.music.number end
     skill_hashes = []
     skills.each do |skill|
@@ -68,7 +68,7 @@ class CxbRankApp < CxbRank::AppBase
         skill_set.load!
         user.point = skill_set.total_point
         user.point_direct = false
-        user.point_updated_at = Time.now
+        user.point_updated_at = Skill.last_modified(user)
         user.save!
         jsonx true
       rescue

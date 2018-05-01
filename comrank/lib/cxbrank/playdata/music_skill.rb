@@ -84,12 +84,15 @@ module CxbRank
 
       def self.find_by_user(user, options={})
         skills = self.where(:user_id => user.id)
-        if SiteSettings.cxb_mode?
-          skills = skills.joins(:music).where('musics.limited = ?', false)
+        if options.has_key?(:limited)
+          skills = skills.joins(:music).where('musics.limited = ?', options[:limited])
         end
         if options[:fill_empty]
           omit_music_ids = (skills.pluck(:music_id).empty? ? [0] : skills.pluck(:music_id))
           empty_musics = Master::Music.find_actives(false).where('id not in (?)', omit_music_ids)
+          if options.has_key?(:limited)
+            empty_musics = empty_musics.where('limited = ?', options[:limited])
+          end
           empty_musics.each do |music|
             skill = Skill.new
             skill.user_id = user.id
