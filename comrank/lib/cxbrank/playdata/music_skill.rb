@@ -216,6 +216,22 @@ module CxbRank
         return send("#{MUSIC_DIFF_PREFIXES[diff]}_gauge")
       end
 
+      def flawless(diff)
+        return send("#{MUSIC_DIFF_PREFIXES[diff]}_flawless")
+      end
+
+      def super_count(diff)
+        return send("#{MUSIC_DIFF_PREFIXES[diff]}_super")
+      end
+
+      def cool(diff)
+        return send("#{MUSIC_DIFF_PREFIXES[diff]}_cool")
+      end
+
+      def maxcombo(diff)
+        return send("#{MUSIC_DIFF_PREFIXES[diff]}_maxcombo")
+      end
+
       def locked(diff)
         return send("#{MUSIC_DIFF_PREFIXES[diff]}_locked")
       end
@@ -430,11 +446,18 @@ module CxbRank
               :point => point(diff), :rate => rate(diff), :score => score(diff),
               :rank => rank(diff), :combo => combo(diff), :gauge => gauge(diff)
             }
+            if SiteSettings.rev_mode?
+              hash[MUSIC_DIFF_PREFIXES[diff]][:flawless] = flawless(diff)
+              hash[MUSIC_DIFF_PREFIXES[diff]][:super] = super_count(diff)
+              hash[MUSIC_DIFF_PREFIXES[diff]][:cool] = cool(diff)
+              hash[MUSIC_DIFF_PREFIXES[diff]][:maxcombo] = maxcombo(diff)
+            end
           else
             hash[MUSIC_DIFF_PREFIXES[diff]] = {
               :stat => nil, :locked => nil,
               :point => nil, :rate => nil, :score => nil,
-              :rank => nil, :combo => nil, :gauge => nil
+              :rank => nil, :combo => nil, :gauge => nil,
+              :flawless => nil, :super => nil, :cool => nil, :maxcombo => nil,
             }
           end
         end
