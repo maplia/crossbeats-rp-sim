@@ -1,0 +1,6 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SKILL_LIST_EDIT_URI]}
+%h1= page_title
+%p スコアバックアップツールからダウンロードしたCSVファイルをそのまま指定してください
+- form_tag CxbRank::SiteSettings.join_site_base('import_csv'), :method => 'post', :enctype => 'multipart/form-data' do
+  = file_field_tag :datafile
+  = submit_tag 'インポートする'

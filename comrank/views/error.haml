@@ -1,5 +1,8 @@
 - if defined? error_no
-  %p= CxbRank::ERRORS[error_no]
+  - if defined? args
+    %p= sprintf(CxbRank::ERRORS[error_no], *args)
+  - else
+    %p= CxbRank::ERRORS[error_no]
 - else
   %p 入力内容にエラーがあります
   %ul

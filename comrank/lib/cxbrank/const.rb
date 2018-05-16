@@ -37,6 +37,8 @@ module CxbRank
   EVENT_SHEET_LIST_URI = '/sheet_list'              # イベントスコアシート（一覧）
   EVENT_SHEET_VIEW_URI = '/sheet'                   # イベントスコアシート（個別）
 
+  IMPORT_CSV_URI = '/import_csv'                    # CSVインポート（CxB）
+
   # ページ名
   PAGE_TITLES = {
     SITE_TOP_URI =>               'トップ',
@@ -59,6 +61,7 @@ module CxbRank
     EVENT_SHEET_VIEW_URI =>       'イベントスコアシート',
     SCORE_RANK_URI =>             'スコアランキング一覧',
     SCORE_RANK_DETAIL_URI =>      'スコアランキング',
+    IMPORT_CSV_URI =>             'CSVインポート',
   }
 
   # ページ使用テンプレート格納パス
@@ -654,6 +657,11 @@ module CxbRank
   ERROR_UNL_SCORE_NOT_NUMERIC_TEXT = "#{MUSIC_DIFF_UNL_NAME}譜面の#{ERROR_SCORE_NOT_NUMERIC_TEXT}"
   ERROR_UNL_SCORE_OUT_OF_RANGE = "#{MUSIC_DIFF_UNL}#{ERROR_SCORE_OUT_OF_RANGE}"
   ERROR_UNL_SCORE_OUT_OF_RANGE_TEXT = "#{MUSIC_DIFF_UNL_NAME}譜面の#{ERROR_SCORE_OUT_OF_RANGE_TEXT}"
+  # CSVインポート
+  ERROR_CSV_MUSIC_NOT_EXIST = '99901'
+  ERROR_CSV_MUSIC_NOT_EXIST_TEXT = "指定された楽曲IDは存在しません: %s"
+  ERROR_CSV_DIFF_NOT_EXIST = '99902'
+  ERROR_CSV_DIFF_NOT_EXIST_TEXT = "指定された難易度は存在しません: %s"
   ERRORS = {
     ERROR_SESSION_IS_DEAD            => ERROR_SESSION_IS_DEAD_TEXT,
     ERROR_SESSION_IS_FINISHED        => ERROR_SESSION_IS_FINISHED_TEXT,
@@ -722,6 +730,8 @@ module CxbRank
     ERROR_UNL_RATE_OUT_OF_RANGE      => ERROR_UNL_RATE_OUT_OF_RANGE_TEXT,
     ERROR_UNL_SCORE_NOT_NUMERIC      => ERROR_UNL_SCORE_NOT_NUMERIC_TEXT,
     ERROR_UNL_SCORE_OUT_OF_RANGE     => ERROR_UNL_SCORE_OUT_OF_RANGE_TEXT,
+    ERROR_CSV_MUSIC_NOT_EXIST        => ERROR_CSV_MUSIC_NOT_EXIST_TEXT,
+    ERROR_CSV_DIFF_NOT_EXIST         => ERROR_CSV_DIFF_NOT_EXIST_TEXT,
   }
   SKILL_ERRORS = {
     MUSIC_DIFF_ESY => {

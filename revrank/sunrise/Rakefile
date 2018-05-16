@@ -44,7 +44,7 @@ namespace :cxbrank do
   desc 'dump music master'
   task :dump_master do
     CSV.open('db/master/musics.tsv', 'w', CxbRank::CSV_OPTIONS) do |csv|
-      CxbRank::Master::Music.dump_to_csv(csv)
+      CxbRank::Master::Music.dump_to_csv(csv, [:csv_id])
     end
 
     CSV.open('db/master/legacy_charts.tsv', 'w', CxbRank::CSV_OPTIONS) do |csv|

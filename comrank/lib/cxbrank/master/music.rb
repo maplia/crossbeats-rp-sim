@@ -52,7 +52,11 @@ module CxbRank
         if SiteSettings.cxb_mode? and search_key.to_s =~ /\A[1-9][0-9]*\z/
           music = self.where(:number => search_key.to_i).first
         end
-        return music || self.where(:text_id => search_key).first || self.where(:lookup_key => search_key).first
+        if SiteSettings.cxb_mode?
+          return music || self.where(:text_id => search_key).first || self.where(:lookup_key => search_key).first || self.where(:csv_id => search_key).first
+        else
+          return music || self.where(:text_id => search_key).first || self.where(:lookup_key => search_key).first
+        end
       end
 
       def self.find_actives(without_deleted)
@@ -188,6 +192,7 @@ module CxbRank
         columns = [
           {:name => :text_id,                     :dump => true},
           {:name => :lookup_key, :unique => true, :dump => true},
+          {:name => :csv_id,                      :dump => true},
           {:name => :number,                      :dump => true},
           {:name => :title,                       :dump => true},
           {:name => :subtitle,                    :dump => true},
