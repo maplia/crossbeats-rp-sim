@@ -40,7 +40,7 @@ namespace :cxbrank do
   desc 'dump music master'
   task :dump_master do
     CSV.open('db/master/musics.tsv', 'w', CxbRank::CSV_OPTIONS) do |csv|
-      CxbRank::Master::Music.dump_to_csv(csv, [:lookup_key, :unlock_unl, :appear, :category, :added_at_unl])
+      CxbRank::Master::Music.dump_to_csv(csv, [:unlock_unl, :appear, :category, :added_at_unl])
     end
 
     CSV.open('db/master/monthlies.tsv', 'w', CxbRank::CSV_OPTIONS) do |csv|

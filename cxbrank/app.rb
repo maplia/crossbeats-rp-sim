@@ -12,7 +12,9 @@ class CxbRankApp < CxbRank::AppBase
 
   get IMPORT_CSV_URI do
     private_page do |user|
-      haml :import_csv, :layout => true
+      settings.views << SiteSettings.join_comrank_path('views/application')
+      musics = Master::Music.find_actives(false)
+      haml :import_csv, :layout => true, :locals => {:musics => musics}
     end
   end
 

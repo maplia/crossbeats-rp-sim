@@ -1,6 +1,27 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI, CxbRank::SKILL_LIST_EDIT_URI]}
 %h1= page_title
-%p スコアバックアップツールからダウンロードしたCSVファイルをそのまま指定してください
-- form_tag CxbRank::SiteSettings.join_site_base('import_csv'), :method => 'post', :enctype => 'multipart/form-data' do
-  = file_field_tag :datafile
-  = submit_tag 'インポートする'
+%div.unit
+  %p <a href="https://seraphin.xyz/backuptool/">スコアバックアップツール</a>（外部サイト）からダウンロードしたCSVファイルを指定してください
+  %div.subunit
+    - form_tag CxbRank::SiteSettings.join_site_base('import_csv'), :method => 'post', :enctype => 'multipart/form-data' do
+      = file_field_tag :datafile
+      = submit_tag 'インポートする'
+%div.unit
+  %h2 楽曲ID一覧
+  %div.subunit
+    %p 楽曲の特定に使用している楽曲IDの一覧を以下に示します（一部にタイトルから大きく離れたIDもあります）
+    %p 未所持曲のスコアはCSVファイルに出力されないようですが、この一覧をもとに不足分を補って登録することもできます
+    %table.music_list
+      %thead
+        %tr
+          %th #
+          %th 楽曲ID
+          %th タイトル
+      %tbody
+        - musics.sort.each do |music|
+          %tr
+            %th= music.number
+            %td
+              %code= music.csv_id
+            %td
+              = haml :music_title, :locals => {:music => music}

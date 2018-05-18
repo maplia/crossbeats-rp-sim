@@ -31,6 +31,9 @@
               %td.text= multiline(user.comment, true)
       - if edit
         #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_EDIT_URI)}
+        - if CxbRank::SiteSettings.cxb_mode?
+          & /
+          #{link_to CxbRank::PAGE_TITLES[CxbRank::IMPORT_CSV_URI], CxbRank::SiteSettings.join_site_base(CxbRank::IMPORT_CSV_URI)}
       - else
         - if request.path_info =~ Regexp.new(CxbRank::SKILL_LIST_VIEW_URI)
           通常RP表
@@ -49,4 +52,5 @@
             #{link_to 'クリア状況表', user.skill_chart_uri}
 - else
   - if edit
-    %p #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_EDIT_URI)}
+    %p
+      #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_EDIT_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_EDIT_URI)}
