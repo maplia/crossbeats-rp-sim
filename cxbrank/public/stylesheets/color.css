@@ -38,3 +38,10 @@ td {
 div.sidebar {
   background-color: white;
 }
+
+/********
+  Magnific Popup
+ ********/
+.white-popup {
+  background-image: url("/images/check.png") !important;
+}
