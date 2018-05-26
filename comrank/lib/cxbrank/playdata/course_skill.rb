@@ -91,6 +91,10 @@ module CxbRank
         return skill
       end
 
+      def fullcombo?
+        return [SP_COMBO_STATUS_FC, SP_COMBO_STATUS_EX].include?(combo)
+      end
+
       def best_point
         return point
       end
@@ -181,7 +185,7 @@ module CxbRank
         else
           return course.sort_key <=> other.course.sort_key
         end
-    end
+      end
     end
   end
 end

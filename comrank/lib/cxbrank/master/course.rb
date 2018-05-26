@@ -38,6 +38,10 @@ module CxbRank
         return course
       end
 
+      def subtitle
+        return nil
+      end
+
       def notes
         sum = 0
         course_musics.each do |course_music|
