@@ -79,12 +79,11 @@
                     = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
                     %del<>
                       = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル')
-              - if CxbRank::SiteSettings.cxb_mode?
-                %label
-                  スコア:
-                  = f.text_field "#{diff_prefix}_score".to_sym,
-                    :size => CxbRank::SCORE_FIGURE, :maxlength => CxbRank::SCORE_FIGURE,
-                    :value => skill.score(diff)
+              %label
+                スコア:
+                = f.text_field "#{diff_prefix}_score".to_sym,
+                  :size => CxbRank::SCORE_FIGURE, :maxlength => CxbRank::SCORE_FIGURE,
+                  :value => skill.score(diff)
         - else
           %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
             %td
@@ -114,13 +113,12 @@
                     = f.check_box "#{diff_prefix}_legacy".to_sym, :checked => skill.legacy(diff), :disabled => true
                     %del<>
                       = (CxbRank::SiteSettings.cxb_mode? ? '旧譜面' : '旧レベル')
-              - if CxbRank::SiteSettings.cxb_mode?
-                %br
-                %label
-                  スコア:
-                  = f.text_field "#{diff_prefix}_score".to_sym,
-                    :size => CxbRank::SCORE_FIGURE, :maxlength => CxbRank::SCORE_FIGURE,
-                    :value => skill.score(diff)
+              %br
+              %label
+                スコア:
+                = f.text_field "#{diff_prefix}_score".to_sym,
+                  :size => CxbRank::SCORE_FIGURE, :maxlength => CxbRank::SCORE_FIGURE,
+                  :value => skill.score(diff)
       %tr
         %th コメント
         %td.comment

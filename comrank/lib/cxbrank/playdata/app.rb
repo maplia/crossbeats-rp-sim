@@ -15,7 +15,7 @@ module CxbRank
             skill_set.load!
             fixed_title = "#{user.name}さんの#{PAGE_TITLES[SKILL_LIST_VIEW_URI]}"
             add_template_paths PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI]
-            unless edit
+            unless edit and session[:user_id]
               data_mtime = skill_set.last_modified
               page_last_modified PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI], data_mtime
             end

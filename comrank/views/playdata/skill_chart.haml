@@ -2,6 +2,11 @@
 %h1= page_title
 - if skill_chart.last_modified
   %p.last_modified 最終更新時刻: #{skill_chart.last_modified.strftime('%Y-%m-%d %H:%M:%S')}
+- if session[:user_id] and CxbRank::SiteSettings.adversary_enabled?
+  - session_user = User.find_by_id(session[:user_id])
+  - adversary_enabled = (session_user == user)
+- else
+  - adversary_enabled = false
 = haml :user, :locals => {:user => user, :edit => false}
 %div.unit
   %h2 クリア状況
@@ -10,4 +15,4 @@
 %div.unit
   %h2 曲リスト
   %div.subunit
-    = haml :skills, :locals => {:skills => skill_chart[:skills]}
+    = haml :skills, :locals => {:skills => skill_chart[:skills], :adversary_enabled => adversary_enabled}

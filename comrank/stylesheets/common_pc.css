@@ -49,7 +49,15 @@ address {
 p.last_modified {
   float: right;
   text-align: right;
+  clear: both;
 }
+p.adversary_edit {
+  float: right;
+  text-align: right;
+  margin-top: 0;
+  clear: both;
+}
+
 p.top_navi {
   margin: 0px 0px 2px 0px;
   padding: 0px;

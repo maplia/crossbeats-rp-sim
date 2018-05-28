@@ -85,6 +85,10 @@ module CxbRank
       return sunrise_mode?
     end
 
+    def self.adversary_enabled?
+      return @@settings.adversary || false
+    end
+
     def self.music_diffs
       return MUSIC_DIFFS[@@settings.site_mode]
     end

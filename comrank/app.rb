@@ -20,6 +20,7 @@ require 'cxbrank/master'
 require 'cxbrank/master/music_set'
 require 'cxbrank/user'
 require 'cxbrank/skill'
+require 'cxbrank/playdata/adversary_skill'
 require 'cxbrank/master/app'
 require 'cxbrank/playdata/app'
 
@@ -108,10 +109,11 @@ module CxbRank
         end
       end
 
-      def private_page(&block)
+      def private_page(layout=true, &block)
         if session[:user_id].blank? or (user = User.find_by_id(session[:user_id])).nil?
-          haml :error, :layout => true,
-            :locals => {:error_no => ERROR_SESSION_IS_DEAD, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
+          haml :error, :layout => layout,
+            :locals => {:popup => !layout,
+              :error_no => ERROR_SESSION_IS_DEAD, :back_uri => SiteSettings.join_site_base(SITE_TOP_URI)}
         else
           yield user
         end
@@ -207,7 +209,9 @@ module CxbRank
       settings.views << SiteSettings.join_comrank_path('views/user_list')
       users = User.find_actives
       data_mtime = User.last_modified
-      page_last_modified PAGE_TEMPLATE_FILES[USER_LIST_URI], data_mtime
+      if session[:user_id].nil?
+        page_last_modified PAGE_TEMPLATE_FILES[USER_LIST_URI], data_mtime
+      end
       haml :user_list, :layout => true, :locals => {:users => users}
     end
 
@@ -293,6 +297,59 @@ module CxbRank
         skills = Skill.get_rank_data(music, diff)
         haml :rank_score_detail, :layout => true, :locals => {
           :music => music, :diff => diff, :skills => skills, :fixed_title => fixed_title}
+      end
+    end
+
+    post ADVERSARY_EDIT_URI do
+      private_page(false) do |user|
+        begin
+          data = JSON.parse(request.body.read, {:symbolize_names => true})
+          adversary = Adversary.where({:user_id => user.id, :adversary_id => data[:id].to_i}).first
+          unless adversary
+            adversary = Adversary.new
+            adversary.user_id = user.id
+            adversary.adversary_id = data[:id].to_i
+          end
+          if data[:status]
+            adversary.save!
+          else
+            adversary.destroy
+          end
+          jsonx :result => 'success', :id => data[:id], :status => data[:status]
+        rescue
+          jsonx :result => 'failed'
+        end
+      end
+    end
+
+    get '/adversary/:music_text_id/:diff' do
+      private_page(false) do |user|
+        if params[:music_text_id].blank?
+          haml :error, :layout => false, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
+        elsif (music = Master::Music.find_by(:text_id => params[:music_text_id])).nil?
+          haml :error, :layout => false, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
+        elsif params[:diff].blank?
+          haml :error, :layout => false, :locals => {:error_no => ERROR_DIFF_IS_UNDECIDED}
+        elsif (diff = SiteSettings.music_diffs.invert[params[:diff].upcase]).nil? or !music.exist?(diff)
+          haml :error, :layout => false, :locals => {:error_no => ERROR_DIFF_NOT_EXIST}
+        else
+          skills = PlayData::AdversarySkill.find_by_user_and_music_and_diff(user, music, diff)
+          haml :adversary, :layout => false, :locals => {:music => music, :diff => diff, :skills => skills}
+        end
+      end
+    end
+
+    get ADVERSARY_FOLLOWINGS_URI do
+      private_page(false) do |user|
+        followings = Adversary.find_followings(user)
+        haml :adversary_relations, :layout => false, :locals => {session_user: user, relations: followings, uri: ADVERSARY_FOLLOWINGS_URI}
+      end
+    end
+
+    get ADVERSARY_FOLLOWERS_URI do
+      private_page(false) do |user|
+        followers = Adversary.find_followers(user)
+        haml :adversary_relations, :layout => false, :locals => {session_user: user, relations: followers, uri: ADVERSARY_FOLLOWERS_URI}
       end
     end
 

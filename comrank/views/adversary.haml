@@ -1,0 +1,41 @@
+%div{:class => 'white-popup'}
+  %h2
+    = music.title
+    %small= "[#{CxbRank::SiteSettings.music_diffs[diff]}]"
+  %p= "Notes: #{music.notes(diff)}"
+  %table.adversary
+    %thead
+      %tr
+        %th.number #
+        %th.name ユーザ名
+        %th.score スコア
+        %th.rate RATE
+        - unless mobile?
+          %th 登録時刻
+    %tbody
+      - skills.sort!
+      - skills.reverse!
+      - rank = skills.rank
+      - skills.each_with_index do |skill, i|
+        %tr
+          %th.rank= rank[i]
+          %td= skill.user.name
+          - if skill.stat_ == SP_STATUS_NO_PLAY
+            %td{:colspan => (mobile? ? 2 : 3)} NO DATA
+          - else
+            %td.score
+              = skill.score_ || '&ndash;'
+              - if skill.score_
+                - if mobile?
+                  %br
+                %small= sprintf("(%.2f%%)", skill.score_rate * 100)
+            %td.rate
+              - if skill.survival_?
+                = image_tag CxbRank::SiteSettings.join_site_image_base('survival.png'), :alt => '[S]', :height => 12
+              - elsif skill.ultimate_?
+                = image_tag CxbRank::SiteSettings.join_site_image_base('ultimate.png'), :alt => '[U]', :height => 12
+              - if skill.fullcombo_?
+                = image_tag CxbRank::SiteSettings.join_site_image_base('crown.png'), :alt => '[FC]', :height => 12
+              = haml :rate, :layout => false, :locals => {:skill => skill, :diff => diff}
+            - unless mobile?
+              %td= skill.updated_at.strftime('%Y-%m-%d %H:%M:%S')

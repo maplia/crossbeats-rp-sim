@@ -6,5 +6,6 @@ style_sp: sp.css
 session_key: revrank
 secret:
 environment: development
+adversary: true
 #tracker_id:
 #domain:

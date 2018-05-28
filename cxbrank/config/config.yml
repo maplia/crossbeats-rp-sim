@@ -11,5 +11,6 @@ secret:
 environment: development
 comrank_path: ../comrank
 legacy_chart: true
+adversary: false
 #tracker_id:
 #domain:

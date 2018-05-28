@@ -38,6 +38,9 @@ module CxbRank
   EVENT_SHEET_VIEW_URI = '/sheet'                   # イベントスコアシート（個別）
 
   IMPORT_CSV_URI = '/import_csv'                    # CSVインポート（CxB）
+  ADVERSARY_EDIT_URI = '/adversary_edit'            # アドバーサリー登録/解除
+  ADVERSARY_FOLLOWINGS_URI = '/adversary_followings'# アドバーサリーフォロー表示
+  ADVERSARY_FOLLOWERS_URI = '/adversary_followers'  # アドバーサリーフォロワー表示
 
   # ページ名
   PAGE_TITLES = {
@@ -62,6 +65,8 @@ module CxbRank
     SCORE_RANK_URI =>             'スコアランキング一覧',
     SCORE_RANK_DETAIL_URI =>      'スコアランキング',
     IMPORT_CSV_URI =>             'CSVインポート',
+    ADVERSARY_FOLLOWINGS_URI =>   'フォロー',
+    ADVERSARY_FOLLOWERS_URI =>    'フォロワー',
   }
 
   # ページ使用テンプレート格納パス
@@ -147,6 +152,9 @@ module CxbRank
     ],
   }
   PAGE_TEMPLATE_FILES[MAX_SKILL_VIEW_URI] = PAGE_TEMPLATE_FILES[SKILL_LIST_VIEW_URI]
+
+  # 画面遷移せずポップアップ表示にするリンクに割り当てるクラス名
+  POPUP_ANCHOR_CLASS = 'simple-ajax-popup-align-top'
 
   # 画像ファイルを置いておくディレクトリへのパス
   IMAGE_PATH = 'images/'
@@ -505,6 +513,28 @@ module CxbRank
 
   # セッションの有効期限（単位: 分）
   EXPIRE_MINUTES = 60
+
+  # アドバーサリー機能リンクテキスト
+  ADVERSARY_REGISTER_LINKTEXT = '□登録する'
+  ADVERSARY_REMOVE_LINKTEXT = '■解除する'
+  ADVERSARY_REGISTER_LINKTEXT_FULL = 'アドバーサリーを' + ADVERSARY_REGISTER_LINKTEXT.gsub(/□/, '')
+  ADVERSARY_REMOVE_LINKTEXT_FULL = 'アドバーサリーを' + ADVERSARY_REMOVE_LINKTEXT.gsub(/■/, '')
+  ADVERSARY_LINKTEXTS = {
+    :register => {
+      true => ADVERSARY_REGISTER_LINKTEXT.gsub(/する/, ''), false => ADVERSARY_REGISTER_LINKTEXT
+    },
+    :remove => {
+      true => ADVERSARY_REMOVE_LINKTEXT.gsub(/する/, ''), false => ADVERSARY_REMOVE_LINKTEXT
+    }
+  }
+  ADVERSARY_LINKTEXTS_FULL = {
+    :register => {
+      true => ADVERSARY_REGISTER_LINKTEXT_FULL.gsub(/する/, ''), false => ADVERSARY_REGISTER_LINKTEXT_FULL,
+    },
+    :remove => {
+      true => ADVERSARY_REMOVE_LINKTEXT_FULL.gsub(/する/, ''), false => ADVERSARY_REMOVE_LINKTEXT_FULL,
+    }
+  }
 
   # エラー/エラーメッセージ定数
   # 定数名の英語はてきとー（逃げ

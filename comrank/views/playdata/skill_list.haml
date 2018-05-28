@@ -1,8 +1,24 @@
+:javascript
+  $(function() {
+    set_adversary_linktext(true);
+  });
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
 %h1
   = page_title.gsub(/(\[\d+\-\d+\-\d+\])/, '<small>\1</small>')
 - if skill_set.last_modified
   %p.last_modified 最終更新時刻: #{skill_set.last_modified.strftime('%Y-%m-%d %H:%M:%S')}
+- if session[:user_id] and !edit
+  - session_user = User.find_by_id(session[:user_id])
+  - if mobile?
+    %p.adversary_edit
+      ユーザー名:
+      = user.name
+  - if session_user != user and CxbRank::SiteSettings.adversary_enabled?
+    %p.adversary_edit
+      - to_status = !CxbRank::Adversary.registered?(session_user, user)
+      - link_text = (!to_status ? "#{CxbRank::ADVERSARY_LINKTEXTS_FULL[:remove][mobile?]}" : "#{CxbRank::ADVERSARY_LINKTEXTS_FULL[:register][mobile?]}")
+      - adversary_id = user.user_id
+      %a{:href => 'javascript:void(0)', :id => "adversary_edit_#{adversary_id}", :onClick => "edit_adversary_status('#{adversary_id}'); return false"}= link_text
 - if defined? user and user.present?
   = haml :user, :locals => {:user => user, :edit => edit}
 %div.unit

@@ -31,11 +31,55 @@
     %script{:src => 'https://marines.sakura.ne.jp/script/jquery.disableOnSubmit.js'}
     %script{:src => 'https://marines.sakura.ne.jp/script/jquery.dialog.js'}
     %script{:src => 'https://marines.sakura.ne.jp/script/jquery.retryAjax.js'}
+    %script{:src => 'https://marines.sakura.ne.jp/script/jquery.magnific-popup.min.js'}
     %link{:rel => 'stylesheet', :href => 'https://code.jquery.com/ui/1.12.1/themes/eggplant/jquery-ui.css'}
+    %link{:rel => 'stylesheet', :href => 'https://marines.sakura.ne.jp/script/magnific-popup.css'}
     :javascript
       $(function() {
         $('form').disableOnSubmit();
       });
+    :javascript
+      $(function() {
+        $('.simple-ajax-popup-align-top').magnificPopup({
+          type: 'ajax', closeOnBgClick: false
+        });
+      });
+    :javascript
+      _label_register = null;
+      _label_remove = null;
+      function set_adversary_linktext(is_full) {
+        if (is_full) {
+          _label_register = '#{CxbRank::ADVERSARY_LINKTEXTS_FULL[:register][mobile?]}';
+          _label_remove = '#{CxbRank::ADVERSARY_LINKTEXTS_FULL[:remove][mobile?]}';
+        } else {
+          _label_register = '#{CxbRank::ADVERSARY_LINKTEXTS[:register][mobile?]}';
+          _label_remove = '#{CxbRank::ADVERSARY_LINKTEXTS[:remove][mobile?]}';
+        }
+      }
+      function make_adversary_edit_id(id) {
+        return 'adversary_edit_' + id;
+      }
+      function edit_adversary_status(id, label_register, label_remove) {
+        _label_register = label_register || _label_register;
+        _label_remove = label_remove || _label_remove;
+        var status = ($('#' + make_adversary_edit_id(id)).text() == _label_register);
+        $('body').css('cursor', 'wait');
+        $('#' + make_adversary_edit_id(id)).css('cursor', 'wait');
+        $('#' + make_adversary_edit_id(id)).text('処理中');
+        $.ajax({
+          type: 'POST', url: '#{CxbRank::SiteSettings.join_site_base(CxbRank::ADVERSARY_EDIT_URI)}',
+          data: JSON.stringify({'id': id, 'status': status})
+        }).fail(function(response) {
+          alert('処理に失敗しました');
+          $('#' + make_adversary_edit_id(response.id)).text(response.status ? _label_register : _label_remove);
+          $('body').css('cursor', 'auto');
+          $('#' + make_adversary_edit_id(response.id)).css('cursor', 'pointer');
+        }).done(function(response) {
+          $('#' + make_adversary_edit_id(response.id)).text(!response.status ? _label_register : _label_remove);
+          $('body').css('cursor', 'auto');
+          $('#' + make_adversary_edit_id(response.id)).css('cursor', 'pointer');
+        });
+      }
     - if defined? settings.tracker_id
       :javascript
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

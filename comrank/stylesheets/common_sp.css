@@ -276,3 +276,11 @@ div.sidebar ul {
 div.sidebar li {
   list-style-type: none;
 }
+
+p.adversary_edit {
+  text-align: right;
+  margin-top: 0;
+  padding-top: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}

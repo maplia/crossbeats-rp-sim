@@ -1,4 +1,5 @@
 = haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+- session_user = CxbRank::User.find_by_id(session[:user_id])
 %h1= page_title
 %div.unit
   %h2 ユーザー一覧
@@ -20,6 +21,8 @@
               %th.point RP
               %th.comment コメント
               %th.update 最終更新時刻
+              - if session_user and CxbRank::SiteSettings.adversary_enabled?
+                %th アドバーサリー
         %tbody
           - users.each do |user|
-            = haml :user, :locals => {:user => user}
+            = haml :user, :locals => {:user => user, :session_user => session_user}

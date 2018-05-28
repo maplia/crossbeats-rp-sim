@@ -9,4 +9,4 @@
           %th{:class => CxbRank::MUSIC_DIFF_CLASSES[diff], :colspan => 2}= CxbRank::SiteSettings.music_diffs[diff]
   %tbody
     - skills.each do |skill|
-      = haml :skill, :locals => {:skill => skill}
+      = haml :skill, :locals => {:skill => skill, :adversary_enabled => adversary_enabled}

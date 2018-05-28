@@ -1,3 +1,7 @@
+:javascript
+  $(function() {
+    set_adversary_linktext(false);
+  });
 - unless mobile?
   %tr
     %th= user.user_id
@@ -13,6 +17,12 @@
     %td.text{:style => 'width: 17em'}
       = (user.comment || '').truncate(100)
     %td= user.point_updated_at.strftime("%Y-%m-%d %H:%M:%S")
+    - if session_user and session_user != user and CxbRank::SiteSettings.adversary_enabled?
+      %td
+        - to_status = !CxbRank::Adversary.registered?(session_user, user)
+        - link_text = (!to_status ? "#{CxbRank::ADVERSARY_LINKTEXTS[:remove][mobile?]}" : "#{CxbRank::ADVERSARY_LINKTEXTS[:register][mobile?]}")
+        - adversary_id = user.user_id
+        %a{:href => 'javascript:void(0)', :id => "adversary_edit_#{adversary_id}", :onClick => "edit_adversary_status('#{adversary_id}'); return false"}= link_text
 - else
   %tr
     %td.name

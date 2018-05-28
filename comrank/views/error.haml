@@ -1,13 +1,16 @@
-- if defined? error_no
-  - if defined? args
-    %p= sprintf(CxbRank::ERRORS[error_no], *args)
+- unless defined? popup
+  - popup = false
+%div{:class => (popup ? 'white-popup' : nil)}
+  - if defined? error_no
+    - if defined? args
+      %p= sprintf(CxbRank::ERRORS[error_no], *args)
+    - else
+      %p= CxbRank::ERRORS[error_no]
   - else
-    %p= CxbRank::ERRORS[error_no]
-- else
-  %p 入力内容にエラーがあります
-  %ul
-    - errors.messages.each do |message_set|
-      - message_set[1].each do |message|
-        %li= message
-- if defined? back_uri
-  %p= link_to '戻る', back_uri
+    %p 入力内容にエラーがあります
+    %ul
+      - errors.messages.each do |message_set|
+        - message_set[1].each do |message|
+          %li= message
+  - if defined? back_uri
+    %p= link_to '戻る', back_uri

@@ -10,8 +10,6 @@
         = haml :music_title, :locals => {:music => skill.course, :link_uri => skill.edit_uri}
       - else
         = skill.course.title
-      - if skill.fullcombo?
-        = image_tag CxbRank::SiteSettings.join_site_image_base('crown.png'), :alt => '[FC]', :height => 12
     - unless skill.played?
       %td.status{:colspan => 5} 記録なし
     - else
@@ -40,8 +38,6 @@
         = haml :music_title, :locals => {:music => skill.course, :link_uri => skill.edit_uri}
       - else
         = skill.course.title
-      - if skill.fullcombo?
-        = image_tag CxbRank::SiteSettings.join_site_image_base('crown.png'), :alt => '[FC]', :height => 120
   %tr{:class => css_class}
     - unless skill.played?
       %td.status{:colspan => 5} 記録なし

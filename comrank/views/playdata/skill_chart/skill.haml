@@ -16,8 +16,13 @@
             %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
           - elsif skill.failed?(diff)
             %div{:class => 'mark'} F
-          - if (skill.cleared?(diff) or skill.failed?(diff)) and skill.score(diff)
-            %div{:class => 'score'}= skill.score(diff) > 0 ? skill.score(diff) : '&ndash;'
+          - else
+            %div{:class => 'mark'} &nbsp;
+          - if adversary_enabled
+            %a{:class => "simple-ajax-popup-align-top", :href => CxbRank::SiteSettings.join_site_base("adversary/#{skill.music.text_id}/#{CxbRank::MUSIC_DIFF_CLASSES[diff]}")}
+              %div{:class => 'score'}= (skill.score(diff) and skill.score(diff) > 0) ? skill.score(diff) : '&ndash;'
+          - else
+            %div{:class => 'score'}= (skill.score(diff) and skill.score(diff) > 0) ? skill.score(diff) : '&ndash;'
         - if skill.best_diff == diff and skill.rp_target?
           %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
         - else
@@ -64,8 +69,13 @@
               %div{:class => 'mark'}= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
             - elsif skill.failed?(diff)
               %div{:class => 'mark'} F
-            - if (skill.cleared?(diff) or skill.failed?(diff)) and skill.score(diff)
-              %div{:class => 'score'}= skill.score(diff) > 0 ? skill.score(diff) : '&ndash;'
+            - else
+              %div{:class => 'mark'} &nbsp;
+            - if adversary_enabled
+              %a{:class => "simple-ajax-popup-align-top", :href => CxbRank::SiteSettings.join_site_base("adversary/#{skill.music.text_id}/#{CxbRank::MUSIC_DIFF_CLASSES[diff]}")}
+                %div{:class => 'score'}= (skill.score(diff) and skill.score(diff) > 0) ? skill.score(diff) : '&ndash;'
+            - else
+              %div{:class => 'score'}= (skill.score(diff) and skill.score(diff) > 0) ? skill.score(diff) : '&ndash;'
           - if skill.best_diff == diff and skill.rp_target?
             %td{:class => "point target #{CxbRank::MUSIC_DIFF_CLASSES[diff]}"}= skill.point_to_s(diff)
           - else

@@ -19,8 +19,7 @@
           %th.u_rate ULT
         %th.rank ランク
         %th.combo コンボ
-        - if CxbRank::SiteSettings.cxb_mode?
-          %th.score スコア
+        %th.score スコア
   %tbody
     - CxbRank::SiteSettings.music_diffs.keys.sort.each do |diff|
       - next unless skill.music.exist?(diff)
@@ -52,18 +51,14 @@
               - difference_class = (difference > 0.0 ? 'inc' : 'dec')
               %td{:class => "point #{difference_class}"}= sprintf('%+.2f', difference)
           - unless skill.cleared?(diff)
-            - if CxbRank::SiteSettings.cxb_mode?
-              %td.status{:colspan => 5}= CxbRank::SP_STATUSES[skill.stat(diff)]
-            - else
-              %td.status{:colspan => 4}= CxbRank::SP_STATUSES[skill.stat(diff)]
+            %td.status{:colspan => 5}= CxbRank::SP_STATUSES[skill.stat(diff)]
           - else
             %td.rate
               = haml :rate, :locals => {:skill => skill, :diff => diff}
             %td.rate= skill.u_rate_to_s(diff)
             %td.mark= CxbRank::SP_RANK_STATUSES[skill.rank(diff)]
             %td.mark= CxbRank::SP_COMBO_STATUSES[skill.combo(diff)]
-            - if CxbRank::SiteSettings.cxb_mode?
-              %td.score= skill.score(diff)
+            %td.score= skill.score(diff)
       - else
         %tr{:class => CxbRank::MUSIC_DIFF_CLASSES[diff]}
           %th.diff{:rowspan => 2}

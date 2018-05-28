@@ -1,0 +1,31 @@
+:javascript
+  $(function() {
+    set_adversary_linktext(false);
+  });
+%div{:class => 'white-popup'}
+  %h2= CxbRank::PAGE_TITLES[uri]
+  - if relations.size == 0
+    %p= (uri == CxbRank::ADVERSARY_FOLLOWINGS_URI ? '登録していません' : '登録されていません')
+  - else
+    %table.adversary_relations
+      - if !mobile?
+        %thead
+          %tr
+            %th ユーザーID
+            %th.name ユーザー名
+            %th 操作
+      %tbody
+        - relations.each do |relation|
+          - user = (uri == CxbRank::ADVERSARY_FOLLOWINGS_URI ? relation.adversary : relation.user)
+          %tr
+            %th= user.user_id
+            %td.name
+              %a{:href => user.skill_view_uri}
+                = user.name.truncate(10)
+              - if relation.crosslink?
+                = image_tag CxbRank::SiteSettings.join_site_image_base('crosslink.png'), :alt => '[相互]', :height => 12
+            %td
+              - to_status = !CxbRank::Adversary.registered?(session_user, user)
+              - link_text = (!to_status ? "#{CxbRank::ADVERSARY_LINKTEXTS[:remove][mobile?]}" : "#{CxbRank::ADVERSARY_LINKTEXTS[:register][mobile?]}")
+              - adversary_id = user.user_id
+              %a{:href => 'javascript:void(0)', :id => "adversary_edit_#{adversary_id}", :onClick => "edit_adversary_status('#{adversary_id}', '#{CxbRank::ADVERSARY_LINKTEXTS[:register][mobile?]}', '#{CxbRank::ADVERSARY_LINKTEXTS[:remove][mobile?]}'); return false"}= link_text
