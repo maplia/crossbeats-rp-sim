@@ -93,6 +93,10 @@ module CxbRank
       return Date.parse(@@settings.edit_stop || '9999/12/31') > Date.today
     end
 
+    def self.service_end
+      return @@settings.service_end ? Date.parse(@@settings.service_end) : nil
+    end
+
     def self.music_diffs
       return MUSIC_DIFFS[@@settings.site_mode]
     end

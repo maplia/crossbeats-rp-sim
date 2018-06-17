@@ -24,11 +24,11 @@
     - if CxbRank::SiteSettings.cxb_mode?
       %dt CROSS&times;BEAT ID（公開しない場合は空欄にしてください）
       %dd
-        = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id
+        = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id, :pattern => '\d*'
     - else
       %dt REV.ユーザーID（MY DATAからのデータインポートに使用します）
       %dd
-        = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id
+        = f.text_field :game_id, :size => 8, :maxlength => 8, :class => :game_id, :pattern => '\d*'
         %label
           = f.check_box :game_id_display
           REV.ユーザーIDを公開する
@@ -41,6 +41,16 @@
       - underscored_id = "#{underscore(CxbRank::User)}_comment"
       - underscored_name = "#{underscore(CxbRank::User)}[comment]"
       %textarea.comment{:id => underscored_id, :name => underscored_name, :rows => 6}= user.comment
+    %dt 削除曲などの表示設定
+    %dd
+      %label
+        = f.check_box :whole
+        通常プレイできない曲（削除曲+期間限定曲）の記録も公開する
+      - if CxbRank::SiteSettings.rev_sunrise_mode?
+        %br
+        %label
+          = f.check_box :legacy
+          オフライン移行時（#{CxbRank::SiteSettings.service_end.strftime('%Y/%-m/%d')}）に削除された曲を削除曲と扱わない（RP計算に含める）
     %dt RP表の公開設定（チェックをはずすと他人からRP表が見えなくなり、ユーザー一覧にも載らなくなります）
     %dd
       %label

@@ -40,6 +40,21 @@
             - else
               = multiline(user.comment, true)
         %tr
+          %th 削除曲記録
+          %td
+            - if user.whole
+              公開する
+            - else
+              公開しない
+        - if CxbRank::SiteSettings::rev_sunrise_mode?
+          %tr
+            %th オフライン削除曲
+            %td
+              - if user.legacy
+                削除曲と扱わない
+              - else
+                削除曲と扱う
+        %tr
           %th RP表公開
           %td
             - if user.display

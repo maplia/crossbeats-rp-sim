@@ -29,7 +29,9 @@ module CxbRank
             if params[:text_id]
               session[:text_id] = params[:text_id]
             end
-            if session[:text_id].blank?
+            if !SiteSettings.edit_enabled?
+              haml :error, :layout => true, :locals => {:error_no => ERROR_RP_EDIT_DISABLED}
+            elsif session[:text_id].blank?
               haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_IS_UNDECIDED}
             elsif (music = Master::Music.find_by(:text_id => session[:text_id])).nil?
               haml :error, :layout => true, :locals => {:error_no => ERROR_MUSIC_NOT_EXIST}
@@ -50,7 +52,9 @@ module CxbRank
             if params[:text_id]
               session[:text_id] = params[:text_id]
             end
-            if session[:text_id].blank?
+            if !SiteSettings.edit_enabled?
+              haml :error, :layout => true, :locals => {:error_no => ERROR_RP_EDIT_DISABLED}
+            elsif session[:text_id].blank?
               haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_IS_UNDECIDED}
             elsif (course = Master::Course.find_by(:text_id => session[:text_id])).nil?
               haml :error, :layout => true, :locals => {:error_no => ERROR_COURSE_NOT_EXIST}

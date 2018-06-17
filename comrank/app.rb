@@ -160,13 +160,18 @@ module CxbRank
     end
 
     get USER_ADD_URI do
-      settings.views << SiteSettings.join_comrank_path('views/user_edit')
-      user = User.new
-      if session["#{underscore(CxbRank::User)}_temp"].present?
-        user.update_by_params!(session[underscore(CxbRank::User)])
+      unless SiteSettings.edit_enabled?
+        haml :error, :layout => true,
+          :locals => {:error_no => ERROR_RP_EDIT_DISABLED}
+      else
+        settings.views << SiteSettings.join_comrank_path('views/user_edit')
+        user = User.new
+        if session["#{underscore(CxbRank::User)}_temp"].present?
+          user.update_by_params!(session[underscore(CxbRank::User)])
+        end
+        session[:user_added] = false
+        haml :user_add, :layout => true, :locals => {:user => user}
       end
-      session[:user_added] = false
-      haml :user_add, :layout => true, :locals => {:user => user}
     end
 
     post USER_ADD_URI do
@@ -354,8 +359,12 @@ module CxbRank
     end
 
     post '/api/authorize' do
-      data = JSON.parse(request.body.read, {:symbolize_names => true})
-      error_no = User.authenticate(data[:user_id], data[:password])
+      unless SiteSettings.edit_enabled?
+        error_no = ERROR_RP_EDIT_DISABLED
+      else
+        data = JSON.parse(request.body.read, {:symbolize_names => true})
+        error_no = User.authenticate(data[:user_id], data[:password])
+      end
       jsonx error_no == NO_ERROR
     end
 

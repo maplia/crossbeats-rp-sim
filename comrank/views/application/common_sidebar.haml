@@ -12,10 +12,11 @@
             = label_tag :password, :caption => 'パスワード: '
             = password_field_tag :password, :id => :password ,:size => 12, :maxlength => 80
           = submit_tag 'ログイン'
-      %dt ■ユーザー未登録の方
-      %dd
-        %ul
-          %li #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_ADD_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_ADD_URI)}
+      - if CxbRank::SiteSettings.edit_enabled?
+        %dt ■ユーザー未登録の方
+        %dd
+          %ul
+            %li #{link_to CxbRank::PAGE_TITLES[CxbRank::USER_ADD_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USER_ADD_URI)}
 %div.unit
   %h2 使い方案内
   %div.subunit
@@ -48,7 +49,8 @@
     %ul
       %li #{link_to CxbRank::PAGE_TITLES[CxbRank::RANK_CALC_URI], CxbRank::SiteSettings.join_site_base(CxbRank::RANK_CALC_URI)}
       %li #{link_to CxbRank::PAGE_TITLES[CxbRank::RATE_CALC_URI], CxbRank::SiteSettings.join_site_base(CxbRank::RATE_CALC_URI)}
-      %li #{link_to CxbRank::PAGE_TITLES[CxbRank::CRATE_CALC_URI], CxbRank::SiteSettings.join_site_base(CxbRank::CRATE_CALC_URI)}
+      - if CxbRank::SiteSettings.rev_mode?
+        %li #{link_to CxbRank::PAGE_TITLES[CxbRank::CRATE_CALC_URI], CxbRank::SiteSettings.join_site_base(CxbRank::CRATE_CALC_URI)}
       %li
         #{link_to CxbRank::PAGE_TITLES[CxbRank::EVENT_SHEET_LIST_URI], CxbRank::SiteSettings.join_site_base(CxbRank::EVENT_SHEET_LIST_URI)}
         %ul
