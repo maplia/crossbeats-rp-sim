@@ -89,6 +89,10 @@ module CxbRank
       return @@settings.adversary || false
     end
 
+    def self.edit_enabled?
+      return Date.parse(@@settings.edit_stop || '9999/12/31') > Date.today
+    end
+
     def self.music_diffs
       return MUSIC_DIFFS[@@settings.site_mode]
     end

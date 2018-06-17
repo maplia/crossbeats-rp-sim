@@ -7,5 +7,6 @@ session_key: revrank
 secret:
 environment: development
 adversary: true
+edit_stop: 
 #tracker_id:
 #domain:

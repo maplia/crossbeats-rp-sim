@@ -15,5 +15,6 @@ mydata_name: crossbeats REV. SUNRISE MY DATA
 mydata_host: rev-srw.ac.capcom.jp
 script_host: secure508.sakura.ne.jp/revtest.maplia.jp/sunrise
 legacy_chart: false
+edit_stop: 
 #tracker_id:
 #domain:

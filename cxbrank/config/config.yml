@@ -12,5 +12,6 @@ environment: development
 comrank_path: ../comrank
 legacy_chart: true
 adversary: false
+edit_stop: 
 #tracker_id:
 #domain:
