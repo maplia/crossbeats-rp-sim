@@ -1,0 +1,49 @@
+= haml :navi, :locals => {:ancestry => [CxbRank::SITE_TOP_URI]}
+%h1= page_title
+= javascript_include_tag 'https://marines.sakura.ne.jp/script/jquery.json2table.js'
+%script{:src => CxbRank::SiteSettings.join_common_script_base('common.js')}
+%script{:src => CxbRank::SiteSettings.join_common_script_base('clearrate.js')}
+:javascript
+  var data = null;
+  var diffs = null;
+  $(document).ready(function () {
+    data = #{data.to_json};
+    diffs = #{diffs.to_json};
+    mobile = #{mobile?.to_s};
+    initialize();
+  });
+%p 選択した譜面と判定数からクリアレートを小数部分まで計算するツールです
+%div.unit
+  %h2 入力フォーム
+  %div.subunit
+    %form
+      %p
+        選択曲:
+        %select#select_music
+      %p
+        譜面難度:
+        - if mobile?
+          %br
+        - CxbRank::SiteSettings.music_diffs.keys.sort.each_with_index do |diff, i|
+          %label
+            = radio_button_tag :diff, :value => CxbRank::MUSIC_DIFF_PREFIXES[diff], :checked => (diff == CxbRank::SiteSettings.music_diffs.keys.max)
+            = CxbRank::SiteSettings.music_diffs[diff]
+          - if mobile? and i == 2
+            %br
+      %p
+        Flawless/Super/Cool/MaxCombo:
+        - if mobile?
+          %br
+        = text_field_tag :flawless, :maxlength => CxbRank::SCORE_FIGURE, :class => :score, :pattern => '\d*'
+        & /
+        = text_field_tag :super, :maxlength => CxbRank::SCORE_FIGURE, :class => :score, :pattern => '\d*'
+        & /
+        = text_field_tag :cool, :maxlength => CxbRank::SCORE_FIGURE, :class => :score, :pattern => '\d*'
+        & /
+        = text_field_tag :maxcombo, :maxlength => CxbRank::SCORE_FIGURE, :class => :score, :pattern => '\d*'
+      %p
+        = button_tag '計算', :onClick => 'calcClearRate()'
+%div.unit
+  %h2 計算結果
+  %div.subunit
+    %table#table_rate.calc

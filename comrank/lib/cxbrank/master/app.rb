@@ -55,6 +55,15 @@ module CxbRank
             :data => music_hashes, :diffs => SiteSettings.music_diffs}
         end
 
+        app.get CRATE_CALC_URI do
+          music_hashes = Music.find_actives(true).sort.collect do |music| music.to_hash end
+          data_mtime = Music.last_modified
+          add_template_paths PAGE_TEMPLATE_FILES[RATE_CALC_URI]
+          page_last_modified PAGE_TEMPLATE_FILES[RATE_CALC_URI], data_mtime
+          haml :calc_crate, :layout => true, :locals => {
+            :data => music_hashes, :diffs => SiteSettings.music_diffs}
+        end
+
         app.get EVENT_SHEET_LIST_URI do
           events = Event.all.order('span_s desc')
           fixed_title = "#{PAGE_TITLES[EVENT_SHEET_LIST_URI]}一覧"

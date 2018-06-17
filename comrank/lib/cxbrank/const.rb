@@ -34,6 +34,7 @@ module CxbRank
   MUSIC_LIST_VIEW_URI = '/musics'                   # 登録曲リスト
   RANK_CALC_URI = '/rankcalc'                       # 許容ミス数計算機
   RATE_CALC_URI = '/scorerate'                      # 得点率計算機
+  CRATE_CALC_URI = '/clearrate'                     # クリアレート計算機
   EVENT_SHEET_LIST_URI = '/sheet_list'              # イベントスコアシート（一覧）
   EVENT_SHEET_VIEW_URI = '/sheet'                   # イベントスコアシート（個別）
 
@@ -60,6 +61,7 @@ module CxbRank
     SKILL_COURSE_ITEM_EDIT_URI => 'ランクポイント編集',
     RANK_CALC_URI =>              'ランク/レート別許容ミス数計算機',
     RATE_CALC_URI =>              '得点率計算ツール',
+    CRATE_CALC_URI =>             'クリアレート計算ツール',
     EVENT_SHEET_LIST_URI =>       'イベントスコアシート',
     EVENT_SHEET_VIEW_URI =>       'イベントスコアシート',
     SCORE_RANK_URI =>             'スコアランキング一覧',
