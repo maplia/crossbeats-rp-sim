@@ -355,7 +355,7 @@ module CxbRank
       end
 
       def point_bonus_to_s(diff, nlv='&ndash;')
-        return cleared?(diff) ? sprintf('%.2f', BigDecimal((point(diff) * BONUS_RATE_UNLIMITED).to_s).floor(2)) : nlv
+        return cleared?(diff) ? sprintf('%.2f', BigDecimal(unlimited_bonus.to_s).floor(2)) : nlv
       end
 
       def point_to_input_value(diff)
@@ -410,7 +410,13 @@ module CxbRank
       def unlimited_bonus
         diff = MUSIC_DIFF_UNL
         if music.exist?(diff) and cleared?(diff)
-          return point(diff) * BONUS_RATE_UNLIMITED
+          calc_point = music.level(diff) * (rate(diff).to_i/100.0) * gauge_bonus_rate(diff)
+          if BigDecimal(point(diff).to_s).floor(2) == BigDecimal(calc_point.to_s).floor(2)
+            base_point = music.level(diff) * (rate(diff)/100.0) * gauge_bonus_rate(diff)
+            return base_point * BONUS_RATE_UNLIMITED
+          else
+            return point(diff) * BONUS_RATE_UNLIMITED
+          end
         else
           return 0.0
         end

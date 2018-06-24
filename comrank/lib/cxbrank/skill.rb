@@ -75,7 +75,7 @@ module CxbRank
         @hash[MUSIC_TYPE_REV_COURSE] = {:skills => [], :point => 0.0}
         @hash[MUSIC_TYPE_REV_COURSE_LIMITED] = {:skills => [], :point => 0.0}
         music_skills.dup.each do |skill|
-          if skill.music.deleted?
+          if skill.deleted_music?
             @hash[MUSIC_TYPE_REV_DELETED][:skills] << skill
           elsif skill.music.limited
             @hash[MUSIC_TYPE_REV_LIMITED][:skills] << skill
