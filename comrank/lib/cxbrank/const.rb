@@ -39,6 +39,7 @@ module CxbRank
   EVENT_SHEET_VIEW_URI = '/sheet'                   # イベントスコアシート（個別）
 
   IMPORT_CSV_URI = '/import_csv'                    # CSVインポート（CxB）
+  EXPORT_CSV_URI = '/export_csv'                    # CSVエクスポート
   ADVERSARY_EDIT_URI = '/adversary_edit'            # アドバーサリー登録/解除
   ADVERSARY_FOLLOWINGS_URI = '/adversary_followings'# アドバーサリーフォロー表示
   ADVERSARY_FOLLOWERS_URI = '/adversary_followers'  # アドバーサリーフォロワー表示
@@ -67,6 +68,7 @@ module CxbRank
     SCORE_RANK_URI =>             'スコアランキング一覧',
     SCORE_RANK_DETAIL_URI =>      'スコアランキング',
     IMPORT_CSV_URI =>             'CSVインポート',
+    EXPORT_CSV_URI =>             'CSVエクスポート',
     ADVERSARY_FOLLOWINGS_URI =>   'フォロー',
     ADVERSARY_FOLLOWERS_URI =>    'フォロワー',
   }

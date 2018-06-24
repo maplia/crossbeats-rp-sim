@@ -410,11 +410,6 @@ module CxbRank
             if SiteSettings.cxb_mode?
               skill.send("#{MUSIC_DIFF_PREFIXES[diff]}_locked=", data[:body][MUSIC_DIFF_PREFIXES[diff].to_sym][:locked])
               skill.send("#{MUSIC_DIFF_PREFIXES[diff]}_legacy=", data[:body][MUSIC_DIFF_PREFIXES[diff].to_sym][:legacy])
-            else
-              skill.send("#{MUSIC_DIFF_PREFIXES[diff]}_flawless=", data[:body][MUSIC_DIFF_PREFIXES[diff].to_sym][:flawless])
-              skill.send("#{MUSIC_DIFF_PREFIXES[diff]}_super=", data[:body][MUSIC_DIFF_PREFIXES[diff].to_sym][:super])
-              skill.send("#{MUSIC_DIFF_PREFIXES[diff]}_cool=", data[:body][MUSIC_DIFF_PREFIXES[diff].to_sym][:cool])
-              skill.send("#{MUSIC_DIFF_PREFIXES[diff]}_maxcombo=", data[:body][MUSIC_DIFF_PREFIXES[diff].to_sym][:maxcombo])
             end
           end
           skill.calc!

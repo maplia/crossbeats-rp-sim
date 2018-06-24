@@ -301,6 +301,70 @@ module CxbRank
               :ignore_locked => false, :fixed_title => fixed_title}
           end
         end
+
+        app.get EXPORT_CSV_URI do
+          private_page do |user|
+            skills = Skill.find_by_user(user, {:fill_empty => true, :limited => false}).to_a
+            if SiteSettings.cxb_mode?
+              skills.sort! do |a, b| a.music.number <=> b.music.number end
+            else
+              skills.sort! do |a, b| a.music.sort_key <=> b.music.sort_key end
+            end
+
+            content_type 'text/csv'
+            attachment "playdata_#{SiteSettings.cxb_mode? ? 'cxb' : 'rev'}rank_#{user.user_id}.csv"
+
+            bom = %w(EF BB BF).map do |e| e.hex.chr end.join
+            CSV.generate(bom) do |csv|
+              if SiteSettings.cxb_mode?
+                csv << ['Music ID', 'Difficulty', 'Level', 'Name', 'Clear Rate', 'Grade', 'Score', 'Fullcombo', 'Ultimate', 'RP']
+              else
+                csv << ['Music ID', 'Difficulty', 'Level', 'Name', 'Clear Rate', 'Grade', 'Score', 'Fullcombo', 'Gauge', 'RP']
+              end
+              skills.each do |skill|
+                music = skill.music
+                title = music.full_title.gsub(/&#x2661;/, '♡')
+                SiteSettings.music_diffs.keys.each do |diff|
+                  level = (SiteSettings.cxb_mode? ? music.level(diff) : music.level(diff).to_i)
+                  if music.exist?(diff)
+                    if skill.stat(diff) == SP_STATUS_NO_PLAY
+                      csv << [
+                        music.text_id, MUSIC_DIFF_CLASSES[diff].upcase, level, title,
+                        nil, nil, nil, nil, nil, nil
+                      ]
+                    else
+                      if SiteSettings.cxb_mode?
+                        csv << [
+                          music.csv_id,
+                          (diff == MUSIC_DIFF_STD ? 'STANDARD' : (diff == MUSIC_DIFF_HRD ? 'HARD' : 'MASTER')),
+                          level, title,
+                          (skill.rate(diff) || 0).to_i,
+                          (skill.stat(diff) == SP_STATUS_FAILED ? 'F' :
+                            SP_RANK_STATUSES[skill.rank(diff)].gsub(/&\#x2b;/, '+')),
+                          skill.score(diff) || '',
+                          (skill.fullcombo?(diff) ? 'yes' : 'no'),
+                          (skill.ultimate?(diff) ? 'yes' : 'no'),
+                          ((skill.point(diff) || 0)*100).to_i
+                        ]
+                      else
+                        csv << [
+                          music.text_id, MUSIC_DIFF_CLASSES[diff].upcase, level, title,
+                          ((skill.rate(diff) || 0)*100).to_i,
+                          (skill.stat(diff) == SP_STATUS_FAILED ? 'F' :
+                            SP_RANK_STATUSES[skill.rank(diff)].gsub(/&\#x2b;/, '+')),
+                          skill.score(diff) || '',
+                          (skill.fullcombo?(diff) ? 'yes' : 'no'),
+                          (skill.ultimate?(diff) ? 'ULT' : (skill.survival?(diff) ? 'SUV' : nil)),
+                          ((skill.point(diff) || 0)*100).to_i
+                        ]
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
       end
     end
   end

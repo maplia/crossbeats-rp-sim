@@ -34,6 +34,8 @@
         - if CxbRank::SiteSettings.cxb_mode?
           & /
           #{link_to CxbRank::PAGE_TITLES[CxbRank::IMPORT_CSV_URI], CxbRank::SiteSettings.join_site_base(CxbRank::IMPORT_CSV_URI)}
+        & /
+        #{link_to CxbRank::PAGE_TITLES[CxbRank::EXPORT_CSV_URI], CxbRank::SiteSettings.join_site_base(CxbRank::EXPORT_CSV_URI)}
         - if CxbRank::SiteSettings.adversary_enabled?
           & /
           アドバーサリー:

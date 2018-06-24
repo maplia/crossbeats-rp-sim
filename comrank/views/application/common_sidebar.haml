@@ -24,6 +24,8 @@
       %li
         #{link_to CxbRank::PAGE_TITLES[CxbRank::USAGE_URI], CxbRank::SiteSettings.join_site_base(CxbRank::USAGE_URI)}
         %ul
+          - if CxbRank::SiteSettings.rev_sunrise_mode?
+            %li #{link_to '一括登録 @ Googleスプレッド', "#{CxbRank::SiteSettings.join_site_base(CxbRank::USAGE_URI)}#spread"}
           - if CxbRank::SiteSettings.rev_mode?
             %li #{link_to 'データ更新ブックマークレット', "#{CxbRank::SiteSettings.join_site_base(CxbRank::USAGE_URI)}#bookmarklet"}
           - else

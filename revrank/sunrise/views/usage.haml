@@ -5,12 +5,36 @@
     %h2 目次
     %div.subunit
       %ul
+        %li #{link_to '一括登録 @ Googleスプレッド', '#spread'}
         %li #{link_to 'データ更新ブックマークレット', '#bookmarklet'}
         %li #{link_to 'ランクポイント', '#calc'}
 %div.main
   %div.unit
+    %h2#spread 一括登録 @ Googleスプレッド
+    %div.subunit
+      %p 2018/6/25のオフライン稼働移行後は、Webからブックマークレットなどを利用した一括登録ができなくなるため、その代替としてスプレッドシートでの一括入力の機能を実装しました
+      %p 詳しくは、下記リンクのスプレッドシートでの説明を参照してください
+      %ul
+        %li= link_to 'REV. RankPoint Simulator SR 編集シート', 'https://docs.google.com/spreadsheets/d/1WwWIr-NDm-pfFdnY7FYCoXKngh0JfLekvolKuG4wzMQ/edit?usp=sharing'
+      %p 動作確認はWindows 10のFirefox最新版で行っています。PCからのみの対応です
+      %dl
+        %dt 注意事項
+        %dd
+          %ul
+            %li Googleスプレッドにシートをコピーして使用する必要があるので、Googleにユーザー登録が必要です
+            %li
+              スクリプトで登録データの取り込みを行うので、初回実行時にスクリプトから実行の許可を求める画面が表示されます。許可しなければこの機能を使うことができません
+              %br
+              = image_tag CxbRank::SiteSettings.join_site_image_base('authorize_1.png')
+            %li
+              この機能はGoogleスプレッドをrevrank.maplia.jpのデータをもとに書き換えたり、スプレッドの内容をrevrank.maplia.jpに送信したりしますが、この動作がGoogleに検証されたものではないので、安全でないとみなされています。そのため、かなり強い文面の警告が出ますが、これを回避するための対応を行う予定はありません。すみませんが、そのまま使用してください
+              %br
+              = image_tag CxbRank::SiteSettings.join_site_image_base('authorize_2.png')
+  %div.unit
     %h2#bookmarklet データ更新ブックマークレット
     %div.subunit
+      %p
+        %em ※この機能は公式サイトのMY DATAを閲覧できることを動作の前提としているため、閲覧ができなくなる2018/6/25以降はこの機能も使用できなくなります
       - bookmarklet_all = %Q[javascript:(function(){if(location.href=='https://#{settings.mydata_host}/profile'){if(confirm('#{settings.site_name}を更新します')){var elem=document.createElement('script');elem.src='https://#{settings.script_host}/javascripts/data_import_all.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('#{settings.mydata_name}のトップページから実行してください');}})()]
       - bookmarklet_music = %Q[javascript:(function(){if(location.href.indexOf('https://#{settings.mydata_host}/playdatamusic/')==0){if(confirm('#{settings.site_name}を更新します')){var elem=document.createElement('script');elem.src='https://#{settings.script_host}/javascripts/data_import_music.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('#{settings.mydata_name}のミュージックデータ詳細ページから実行してください');}})()]
       - bookmarklet_all_music = %Q[javascript:(function(){if(location.href=='https://#{settings.mydata_host}/profile'){if(confirm('#{settings.site_name}を更新します（ミュージックRPのみ）')){var elem=document.createElement('script');elem.src='https://#{settings.script_host}/javascripts/data_import_all_music.js?'+new Date().getTime();document.getElementsByTagName('head')[0].appendChild(elem);}}else{alert('#{settings.mydata_name}のトップページから実行してください');}})()]
